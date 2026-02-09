@@ -1,0 +1,21 @@
+{
+  "name": "daftai-skills",
+  "owner": {
+    "name": "daftAI"
+  },
+  "metadata": {
+    "description": "Skills shared by daftAI for improving daily work efficiency",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "video-skills",
+      "description": "Video processing and subtitle tools",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/local-video-subtitler"
+      ]
+    }
+  ]
+}
