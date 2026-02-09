@@ -1,5 +1,0 @@
-{
-  "name": "local-video-subtitler",
-  "description": "Burn subtitles into local videos with SRT/VTT/ASS support, bilingual merge and translation",
-  "version": "1.0.0"
-}
