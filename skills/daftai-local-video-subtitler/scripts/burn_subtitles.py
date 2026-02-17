@@ -22,6 +22,14 @@ DEFAULT_OUTLINE = 0.75
 DEFAULT_MARGIN_V = 15
 DEFAULT_CRF = 18
 
+# 水印默认参数
+DEFAULT_WATERMARK_OPACITY = 0.7
+DEFAULT_WATERMARK_FONTSIZE_RATIO = 0.025  # 相对于视频高度的比例
+
+# 素材来源默认参数
+DEFAULT_SOURCE_OPACITY = 0.7
+DEFAULT_SOURCE_FONTSIZE_RATIO = 0.025
+
 # 字体优先级
 FONT_PRIORITY = [
     "Alibaba PuHuiTi 3.0",
@@ -33,6 +41,24 @@ FONT_PRIORITY = [
     "Hiragino Sans GB",
     "Microsoft YaHei",
 ]
+
+
+def get_video_height(video_path: str, ffprobe_path: str = None) -> int:
+    """获取视频高度（像素）"""
+    if ffprobe_path is None:
+        ffprobe_path = shutil.which('ffprobe')
+    if ffprobe_path is None:
+        return 1080  # 默认假设 1080p
+    try:
+        result = subprocess.run(
+            [ffprobe_path, '-v', 'error', '-select_streams', 'v:0',
+             '-show_entries', 'stream=height', '-of', 'csv=p=0',
+             str(video_path)],
+            capture_output=True, text=True, timeout=10
+        )
+        return int(result.stdout.strip())
+    except Exception:
+        return 1080
 
 
 def detect_available_font() -> str:
@@ -125,6 +151,63 @@ def is_supported_subtitle(path: Path) -> bool:
     return get_subtitle_extension(path) in supported
 
 
+def get_drawtext_position(position: str, margin: int = 20) -> str:
+    """
+    根据位置名称生成 FFmpeg drawtext 的 x:y 坐标
+    
+    Args:
+        position: 位置名称 (top-right, top-left, bottom-right, bottom-left)
+        margin: 边距像素
+    
+    Returns:
+        str: "x=...:y=..." 格式的坐标字符串
+    """
+    positions = {
+        'top-right': f'x=w-tw-{margin}:y={margin}',
+        'top-left': f'x={margin}:y={margin}',
+        'bottom-right': f'x=w-tw-{margin}:y=h-th-{margin}',
+        'bottom-left': f'x={margin}:y=h-th-{margin}',
+    }
+    return positions.get(position, positions['top-right'])
+
+
+def build_drawtext_filter(
+    text: str,
+    position: str,
+    opacity: float,
+    font_name: str,
+    font_size: int,
+    margin: int = 20
+) -> str:
+    """
+    构建 FFmpeg drawtext 滤镜字符串
+    
+    Args:
+        text: 显示的文字
+        position: 位置 (top-right, top-left, bottom-right, bottom-left)
+        opacity: 透明度 (0.0-1.0)
+        font_name: 字体名称
+        font_size: 字体大小
+        margin: 边距像素
+    
+    Returns:
+        str: drawtext 滤镜字符串
+    """
+    pos = get_drawtext_position(position, margin)
+    # 转义特殊字符
+    escaped_text = text.replace("'", "'\\''").replace(":", "\\:")
+    alpha = opacity
+    
+    return (
+        f"drawtext=text='{escaped_text}':"
+        f"fontfile='':"
+        f"font='{font_name}':"
+        f"fontsize={font_size}:"
+        f"fontcolor=white@{alpha}:"
+        f"{pos}"
+    )
+
+
 def burn_subtitles(
     video_path: str,
     subtitle_path: str,
@@ -134,7 +217,13 @@ def burn_subtitles(
     font_size: int = DEFAULT_FONT_SIZE,
     outline: float = DEFAULT_OUTLINE,
     margin_v: int = DEFAULT_MARGIN_V,
-    crf: int = DEFAULT_CRF
+    crf: int = DEFAULT_CRF,
+    watermark_text: str = None,
+    watermark_position: str = "top-right",
+    watermark_opacity: float = DEFAULT_WATERMARK_OPACITY,
+    source_text: str = None,
+    source_position: str = "top-left",
+    source_opacity: float = DEFAULT_SOURCE_OPACITY,
 ) -> str:
     """
     烧录字幕到视频
@@ -151,6 +240,12 @@ def burn_subtitles(
         outline: 描边粗细
         margin_v: 底部边距
         crf: 视频质量（越小越好）
+        watermark_text: 水印文字（可选）
+        watermark_position: 水印位置 (top-right, top-left, bottom-right, bottom-left)
+        watermark_opacity: 水印透明度 (0.0-1.0)
+        source_text: 素材来源标注文字（可选）
+        source_position: 来源标注位置 (top-right, top-left, bottom-right, bottom-left)
+        source_opacity: 来源标注透明度 (0.0-1.0)
     
     Returns:
         str: 输出视频路径
@@ -215,11 +310,46 @@ def burn_subtitles(
             f"MarginV={margin_v}'"
         )
 
+        # 构建复合视频滤镜链
+        vf_filters = [subtitle_filter]
+
+        # 获取视频高度，用于计算水印/来源字号
+        video_height = get_video_height(video_path)
+
+        # 添加水印
+        if watermark_text:
+            wm_fontsize = int(video_height * DEFAULT_WATERMARK_FONTSIZE_RATIO)
+            wm_filter = build_drawtext_filter(
+                text=watermark_text,
+                position=watermark_position,
+                opacity=watermark_opacity,
+                font_name=font_name,
+                font_size=wm_fontsize,
+            )
+            vf_filters.append(wm_filter)
+            print(f"   水印: '{watermark_text}' ({watermark_position}, 透明度 {watermark_opacity})")
+
+        # 添加素材来源标注
+        if source_text:
+            src_fontsize = int(video_height * DEFAULT_SOURCE_FONTSIZE_RATIO)
+            src_filter = build_drawtext_filter(
+                text=source_text,
+                position=source_position,
+                opacity=source_opacity,
+                font_name=font_name,
+                font_size=src_fontsize,
+            )
+            vf_filters.append(src_filter)
+            print(f"   来源: '{source_text}' ({source_position}, 透明度 {source_opacity})")
+
+        # 合并滤镜
+        combined_filter = ','.join(vf_filters)
+
         # 构建 FFmpeg 命令（H.264 编码）
         cmd = [
             ffmpeg_path,
             '-i', temp_video,
-            '-vf', subtitle_filter,
+            '-vf', combined_filter,
             '-c:v', 'libx264',
             '-crf', str(crf),
             '-preset', 'medium',
@@ -279,6 +409,13 @@ def main():
         print(f"  字号   - 字体大小，默认 {DEFAULT_FONT_SIZE}")
         print(f"  描边   - 描边粗细，默认 {DEFAULT_OUTLINE}")
         print(f"  边距   - 底部边距，默认 {DEFAULT_MARGIN_V}")
+        print("\n水印和来源标注通过 Python API 调用传入，命令行暂不支持。")
+        print("  watermark_text     - 水印文字")
+        print("  watermark_position - 水印位置 (top-right/top-left/bottom-right/bottom-left)")
+        print("  watermark_opacity  - 水印透明度 (0.0-1.0)")
+        print("  source_text        - 素材来源标注文字")
+        print("  source_position    - 来源位置 (top-right/top-left/bottom-right/bottom-left)")
+        print("  source_opacity     - 来源透明度 (0.0-1.0)")
         print("\n示例:")
         print("  python burn_subtitles.py video.mp4 subtitle.srt output.mp4")
         print("  python burn_subtitles.py video.mp4 subtitle.srt output.mp4 24 0.75 15")

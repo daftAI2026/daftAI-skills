@@ -33,5 +33,15 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Node / Bun runtime artifacts
+node_modules/
+bun.lockb
+package-lock.json
+
+# Skill runtime artifacts (safety net)
+EXTEND.md
+*.log
+*.cache
+
 # Internal docs (research, notes)
 docs/

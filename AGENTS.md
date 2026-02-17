@@ -13,11 +13,16 @@ skills/
 
 ## Skills Overview
 
-### local-video-subtitler
+### daftAI-local-video-subtitler
 - **Purpose**: Burn subtitles into local videos
 - **Formats**: SRT, VTT, ASS, SSA
 - **Features**: Bilingual subtitles, translation, font detection
 - **Scripts**: Python utilities in `scripts/` directory
+
+### daftAI-url-to-markdown
+- **Purpose**: Fetch any URL and convert to markdown with images
+- **Features**: Chrome CDP rendering, auto image download, `<picture>` tag support, lazy-load handling
+- **Scripts**: TypeScript utilities in `scripts/` directory, run via `npx -y bun`
 
 ## Running Scripts
 

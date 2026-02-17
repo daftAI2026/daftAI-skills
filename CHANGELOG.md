@@ -2,6 +2,20 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.1.0 - 2026-02-17
+
+### Improved
+- Watermark/source label font size now calculated from video height (`height × 0.025`) instead of subtitle font size ratio. Fixes tiny text on high-res videos (e.g., 16px on 1080p → 27px).
+- Watermark/source label default opacity changed from 0.5 to 0.7 for better visibility.
+- SKILL.md and first-time-setup.md rewritten to structured English (following baoyu-skills pattern).
+- Added `Language: Use user's input language` and `AskUserQuestion` rules for multilingual support.
+- Added `get_video_height()` function using ffprobe for resolution-aware sizing.
+
+## 1.0.1 - 2026-02-14
+
+### Improved
+- Translation rule: remove trailing period (。) from Chinese subtitle lines when translating from English.
+
 ## 1.0.0 - 2026-02-10
 
 ### Features
