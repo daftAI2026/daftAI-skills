@@ -127,6 +127,43 @@ url-to-markdown/<domain>/
 
 **Troubleshooting**: Chrome not found → set `URL_CHROME_PATH`. Timeout → increase `--timeout`. Complex pages → try `--wait` mode.
 
+## Post-Capture Validation
+
+After the script finishes, the agent **MUST** perform the following validation steps before reporting completion:
+
+### 1. Completeness Check
+- Use `read_web_page` to fetch the original URL
+- Compare the generated Markdown against the original page content
+- Ensure no paragraphs, sections, or headings are missing
+
+### 2. Video & Embedded Media Detection
+- Search the original page source (`curl`) for `<video>`, `<iframe>`, `<source>`, or links to Vimeo, YouTube, Wistia, Lottie, etc.
+- For each embedded video found, insert a link at the correct position in the Markdown: `[视频：<caption or description>](<video_url>)`
+- Videos are often hidden in JS-rendered `mediaGallery` blocks — check the page's raw HTML/JSON for `vimeo.com`, `youtube.com`, `.mp4`, `.webm`
+
+### 3. Image Placement Verification
+- Confirm that images appear after the correct paragraphs, matching their positions on the original page
+- Check that all `![](images/...)` references point to files that actually exist in the `images/` directory
+
+### 4. Irrelevant Content Cleanup
+- Remove navigation menus, tag/category lists, newsletter signup forms, "Related articles" sections, footer boilerplate, and social media icons
+- Remove duplicate titles (e.g., page title repeated as H1)
+- Keep only the article body content and author attribution
+
+### 5. Formatting & Style Verification
+- Check that **bold/italic** emphasis is preserved (not stripped during conversion)
+- Verify heading hierarchy (H2/H3 levels match the original page structure)
+- Confirm ordered/unordered lists retain their structure
+- Ensure blockquotes are properly converted with `>`
+- Verify code blocks use ``` fencing with correct language tags
+- Check that `<hr>` elements are converted to `---`
+- Note: colors, fonts, spacing and other CSS-only styles are out of scope for Markdown
+
+### 6. Link Verification
+- Fix broken links caused by inline cards or embedded previews spanning multiple lines
+- Convert relative links (e.g., `/blog/some-post/`) to absolute URLs (e.g., `https://domain.com/blog/some-post/`)
+- Ensure all `[text](url)` links are properly formatted
+
 ## Extension Support
 
 Custom configurations via EXTEND.md. See **Preferences** section for paths and supported options.

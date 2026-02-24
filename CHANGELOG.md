@@ -2,6 +2,41 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.3.1 - 2026-02-24
+
+### Improved (daftai-video-subtitler)
+- Clarified process-artifact policy: keep translated and bilingual merged subtitle outputs by default for reuse/review.
+- Default cleanup now targets detection-only artifacts (screenshots/probe logs/temp checks), unless debugging is explicitly requested.
+- Updated documentation and setup defaults in:
+  - `skills/daftai-video-subtitler/SKILL.md`
+  - `skills/daftai-video-subtitler/references/config/preferences-schema.md`
+  - `skills/daftai-video-subtitler/references/config/first-time-setup.md`
+
+## 1.3.0 - 2026-02-24
+
+### Added (daftai-extracting-video-subtitles)
+- New skill: extract timed SRT subtitles from video/audio files using OpenAI Whisper.
+- `scripts/extract_subtitles.ts` — TypeScript wrapper for the full Whisper extraction workflow:
+  - Auto-detects Whisper and FFmpeg environment
+  - Validates audio stream presence
+  - Auto-selects Whisper model by video duration (medium / turbo / base)
+  - Handles complex filenames (copies to temp dir)
+  - Auto-cleans temp files
+  - Reports subtitle count and processing time
+- Migrated from standalone `~/.agents/skills/extracting-video-subtitles` into this repo with symlink.
+- Refactored from instruction-only SKILL.md to TypeScript script, consistent with other daftai- skills.
+
+## 1.2.0 - 2026-02-18
+
+### Added (daftai-url-to-markdown)
+- Post-Capture Validation workflow in SKILL.md — agent now MUST validate output before reporting completion:
+  1. **Completeness Check** — compare generated Markdown against original page, ensure no missing sections
+  2. **Video & Embedded Media Detection** — scan page source for Vimeo/YouTube/iframe embeds, insert video links at correct positions
+  3. **Image Placement Verification** — confirm images appear after correct paragraphs, verify local files exist
+  4. **Irrelevant Content Cleanup** — remove nav menus, tag lists, newsletter forms, related articles, footer boilerplate
+  5. **Formatting & Style Verification** — check bold/italic, heading hierarchy, lists, blockquotes, code blocks, `<hr>` → `---`
+  6. **Link Verification** — fix broken multi-line links, convert relative URLs to absolute, validate link format
+
 ## 1.1.0 - 2026-02-17
 
 ### Improved

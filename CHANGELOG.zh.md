@@ -2,6 +2,41 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.3.1 - 2026-02-24
+
+### 改进 (daftai-video-subtitler)
+- 明确过程文件策略：默认保留翻译字幕与双语合并字幕，便于复用和复查。
+- 默认清理仅用于检测类产物（截图/探测日志/临时检测文件）；仅在调试场景下保留。
+- 已同步更新以下文档与默认配置：
+  - `skills/daftai-video-subtitler/SKILL.md`
+  - `skills/daftai-video-subtitler/references/config/preferences-schema.md`
+  - `skills/daftai-video-subtitler/references/config/first-time-setup.md`
+
+## 1.3.0 - 2026-02-24
+
+### 新增 (daftai-extracting-video-subtitles)
+- 新 Skill：使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕。
+- `scripts/extract_subtitles.ts` — TypeScript 封装完整的 Whisper 提取流程：
+  - 自动检测 Whisper 和 FFmpeg 环境
+  - 验证音频流是否存在
+  - 根据视频时长自动选择 Whisper 模型（medium / turbo / base）
+  - 自动处理复杂文件名（复制到临时目录）
+  - 自动清理临时文件
+  - 输出字幕条数和耗时统计
+- 从 `~/.agents/skills/extracting-video-subtitles` 迁移至本仓库，通过软链接引用。
+- 从纯指令式 SKILL.md 重构为 TypeScript 脚本封装，与其他 daftai- Skill 保持一致。
+
+## 1.2.0 - 2026-02-18
+
+### 新增 (daftai-url-to-markdown)
+- SKILL.md 新增「抓取后核验」流程 — agent 在脚本执行完毕后必须完成以下验证才能汇报完成：
+  1. **完整性核对** — 对比原网页与生成的 Markdown，确保无遗漏段落/章节
+  2. **视频/嵌入媒体检测** — 扫描原页面源码中的 Vimeo/YouTube/iframe 嵌入，在正确位置插入视频链接
+  3. **图片位置验证** — 确认图片出现在正确段落后，验证本地文件是否存在
+  4. **无关内容清理** — 删除导航栏、标签列表、Newsletter 表单、推荐阅读、页脚等
+  5. **样式格式核验** — 检查粗体/斜体、标题层级、列表结构、引用块、代码块、`<hr>` → `---`
+  6. **链接验证** — 修复跨行断裂的链接、相对路径转绝对 URL、验证链接格式完整性
+
 ## 1.1.0 - 2026-02-17
 
 ### 改进

@@ -1,6 +1,6 @@
 ---
 name: preferences-schema
-description: EXTEND.md YAML 完整 schema 定义 - daftAI-local-video-subtitler 用户偏好
+description: EXTEND.md YAML 完整 schema 定义 - daftAI-video-subtitler 用户偏好
 ---
 
 # 偏好配置 Schema
@@ -37,6 +37,11 @@ source_label:
   position: "top-left"  # 来源标注位置
   opacity: 0.5          # 来源标注透明度 (0.0-1.0)
 
+artifacts:
+  keep_intermediate_subtitles: true  # 保留翻译/合并字幕成果
+  keep_screenshots: false            # 默认清理检测截图
+  keep_probe_logs: false             # 默认清理探测日志
+
 quick_mode: false       # 快速模式：跳过确认直接烧录
 
 language: zh            # 界面语言
@@ -64,6 +69,9 @@ language: zh            # 界面语言
 | `source_label.prefix` | string | "素材来自于" | 来源文字固定前缀，实际来源名称每次烧录时询问 |
 | `source_label.position` | string | "top-left" | 来源标注位置 |
 | `source_label.opacity` | float | 0.5 | 来源标注透明度 |
+| `artifacts.keep_intermediate_subtitles` | bool | true | 是否保留翻译/合并后的字幕成果 |
+| `artifacts.keep_screenshots` | bool | false | 是否保留检测截图 |
+| `artifacts.keep_probe_logs` | bool | false | 是否保留探测日志 |
 | `quick_mode` | bool | false | 是否跳过确认步骤直接使用偏好设置烧录 |
 | `language` | string | `"zh"` | 界面交互语言 |
 
@@ -188,6 +196,14 @@ language: zh            # 界面语言
 
 与水印设置格式相同，position 和 opacity 选项一致。
 
+## 过程文件策略
+
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| `artifacts.keep_intermediate_subtitles` | true | 保留翻译/双语合并字幕，便于复用与复查 |
+| `artifacts.keep_screenshots` | false | 默认清理检测截图 |
+| `artifacts.keep_probe_logs` | false | 默认清理探测日志 |
+
 ## 快速模式
 
 | 值 | 说明 |
@@ -219,6 +235,10 @@ source_label:
   prefix: "素材来自于"
   position: "top-left"
   opacity: 0.5
+artifacts:
+  keep_intermediate_subtitles: true
+  keep_screenshots: false
+  keep_probe_logs: false
 quick_mode: false
 language: zh
 ---
@@ -262,6 +282,12 @@ source_label:
   prefix: "素材来自于"
   position: "top-left"
   opacity: 0.5
+
+# 过程文件策略：保留字幕成果，清理检测产物
+artifacts:
+  keep_intermediate_subtitles: true
+  keep_screenshots: false
+  keep_probe_logs: false
 
 # 快速模式：跳过确认直接烧录
 quick_mode: false

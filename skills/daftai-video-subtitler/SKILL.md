@@ -1,16 +1,17 @@
 ---
-name: daftai-local-video-subtitler
+name: daftai-video-subtitler
 description: >
   Burn subtitles into local video files. Supports SRT/VTT/ASS formats, auto-detect subtitles and language,
   bilingual subtitle merging and translation. Use when user needs to hardcode subtitles into video.
   Keywords: 字幕烧录、burn subtitles、本地视频、hardcode subtitles
 ---
 
-# Local Video Subtitle Burner
+# Video Subtitle Burner
 
 Burn (hardcode) subtitle files into local video.
 
 > **Scripts**: All scripts are in `scripts/` relative to this SKILL.md.
+> **CRITICAL**: When running any `npx tsx scripts/...` command, you MUST set the working directory (`cwd`) to this skill's base directory. Do NOT run from the user's project directory.
 
 ## Priority Chain
 
@@ -60,8 +61,8 @@ Input → [Step 0: Preferences] ─┬─ Found → Load summary → Continue
 
 Check EXTEND.md (project-level first, then user-level):
 ```bash
-test -f .daftAI-skills/daftAI-local-video-subtitler/EXTEND.md && echo "project"
-test -f "$HOME/.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md" && echo "user"
+test -f .daftAI-skills/daftAI-video-subtitler/EXTEND.md && echo "project"
+test -f "$HOME/.daftAI-skills/daftAI-video-subtitler/EXTEND.md" && echo "user"
 ```
 
 | Result | Action |
@@ -116,7 +117,7 @@ test -f "$HOME/.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md" && echo "u
 
 5. VTT → SRT conversion only when merging or translating:
    ```bash
-   python3 scripts/convert_vtt_to_srt.py "<vtt_path>" "<srt_output>"
+   npx tsx scripts/convert_vtt_to_srt.ts "<vtt_path>" "<srt_output>"
    ```
 
 6. Auto-detect language:
@@ -148,20 +149,13 @@ Use single AskUserQuestion with multiple questions when confirmation is needed.
 
 **Goal**: Prepare final subtitle file
 
-#### 4a: Bilingual Merge (if needed)
+**CRITICAL**: Translated/merged subtitle artifacts MUST be kept by default for reuse. Detection-only process artifacts (screenshots/probe logs/temp checks) should be cleaned up by default unless debugging is requested.
 
-```bash
-python3 scripts/merge_bilingual_subtitles.py \
-  "<top_subtitle.srt>" \
-  "<bottom_subtitle.srt>" \
-  "<output_bilingual.srt>"
-```
-
-Order: from preferences `bilingual.order`, fallback to default (Chinese top, English bottom).
-
-#### 4b: Translate (if needed)
+#### 4a: Translate (if needed)
 
 **Trigger**: User explicitly requests translation.
+
+**Output path**: `<output_dir>/<video_name>_<target_lang>.srt` (e.g., `output/video_zh.srt`)
 
 **Principles**: Accuracy first, natural flow, concise.
 
@@ -188,6 +182,19 @@ Order: from preferences `bilingual.order`, fallback to default (Chinese top, Eng
 - If mismatch → fix it. NEVER say "only off by one, close enough"
 - Verify: `grep -c "^[0-9]\+$" <original>` vs `grep -c "^[0-9]\+$" <translated>`
 
+#### 4b: Bilingual Merge (if needed)
+
+**Output path**: `<output_dir>/<video_name>_bilingual.srt` (e.g., `output/video_bilingual.srt`)
+
+```bash
+npx tsx scripts/merge_bilingual_subtitles.ts \
+  "<top_subtitle.srt>" \
+  "<bottom_subtitle.srt>" \
+  "<output_dir>/<video_name>_bilingual.srt"
+```
+
+Order: from preferences `bilingual.order`, fallback to default (Chinese top, English bottom).
+
 ---
 
 ### Step 5: Burn Subtitles
@@ -195,11 +202,23 @@ Order: from preferences `bilingual.order`, fallback to default (Chinese top, Eng
 **Goal**: Hardcode subtitles into video
 
 ```bash
-python3 scripts/burn_subtitles.py \
+npx tsx scripts/burn_subtitles.ts \
   "<video_path>" \
   "<subtitle_path>" \
-  "<output_path>"
+  "<output_path>" \
+  [--font-size <数字>] \
+  [--outline <数字>] \
+  [--margin-v <数字>] \
+  [--crf <数字>] \
+  [--watermark-text <文字>] \
+  [--watermark-position <top-left|top-right|bottom-left|bottom-right>] \
+  [--watermark-opacity <0-1>] \
+  [--source-text <文字>] \
+  [--source-position <top-left|top-right|bottom-left|bottom-right>] \
+  [--source-opacity <0-1>]
 ```
+
+All `--` options are optional and fall back to EXTEND.md preferences or built-in defaults.
 
 **Parameters** (from preferences, fallback to defaults):
 
@@ -231,9 +250,16 @@ python3 scripts/burn_subtitles.py \
    - Mono: `video_zh.mp4`
    - Bilingual: `video_zh-en.mp4`
 
-3. Show user:
+3. **Intermediate files policy**:
+   - Keep generated translated subtitles (e.g., `subtitle_zh.srt`)
+   - Keep generated bilingual merged subtitles (e.g., `bilingual.srt`)
+   - Clean detection-only process artifacts by default (screenshots/probe logs/temp checks)
+   - If debugging is required, set `artifacts.keep_screenshots` / `artifacts.keep_probe_logs` to `true`
+
+4. Show user:
    - Output file path
    - File size
+   - Intermediate file paths (if any)
    - Preview: `open "<output_path>"`
 
 ---
@@ -279,7 +305,7 @@ User: Add Chinese subtitles with @daftAI watermark
 
 Customize via EXTEND.md. See **Step 0** for paths.
 
-Supports: font | size | outline | margin | color | CRF | bilingual order | output dir | naming | language | watermark | source label | quick mode
+Supports: font | size | outline | margin | color | CRF | bilingual order | output dir | naming | language | watermark | source label | quick mode | artifacts policy
 
 Schema: [references/config/preferences-schema.md](references/config/preferences-schema.md)
 

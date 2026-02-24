@@ -1,6 +1,6 @@
 ---
 name: first-time-setup
-description: First-time setup flow for daftAI-local-video-subtitler preferences
+description: First-time setup flow for daftAI-video-subtitler preferences
 ---
 
 # First-Time Setup
@@ -41,8 +41,8 @@ No EXTEND.md found
 
 Search order:
 
-1. **Project**: `.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md`
-2. **User**: `~/.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md`
+1. **Project**: `.daftAI-skills/daftAI-video-subtitler/EXTEND.md`
+2. **User**: `~/.daftAI-skills/daftAI-video-subtitler/EXTEND.md`
 
 Found → Read config, skip setup, continue workflow.
 Neither found → Trigger first-time setup.
@@ -150,13 +150,16 @@ These parameters are NOT asked, use recommended defaults directly:
 - **Outline**: 0.75
 - **Margin**: 15
 - **CRF**: 18
+- **Keep intermediate subtitles**: true
+- **Keep screenshots**: false
+- **Keep probe logs**: false
 
 ## Save Locations
 
 | Choice | Path | Scope |
 |--------|------|-------|
-| User | `~/.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md` | All projects |
-| Project | `.daftAI-skills/daftAI-local-video-subtitler/EXTEND.md` | Current project |
+| User | `~/.daftAI-skills/daftAI-video-subtitler/EXTEND.md` | All projects |
+| Project | `.daftAI-skills/daftAI-video-subtitler/EXTEND.md` | Current project |
 
 ## After Setup
 
@@ -194,6 +197,11 @@ output_dir: "same-dir"
 bilingual:
   auto_merge: false
   order: "zh-top"
+
+artifacts:
+  keep_intermediate_subtitles: true
+  keep_screenshots: false
+  keep_probe_logs: false
 
 quick_mode: false
 language: null
