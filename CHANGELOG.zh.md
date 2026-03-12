@@ -2,6 +2,19 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.4.0 - 2026-03-06
+
+### 新增 (daftai-subtitle-translator)
+- Step 4 术语扫描 — 翻译前先扫描全文提取专有名词和技术术语，建立 session glossary，确保全文术语一致性。
+- Step 6 可选审校 — 翻译后检查术语一致性、漏翻、字幕长度，100+ 条字幕自动触发。
+- 独立术语表文件 `references/glossary-en-zh.md`，从 SKILL.md 中提取并扩充至 20 条常见 AI/技术术语。
+
+### 改进 (daftai-subtitle-translator)
+- 翻译原则从 5 条扩充到 8 条：新增「意义优先于文字」「比喻意译」「情感保真」。
+
+### 修复 (daftai-subtitle-translator)
+- (2026-02-26) 双语字幕默认合并顺序从「译文在上、原文在下」改为「原文在上、译文在下」（英上中下），更符合观看习惯。
+
 ## 1.3.1 - 2026-02-24
 
 ### 改进 (daftai-video-subtitler)

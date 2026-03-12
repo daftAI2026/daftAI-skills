@@ -2,6 +2,19 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.4.0 - 2026-03-06
+
+### Added (daftai-subtitle-translator)
+- Step 4 Terminology Scan — scan full subtitle file before translating to extract proper nouns and technical terms, build session glossary, ensure terminology consistency across all batches.
+- Step 6 Review (optional) — post-translation quality check for terminology consistency, missing translations, subtitle length, meaning spot-check. Auto-triggers for files with 100+ entries.
+- Standalone glossary file `references/glossary-en-zh.md` — extracted from SKILL.md and expanded to 20 common AI/tech terms.
+
+### Improved (daftai-subtitle-translator)
+- Translation principles expanded from 5 to 8: added "meaning over words", "figurative language interpretation", and "emotional fidelity".
+
+### Fixed (daftai-subtitle-translator)
+- (2026-02-26) Bilingual subtitle default merge order changed from translated-on-top to original-on-top (English top, Chinese bottom), matching typical viewing preference.
+
 ## 1.3.1 - 2026-02-24
 
 ### Improved (daftai-video-subtitler)

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Skills shared by daftAI for improving daily work efficiency",
-    "version": "1.0.0"
+    "version": "1.4.0"
   },
   "plugins": [
     {
@@ -14,7 +14,18 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/local-video-subtitler"
+        "./skills/daftai-video-subtitler",
+        "./skills/daftai-subtitle-translator",
+        "./skills/daftai-extracting-video-subtitles"
+      ]
+    },
+    {
+      "name": "utility-skills",
+      "description": "Content processing utilities",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/daftai-url-to-markdown"
       ]
     }
   ]
