@@ -6,9 +6,11 @@ A collection of AI Agent skills for Amp, Claude Code, and other AI coding assist
 
 | Skill | Description |
 |-------|-------------|
-| [daftai-local-video-subtitler](skills/daftai-local-video-subtitler/) | Burn subtitles into local videos. Supports SRT/VTT/ASS formats, bilingual subtitle merging and translation |
-| [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | Fetch any URL and convert to markdown using Chrome CDP, with automatic image downloading |
+| [daftai-video-subtitler](skills/daftai-video-subtitler/) | Burn subtitles into local videos. Supports SRT/VTT/ASS formats, bilingual subtitle merging and translation |
+| [daftai-subtitle-translator](skills/daftai-subtitle-translator/) | Translate subtitle files (SRT/VTT) between languages with terminology consistency |
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | Extract timed SRT subtitles from video/audio files using OpenAI Whisper |
+| [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | Fetch any URL and convert to markdown using Chrome CDP, with automatic image downloading |
+| [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | Check and fix Chinese copywriting (punctuation, spacing, full-width/half-width) using autocorrect |
 
 ## Installation
 
@@ -19,18 +21,22 @@ A collection of AI Agent skills for Amp, Claude Code, and other AI coding assist
 git clone https://github.com/daftAI2026/daftAI-skills.git
 
 # Symlink individual skills
-ln -s /path/to/daftAI-skills/skills/daftai-local-video-subtitler ~/.agents/skills/daftai-local-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.agents/skills/daftai-video-subtitler
+ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.agents/skills/daftai-subtitle-translator
 ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.agents/skills/daftai-extracting-video-subtitles
+ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.agents/skills/daftai-chinese-copywriting
 ```
 
 ### For Claude Code
 
 ```bash
 # Symlink individual skills
-ln -s /path/to/daftAI-skills/skills/daftai-local-video-subtitler ~/.claude/skills/daftai-local-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.claude/skills/daftai-video-subtitler
+ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.claude/skills/daftai-subtitle-translator
 ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/skills/daftai-extracting-video-subtitles
+ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.claude/skills/daftai-chinese-copywriting
 ```
 
 ## Requirements
@@ -38,6 +44,7 @@ ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/
 - **Node.js** + **npx tsx** (for TypeScript scripts)
 - **FFmpeg** with libass support (for video processing)
 - **OpenAI Whisper** (for subtitle extraction)
+- **autocorrect** (for Chinese copywriting, auto-installed)
 
 ### macOS
 
@@ -69,7 +76,7 @@ User: Extract subtitles from this video
 
 ```
 User: Burn Chinese subtitles into this video
-→ AI loads daftai-local-video-subtitler skill
+→ AI loads daftai-video-subtitler skill
 → Detects environment, scans subtitles, burns to video
 → Output: video_zh.mp4
 ```
@@ -85,18 +92,23 @@ daftAI-skills/
 ├── AGENTS.md
 ├── .gitignore
 └── skills/
-    ├── daftai-local-video-subtitler/
+    ├── daftai-video-subtitler/
     │   ├── SKILL.md
-    │   ├── CHANGELOG.md
     │   ├── scripts/          # TypeScript utilities
     │   └── references/       # Config docs
+    ├── daftai-subtitle-translator/
+    │   ├── SKILL.md
+    │   └── references/       # Glossary
+    ├── daftai-extracting-video-subtitles/
+    │   ├── SKILL.md
+    │   └── scripts/          # TypeScript utilities
     ├── daftai-url-to-markdown/
     │   ├── SKILL.md
     │   └── scripts/          # TypeScript utilities
-    └── daftai-extracting-video-subtitles/
+    └── daftai-chinese-copywriting/
         ├── SKILL.md
-        ├── CHANGELOG.md
-        └── scripts/          # TypeScript utilities
+        ├── scripts/          # TypeScript utilities
+        └── references/       # Config docs
 ```
 
 ## Contributing

@@ -6,9 +6,11 @@
 
 | Skill | 描述 |
 |-------|------|
-| [daftai-local-video-subtitler](skills/daftai-local-video-subtitler/) | 本地视频字幕烧录工具，支持 SRT/VTT/ASS 格式、双语字幕合并和翻译 |
-| [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
+| [daftai-video-subtitler](skills/daftai-video-subtitler/) | 本地视频字幕烧录工具，支持 SRT/VTT/ASS 格式、双语字幕合并和翻译 |
+| [daftai-subtitle-translator](skills/daftai-subtitle-translator/) | 字幕文件翻译（SRT/VTT），支持术语一致性检查 |
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | 使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕 |
+| [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
+| [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
 
 ## 安装
 
@@ -19,18 +21,22 @@
 git clone https://github.com/daftAI2026/daftAI-skills.git
 
 # 软链接各个 skill
-ln -s /path/to/daftAI-skills/skills/daftai-local-video-subtitler ~/.agents/skills/daftai-local-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.agents/skills/daftai-video-subtitler
+ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.agents/skills/daftai-subtitle-translator
 ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.agents/skills/daftai-extracting-video-subtitles
+ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.agents/skills/daftai-chinese-copywriting
 ```
 
 ### Claude Code 用户
 
 ```bash
 # 软链接各个 skill
-ln -s /path/to/daftAI-skills/skills/daftai-local-video-subtitler ~/.claude/skills/daftai-local-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.claude/skills/daftai-video-subtitler
+ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.claude/skills/daftai-subtitle-translator
 ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/skills/daftai-extracting-video-subtitles
+ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
+ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.claude/skills/daftai-chinese-copywriting
 ```
 
 ## 环境要求
@@ -38,6 +44,7 @@ ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/
 - **Node.js** + **npx tsx**（运行 TypeScript 脚本）
 - **FFmpeg**（需要 libass 支持，用于视频处理）
 - **OpenAI Whisper**（用于字幕提取）
+- **autocorrect**（用于中文排版检查，自动安装）
 
 ### macOS
 
@@ -69,7 +76,7 @@ pip install openai-whisper
 
 ```
 用户：把这个视频加上中文字幕
-→ AI 加载 daftai-local-video-subtitler skill
+→ AI 加载 daftai-video-subtitler skill
 → 检测环境 → 扫描字幕 → 烧录到视频
 → 输出：video_zh.mp4
 ```
@@ -85,18 +92,23 @@ daftAI-skills/
 ├── AGENTS.md             # AI 助手指南
 ├── .gitignore
 └── skills/
-    ├── daftai-local-video-subtitler/
+    ├── daftai-video-subtitler/
     │   ├── SKILL.md
-    │   ├── CHANGELOG.md
     │   ├── scripts/          # TypeScript 工具脚本
     │   └── references/       # 配置文档
+    ├── daftai-subtitle-translator/
+    │   ├── SKILL.md
+    │   └── references/       # 术语表
+    ├── daftai-extracting-video-subtitles/
+    │   ├── SKILL.md
+    │   └── scripts/          # TypeScript 工具脚本
     ├── daftai-url-to-markdown/
     │   ├── SKILL.md
     │   └── scripts/          # TypeScript 工具脚本
-    └── daftai-extracting-video-subtitles/
+    └── daftai-chinese-copywriting/
         ├── SKILL.md
-        ├── CHANGELOG.md
-        └── scripts/          # TypeScript 工具脚本
+        ├── scripts/          # TypeScript 工具脚本
+        └── references/       # 配置文档
 ```
 
 ## 贡献

@@ -2,6 +2,15 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.0 - 2026-03-18
+
+### 新增 (daftai-chinese-copywriting)
+- 新 Skill：基于 [autocorrect](https://github.com/huacnlee/autocorrect) 检查和修正中文排版，以 [sparanoid/chinese-copywriting-guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines) 为规则来源。
+- 三种模式：`review`（仅检查）、`stable`（修正并输出摘要）、`quick`（快速修正）。
+- 自动检测并通过 Homebrew 或 Cargo 安装 `autocorrect`。
+- Markdown 代码块保护 — 修正时自动跳过 fenced code blocks。
+- 支持 EXTEND.md 偏好配置（项目级/用户级）。
+
 ## 1.4.0 - 2026-03-06
 
 ### 新增 (daftai-subtitle-translator)
