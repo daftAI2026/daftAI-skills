@@ -2,6 +2,14 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.1 - 2026-03-21
+
+### Improved (daftai-chinese-copywriting)
+- Batch file support: pass multiple file paths in a single command instead of running once per file.
+- Removed `autoInstallAutocorrect` preference — autocorrect is now always auto-installed when missing, no need to ask.
+- `reportStyle` setup question is now conditional — only asked when default mode is `review` (the only mode where it matters).
+- Simplified first-time setup from 4 questions to 2–3.
+
 ## 1.5.0 - 2026-03-18
 
 ### Added (daftai-chinese-copywriting)

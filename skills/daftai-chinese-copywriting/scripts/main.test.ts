@@ -5,8 +5,10 @@ import * as path from "node:path";
 
 import {
   DEFAULT_PREFERENCES,
+  ensurePreferencesConfigured,
   loadPreferences,
   protectFencedCodeBlocks,
+  resolvePreferences,
   restoreFencedCodeBlocks,
   writePreferences,
 } from "./shared";
@@ -18,14 +20,12 @@ async function testPreferencesRoundTrip(): Promise<void> {
   writePreferences(prefsPath, {
     ...DEFAULT_PREFERENCES,
     defaultMode: "quick",
-    autoInstallAutocorrect: false,
     reportStyle: "detailed",
   });
 
   const loaded = loadPreferences(prefsPath);
 
   assert.equal(loaded.defaultMode, "quick");
-  assert.equal(loaded.autoInstallAutocorrect, false);
   assert.equal(loaded.reportStyle, "detailed");
 }
 
@@ -49,9 +49,22 @@ async function testFenceProtection(): Promise<void> {
   assert.equal(restored, content);
 }
 
+async function testMissingPreferencesFails(): Promise<void> {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "copywriting-no-prefs-"));
+  const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), "copywriting-no-prefs-home-"));
+  const resolution = resolvePreferences(tempDir, fakeHome);
+
+  assert.equal(resolution.sourcePath, null);
+  assert.throws(
+    () => ensurePreferencesConfigured(resolution),
+    /First-time setup required/,
+  );
+}
+
 async function main(): Promise<void> {
   await testPreferencesRoundTrip();
   await testFenceProtection();
+  await testMissingPreferencesFails();
   console.log("main.test.ts passed");
 }
 

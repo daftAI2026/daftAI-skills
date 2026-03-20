@@ -31,29 +31,55 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 
 ## Rules Source
 
-- Upstream guideline: [sparanoid/chinese-copywriting-guidelines README.zh-Hans.md](https://github.com/sparanoid/chinese-copywriting-guidelines/blob/master/README.zh-Hans.md)
+- Upstream guideline: [sparanoid/chinese-copywriting-guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines/blob/master/README.zh-Hans.md)
+- Local reference: [references/rules/copywriting-guidelines.md](references/rules/copywriting-guidelines.md) — full rules with correct/incorrect examples (空格 through 争议)
 - Execution engine: [huacnlee/autocorrect](https://github.com/huacnlee/autocorrect)
 
-This skill does not copy or redefine the upstream guideline. It uses the guideline as source-of-truth and applies `autocorrect` as the execution engine.
-
 ## Workflow
+
+### Modes
+
+| Mode | Behavior | Output |
+|------|----------|--------|
+| `review` | Check only. Output lint summary and suggested corrections. | No file written. |
+| `quick` | Pure `autocorrect --fix`. Fast, tool-only. | `{filename}-corrected.{ext}` |
+| `stable` | `autocorrect --fix` + AI post-processing. Catches issues autocorrect misses. | `{filename}-corrected.{ext}` |
+
+### `review` workflow
 
 ```
 - [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
 - [ ] Step 1: Detect autocorrect and auto-install if missing
-- [ ] Step 2: Resolve input as direct text or single Markdown/TXT file
-- [ ] Step 3: Protect fenced code blocks in Markdown content
-- [ ] Step 4: Run review/stable/quick
-- [ ] Step 5: Report the result and write back file changes when applicable
+- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts review <input>
+- [ ] Step 3: Report lint results to user
 ```
 
-### Modes
+### `quick` workflow
 
-| Mode | Behavior |
-|------|----------|
-| `review` | Check only. Output lint summary and suggested corrected content. |
-| `stable` | Fix content and output a normal summary. |
-| `quick` | Fix content immediately with the same engine, optimized for speed. |
+```
+- [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
+- [ ] Step 1: Detect autocorrect and auto-install if missing
+- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts quick <input>
+- [ ] Step 3: Report output file path to user
+```
+
+### `stable` workflow
+
+```
+- [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
+- [ ] Step 1: Detect autocorrect and auto-install if missing
+- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts stable <input>
+- [ ] Step 3: Read the output file ({filename}-corrected.{ext})
+- [ ] Step 4: Read references/rules/copywriting-guidelines.md for the full rule set
+- [ ] Step 5: AI post-processing — review the corrected content against the guidelines and fix remaining issues that autocorrect missed, including:
+  - Half-width punctuation (. , : ;) after English words in Chinese context → convert to full-width（。，：；）
+  - Half-width parentheses () in Chinese context → convert to full-width（）
+  - Repeated punctuation (！！、？？) → deduplicate
+  - Full-width punctuation followed by extra space → remove space
+  - Other violations listed in the guidelines
+- [ ] Step 6: Write the final result back to the same output file
+- [ ] Step 7: Report output file path to user
+```
 
 ## Preferences (EXTEND.md)
 
@@ -66,9 +92,21 @@ test -f "$HOME/.daftAI-skills/daftai-chinese-copywriting/EXTEND.md" && echo "use
 
 Priority: user explicit input > project EXTEND.md > user EXTEND.md > built-in defaults
 
-If neither file exists, run first-time setup using:
-- [references/config/first-time-setup.md](references/config/first-time-setup.md)
-- [references/config/preferences-schema.md](references/config/preferences-schema.md)
+### First-time setup (BLOCKING)
+
+When neither EXTEND.md exists, the agent **MUST** complete first-time setup before any correction workflow step:
+
+1. Ask the user (in one message) their preferences:
+   - Default mode: `stable` / `quick` / `review` (default: `stable`)
+   - Report style: `brief` / `detailed` (default: `brief`) — **only ask when default mode is `review`**
+   - Save location: `user` (~/.daftAI-skills/...) or `project` (.daftAI-skills/...) (default: `user`)
+2. Write the EXTEND.md file via the script: `npx tsx ${SKILL_DIR}/scripts/main.ts init --mode <mode> --report-style <style> --scope <user|project>`
+3. Confirm to the user: "Preferences saved to [path]"
+4. Continue with the requested workflow
+
+Do not auto-fill defaults before asking. Do not silently create a user-level or project-level EXTEND.md.
+
+After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers to the four setup items, save EXTEND.md, confirm the saved path, and continue.
 
 ## Dependency
 
@@ -84,6 +122,7 @@ When `autocorrect` is missing, the script will:
 ```bash
 npx tsx ${SKILL_DIR}/scripts/main.ts review "你好world"
 npx tsx ${SKILL_DIR}/scripts/main.ts stable "/path/to/file.md"
+npx tsx ${SKILL_DIR}/scripts/main.ts stable "/path/to/a.md" "/path/to/b.md" "/path/to/c.txt"
 npx tsx ${SKILL_DIR}/scripts/main.ts quick "/path/to/file.txt"
 ```
 

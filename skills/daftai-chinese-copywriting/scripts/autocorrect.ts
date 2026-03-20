@@ -19,20 +19,12 @@ export interface RunAutocorrectResult {
   installLog: string;
 }
 
-export function ensureAutocorrect(autoInstall: boolean): EnsureAutocorrectResult {
+export function ensureAutocorrect(): EnsureAutocorrectResult {
   if (hasCommand("autocorrect")) {
     return {
       available: true,
       installAttempted: false,
       installLog: "",
-    };
-  }
-
-  if (!autoInstall) {
-    return {
-      available: false,
-      installAttempted: false,
-      installLog: "autocorrect not found and auto-install is disabled.",
     };
   }
 

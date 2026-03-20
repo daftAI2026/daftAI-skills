@@ -1,7 +1,6 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { createInterface } from "node:readline/promises";
 
 export type Mode = "review" | "stable" | "quick";
 export type ReportStyle = "brief" | "detailed";
@@ -11,7 +10,6 @@ export type SaveScope = "user" | "project";
 export interface Preferences {
   version: number;
   defaultMode: Mode;
-  autoInstallAutocorrect: boolean;
   reportStyle: ReportStyle;
   language: string;
 }
@@ -40,7 +38,6 @@ export const SKILL_NAME = "daftai-chinese-copywriting";
 export const DEFAULT_PREFERENCES: Preferences = {
   version: 1,
   defaultMode: "stable",
-  autoInstallAutocorrect: true,
   reportStyle: "brief",
   language: "zh",
 };
@@ -60,7 +57,6 @@ export function writePreferences(filePath: string, preferences: Preferences): vo
     "---",
     `version: ${preferences.version}`,
     `default_mode: ${preferences.defaultMode}`,
-    `auto_install_autocorrect: ${preferences.autoInstallAutocorrect}`,
     `report_style: ${preferences.reportStyle}`,
     `language: ${preferences.language}`,
     "---",
@@ -77,19 +73,15 @@ export function loadPreferences(filePath: string): Preferences {
   return {
     version: toNumber(parsed.version, DEFAULT_PREFERENCES.version),
     defaultMode: toMode(parsed.default_mode, DEFAULT_PREFERENCES.defaultMode),
-    autoInstallAutocorrect: toBoolean(
-      parsed.auto_install_autocorrect,
-      DEFAULT_PREFERENCES.autoInstallAutocorrect,
-    ),
     reportStyle: toReportStyle(parsed.report_style, DEFAULT_PREFERENCES.reportStyle),
     language: toStringValue(parsed.language, DEFAULT_PREFERENCES.language),
   };
 }
 
-export async function resolvePreferences(
+export function resolvePreferences(
   cwd: string = process.cwd(),
   homeDir: string = os.homedir(),
-): Promise<PreferenceResolution> {
+): PreferenceResolution {
   const projectPath = getProjectPreferencesPath(cwd);
   if (fs.existsSync(projectPath)) {
     return {
@@ -108,49 +100,71 @@ export async function resolvePreferences(
     };
   }
 
-  const setup = await runFirstTimeSetup(cwd, homeDir);
   return {
-    preferences: setup.preferences,
-    sourcePath: setup.path,
-    created: true,
+    preferences: DEFAULT_PREFERENCES,
+    sourcePath: null,
+    created: false,
   };
+}
+
+export function ensurePreferencesConfigured(
+  resolution: PreferenceResolution,
+): PreferenceResolution {
+  if (resolution.sourcePath) {
+    return resolution;
+  }
+
+  throw new Error(
+    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `npx tsx scripts/main.ts init --mode <stable|quick|review> --report-style <brief|detailed> --scope <user|project>` before running review, quick, or stable.",
+  );
 }
 
 export function resolveMode(explicitMode: Mode | undefined, preferences: Preferences): Mode {
   return explicitMode ?? preferences.defaultMode;
 }
 
-export function resolveInput(rawArgs: string[], cwd: string = process.cwd()): ResolvedInput {
+export function resolveInputs(rawArgs: string[], cwd: string = process.cwd()): ResolvedInput[] {
   if (rawArgs.length === 0) {
-    throw new Error("Missing input. Pass text or a single .md/.txt file path.");
+    throw new Error("Missing input. Pass text or file path(s).");
   }
 
-  if (rawArgs.length === 1) {
-    const candidatePath = path.resolve(cwd, rawArgs[0]);
+  const files: ResolvedInput[] = [];
+  const textParts: string[] = [];
+
+  for (const arg of rawArgs) {
+    const candidatePath = path.resolve(cwd, arg);
     if (fs.existsSync(candidatePath) && fs.statSync(candidatePath).isFile()) {
       const extension = path.extname(candidatePath).toLowerCase();
       if (![".md", ".txt"].includes(extension)) {
         throw new Error(`Unsupported file type: ${extension || "(none)"}. Only .md and .txt are supported.`);
       }
-
-      return {
+      files.push({
         kind: "file",
         label: candidatePath,
         content: fs.readFileSync(candidatePath, "utf8"),
         filePath: candidatePath,
         extension,
-      };
+      });
+    } else {
+      textParts.push(arg);
     }
   }
 
-  const content = rawArgs.join(" ");
+  if (files.length > 0) {
+    if (textParts.length > 0) {
+      throw new Error(`Mixed file and text input not supported. Got ${files.length} file(s) and text: "${textParts.join(" ")}"`);
+    }
+    return files;
+  }
+
+  const content = textParts.join(" ");
   const extension = looksLikeMarkdown(content) ? ".md" : ".txt";
-  return {
+  return [{
     kind: "text",
     label: "<text>",
     content,
     extension,
-  };
+  }];
 }
 
 export function protectFencedCodeBlocks(content: string): ProtectedContent {
@@ -180,6 +194,13 @@ export function restoreFencedCodeBlocks(content: string, blocks: ProtectedConten
   return restored;
 }
 
+export function computeOutputPath(filePath: string): string {
+  const dir = path.dirname(filePath);
+  const ext = path.extname(filePath);
+  const base = path.basename(filePath, ext);
+  return path.join(dir, `${base}-corrected${ext}`);
+}
+
 export function renderSummary(params: {
   mode: Mode;
   input: ResolvedInput;
@@ -191,6 +212,7 @@ export function renderSummary(params: {
   changed: boolean;
   lintOutput?: string;
   correctedContent?: string;
+  outputPath?: string;
 }): string {
   const lines: string[] = [];
   lines.push(`Mode: ${params.mode}`);
@@ -219,6 +241,9 @@ export function renderSummary(params: {
   }
 
   lines.push(`Result: ${params.changed ? "content updated" : "already clean"}`);
+  if (params.outputPath) {
+    lines.push(`Output: ${params.outputPath}`);
+  }
   return lines.join("\n");
 }
 
@@ -257,22 +282,6 @@ function toNumber(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function toBoolean(value: string | undefined, fallback: boolean): boolean {
-  if (!value) {
-    return fallback;
-  }
-
-  if (value === "true") {
-    return true;
-  }
-
-  if (value === "false") {
-    return false;
-  }
-
-  return fallback;
-}
-
 function toStringValue(value: string | undefined, fallback: string): string {
   return value && value.length > 0 ? value : fallback;
 }
@@ -293,106 +302,4 @@ function toReportStyle(value: string | undefined, fallback: ReportStyle): Report
 
 function looksLikeMarkdown(content: string): boolean {
   return /```|^# |\[[^\]]+\]\([^)]+\)/m.test(content);
-}
-
-async function runFirstTimeSetup(
-  cwd: string,
-  homeDir: string,
-): Promise<{ preferences: Preferences; path: string }> {
-  if (!process.stdin.isTTY) {
-    const filePath = getUserPreferencesPath(homeDir);
-    writePreferences(filePath, DEFAULT_PREFERENCES);
-    console.log(`Preferences saved to ${filePath}`);
-    return {
-      preferences: DEFAULT_PREFERENCES,
-      path: filePath,
-    };
-  }
-
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  try {
-    const defaultMode = await askChoice(
-      rl,
-      "Default mode [stable/quick/review] (default: stable): ",
-      ["stable", "quick", "review"],
-      DEFAULT_PREFERENCES.defaultMode,
-    );
-    const autoInstall = await askBoolean(
-      rl,
-      "Auto-install autocorrect when missing? [Y/n] (default: yes): ",
-      DEFAULT_PREFERENCES.autoInstallAutocorrect,
-    );
-    const reportStyle = await askChoice(
-      rl,
-      "Report style [brief/detailed] (default: brief): ",
-      ["brief", "detailed"],
-      DEFAULT_PREFERENCES.reportStyle,
-    );
-    const scope = await askChoice(
-      rl,
-      "Save preferences to [user/project] (default: user): ",
-      ["user", "project"],
-      "user",
-    );
-
-    const preferences: Preferences = {
-      ...DEFAULT_PREFERENCES,
-      defaultMode: defaultMode as Mode,
-      autoInstallAutocorrect: autoInstall,
-      reportStyle: reportStyle as ReportStyle,
-    };
-
-    const filePath = scope === "project"
-      ? getProjectPreferencesPath(cwd)
-      : getUserPreferencesPath(homeDir);
-    writePreferences(filePath, preferences);
-    console.log(`Preferences saved to ${filePath}`);
-
-    return { preferences, path: filePath };
-  } catch (error) {
-    const filePath = getUserPreferencesPath(homeDir);
-    writePreferences(filePath, DEFAULT_PREFERENCES);
-    console.log(`Preferences saved to ${filePath}`);
-    return {
-      preferences: DEFAULT_PREFERENCES,
-      path: filePath,
-    };
-  } finally {
-    rl.close();
-  }
-}
-
-async function askChoice(
-  rl: ReturnType<typeof createInterface>,
-  prompt: string,
-  allowedValues: string[],
-  fallback: string,
-): Promise<string> {
-  const answer = (await rl.question(prompt)).trim().toLowerCase();
-  if (!answer) {
-    return fallback;
-  }
-  return allowedValues.includes(answer) ? answer : fallback;
-}
-
-async function askBoolean(
-  rl: ReturnType<typeof createInterface>,
-  prompt: string,
-  fallback: boolean,
-): Promise<boolean> {
-  const answer = (await rl.question(prompt)).trim().toLowerCase();
-  if (!answer) {
-    return fallback;
-  }
-  if (["y", "yes"].includes(answer)) {
-    return true;
-  }
-  if (["n", "no"].includes(answer)) {
-    return false;
-  }
-  return fallback;
 }

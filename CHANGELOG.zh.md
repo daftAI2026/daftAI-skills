@@ -2,6 +2,14 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.1 - 2026-03-21
+
+### 改进 (daftai-chinese-copywriting)
+- 支持批量文件：一条命令传入多个文件路径，无需逐个调用。
+- 移除 `autoInstallAutocorrect` 偏好 — 缺少 autocorrect 时直接自动安装，不再询问。
+- `reportStyle` 设置项改为条件提问 — 仅在默认模式选 `review` 时才问（唯一用到的模式）。
+- 首次设置从 4 个问题精简为 2–3 个。
+
 ## 1.5.0 - 2026-03-18
 
 ### 新增 (daftai-chinese-copywriting)
