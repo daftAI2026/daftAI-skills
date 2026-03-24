@@ -13,7 +13,7 @@ This is a blocking step. Do not start `review`, `quick`, or `stable` first. Do n
 
 1. Default mode: `stable`, `quick`, or `review`
 2. Report style: `brief` or `detailed` — **only ask when default mode is `review`**
-3. Save location: `user` or `project`
+3. Save location: `project` or `user` (default: `project`)
 
 ## Save Paths
 

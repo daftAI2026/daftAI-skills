@@ -1,6 +1,21 @@
-# daftAI Skills
+# daftAI-skills
 
-为 Amp、Claude Code 等 AI 编程助手打造的 Skills 合集。
+[English](./README.md) | 中文
+
+daftAI 分享的 AI Agent Skills，提升日常工作效率。
+
+## 环境要求
+
+- 已安装 Node.js 环境
+- 能运行 `npx bun` 命令
+
+## 安装
+
+### 快速安装（推荐）
+
+```bash
+npx skills add daftAI2026/daftAI-skills
+```
 
 ## 可用 Skills
 
@@ -11,53 +26,6 @@
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | 使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕 |
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
-
-## 安装
-
-### Amp 用户
-
-```bash
-# 克隆仓库
-git clone https://github.com/daftAI2026/daftAI-skills.git
-
-# 软链接各个 skill
-ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.agents/skills/daftai-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.agents/skills/daftai-subtitle-translator
-ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.agents/skills/daftai-extracting-video-subtitles
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
-ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.agents/skills/daftai-chinese-copywriting
-```
-
-### Claude Code 用户
-
-```bash
-# 软链接各个 skill
-ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.claude/skills/daftai-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.claude/skills/daftai-subtitle-translator
-ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/skills/daftai-extracting-video-subtitles
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
-ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.claude/skills/daftai-chinese-copywriting
-```
-
-## 环境要求
-
-- **Node.js** + **npx tsx**（运行 TypeScript 脚本）
-- **FFmpeg**（需要 libass 支持，用于视频处理）
-- **OpenAI Whisper**（用于字幕提取）
-- **autocorrect**（用于中文排版检查，自动安装）
-
-### macOS
-
-```bash
-brew install ffmpeg openai-whisper
-```
-
-### Ubuntu/Debian
-
-```bash
-sudo apt install ffmpeg libass-dev
-pip install openai-whisper
-```
 
 ## 使用方式
 

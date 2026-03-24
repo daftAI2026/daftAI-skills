@@ -1,6 +1,21 @@
-# daftAI Skills
+# daftAI-skills
 
-A collection of AI Agent skills for Amp, Claude Code, and other AI coding assistants.
+English | [中文](./README.zh.md)
+
+Skills shared by daftAI for improving daily work efficiency with AI Agent.
+
+## Prerequisites
+
+- Node.js environment installed
+- Ability to run `npx bun` commands
+
+## Installation
+
+### Quick Install (Recommended)
+
+```bash
+npx skills add daftAI2026/daftAI-skills
+```
 
 ## Available Skills
 
@@ -11,53 +26,6 @@ A collection of AI Agent skills for Amp, Claude Code, and other AI coding assist
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | Extract timed SRT subtitles from video/audio files using OpenAI Whisper |
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | Fetch any URL and convert to markdown using Chrome CDP, with automatic image downloading |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | Check and fix Chinese copywriting (punctuation, spacing, full-width/half-width) using autocorrect |
-
-## Installation
-
-### For Amp
-
-```bash
-# Clone the repository
-git clone https://github.com/daftAI2026/daftAI-skills.git
-
-# Symlink individual skills
-ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.agents/skills/daftai-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.agents/skills/daftai-subtitle-translator
-ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.agents/skills/daftai-extracting-video-subtitles
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.agents/skills/daftai-url-to-markdown
-ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.agents/skills/daftai-chinese-copywriting
-```
-
-### For Claude Code
-
-```bash
-# Symlink individual skills
-ln -s /path/to/daftAI-skills/skills/daftai-video-subtitler ~/.claude/skills/daftai-video-subtitler
-ln -s /path/to/daftAI-skills/skills/daftai-subtitle-translator ~/.claude/skills/daftai-subtitle-translator
-ln -s /path/to/daftAI-skills/skills/daftai-extracting-video-subtitles ~/.claude/skills/daftai-extracting-video-subtitles
-ln -s /path/to/daftAI-skills/skills/daftai-url-to-markdown ~/.claude/skills/daftai-url-to-markdown
-ln -s /path/to/daftAI-skills/skills/daftai-chinese-copywriting ~/.claude/skills/daftai-chinese-copywriting
-```
-
-## Requirements
-
-- **Node.js** + **npx tsx** (for TypeScript scripts)
-- **FFmpeg** with libass support (for video processing)
-- **OpenAI Whisper** (for subtitle extraction)
-- **autocorrect** (for Chinese copywriting, auto-installed)
-
-### macOS
-
-```bash
-brew install ffmpeg openai-whisper
-```
-
-### Ubuntu/Debian
-
-```bash
-sudo apt install ffmpeg libass-dev
-pip install openai-whisper
-```
 
 ## Usage
 

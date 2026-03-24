@@ -6,6 +6,12 @@ description: >
   supports review/stable/quick modes, and uses the upstream Chinese copywriting
   guidelines as the rule source. Use when user asks to normalize Chinese
   punctuation, spacing, full-width/half-width usage, or copywriting style.
+metadata:
+  openclaw:
+    requires:
+      anyBins:
+        - bun
+        - npx
 ---
 
 # Chinese Copywriting
@@ -28,6 +34,17 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 | `scripts/main.ts` | CLI entry for review/stable/quick workflows |
 | `scripts/autocorrect.ts` | Detect, install, and run `autocorrect` |
 | `scripts/shared.ts` | Preferences, input handling, and Markdown fence protection |
+| `scripts/chunk.ts` | Markdown-aware chunking for long texts |
+
+Resolve `${BUN_X}` runtime: if `bun` is installed → `bun`; if only `npx` available → `npx -y bun`. `scripts/chunk.ts` must be executed via `${BUN_X}` (not `npx tsx`) because it depends on `markdown-it` which is installed under `scripts/node_modules/`.
+
+## Defaults
+
+| Setting | Default | EXTEND.md key | Description |
+|---------|---------|---------------|-------------|
+| Mode | `stable` | `default_mode` | Workflow mode |
+| Chunk threshold | `4000` | `chunk_threshold` | Word count to trigger chunked processing |
+| Chunk max words | `5000` | `chunk_max_words` | Max words per chunk |
 
 ## Rules Source
 
@@ -70,14 +87,29 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 - [ ] Step 1: Detect autocorrect and auto-install if missing
 - [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts stable <input>
 - [ ] Step 3: Read the output file ({filename}-corrected.{ext})
-- [ ] Step 4: Read references/rules/copywriting-guidelines.md for the full rule set
-- [ ] Step 5: AI post-processing — review the corrected content against the guidelines and fix remaining issues that autocorrect missed, including:
+- [ ] Step 4: Assess content length — estimate word count of the corrected file
+      If word count < chunk_threshold (default 4000): proceed to Step 5 (single-pass)
+      If word count >= chunk_threshold: proceed to Step 4.1 (chunked processing)
+- [ ] Step 4.1 (chunked only): Split the corrected file into chunks:
+      Run: ${BUN_X} ${SKILL_DIR}/scripts/chunk.ts "{corrected-file}" --max-words 5000 --output-dir "{corrected-file-dir}"
+      This outputs chunk-01.md, chunk-02.md, ... in a chunks/ subdirectory.
+      Note the absolute path of the chunks/ directory for use in Step 6.
+- [ ] Step 5: Read references/rules/copywriting-guidelines.md for the full rule set
+- [ ] Step 6: AI post-processing — review the corrected content against the guidelines and fix remaining issues that autocorrect missed, including:
   - Half-width punctuation (. , : ;) after English words in Chinese context → convert to full-width（。，：；）
   - Half-width parentheses () in Chinese context → convert to full-width（）
   - Repeated punctuation (！！、？？) → deduplicate
   - Full-width punctuation followed by extra space → remove space
   - Other violations listed in the guidelines
-- [ ] Step 6: Write the final result back to the same output file
+  **Single-pass** (word count < chunk_threshold): Read entire file, apply fixes, write back to the same output file.
+  **Chunked** (word count >= chunk_threshold): Use subagents in parallel via [references/subagent-prompt-template.md](references/subagent-prompt-template.md).
+    - Spawn one subagent **per chunk**, all in parallel
+    - Each subagent spawn prompt MUST use **absolute paths** for all file references
+    - Replace `{SKILL_DIR}`, `{chunks_dir}`, `{NN}` placeholders in the template with actual absolute paths before spawning
+    - Each subagent reads the rules file, reads its assigned chunk, applies fixes, writes corrected content back to the same chunk file
+    - If Task tool is unavailable, process chunks sequentially inline
+    After all chunks are processed, merge:
+    Read all chunk-*.md files from the chunks/ directory in sorted order, concatenate with \n\n, write to {corrected-file}. If chunks/frontmatter.md exists, prepend it.
 - [ ] Step 7: Report output file path to user
 ```
 
@@ -99,7 +131,7 @@ When neither EXTEND.md exists, the agent **MUST** complete first-time setup befo
 1. Ask the user (in one message) their preferences:
    - Default mode: `stable` / `quick` / `review` (default: `stable`)
    - Report style: `brief` / `detailed` (default: `brief`) — **only ask when default mode is `review`**
-   - Save location: `user` (~/.daftAI-skills/...) or `project` (.daftAI-skills/...) (default: `user`)
+   - Save location: `project` (.daftAI-skills/...) or `user` (~/.daftAI-skills/...) (default: `project`)
 2. Write the EXTEND.md file via the script: `npx tsx ${SKILL_DIR}/scripts/main.ts init --mode <mode> --report-style <style> --scope <user|project>`
 3. Confirm to the user: "Preferences saved to [path]"
 4. Continue with the requested workflow
@@ -108,14 +140,24 @@ Do not auto-fill defaults before asking. Do not silently create a user-level or 
 
 After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers to the four setup items, save EXTEND.md, confirm the saved path, and continue.
 
-## Dependency
+## Dependencies
 
-The skill requires `autocorrect`.
+### autocorrect
+
+The skill requires `autocorrect` for the core copywriting engine.
 
 When `autocorrect` is missing, the script will:
 1. Try `brew install autocorrect`
 2. Fall back to `cargo install autocorrect`
 3. Continue the current command if installation succeeds
+
+### Node modules (chunking)
+
+`scripts/chunk.ts` depends on `markdown-it`. The `scripts/` directory contains `package.json` and `bun.lock`. Before running `chunk.ts`, the agent **MUST** check if `${SKILL_DIR}/scripts/node_modules` exists. If not, run:
+
+```bash
+cd "${SKILL_DIR}/scripts" && bun install
+```
 
 ## Usage
 

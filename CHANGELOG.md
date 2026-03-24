@@ -2,6 +2,20 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.2 - 2026-03-24
+
+### Improved (daftai-chinese-copywriting)
+- Added explicit Defaults table with `chunk_threshold` (4000) and `chunk_max_words` (5000) — agents no longer guess chunk sizes.
+- Added `references/subagent-prompt-template.md` — precise subagent instructions with absolute paths for chunked AI post-processing.
+- Rewrote Step 6 chunked workflow to mandate subagent usage with the prompt template instead of vague "can use subagents in parallel".
+- `renderSummary` now warns "AI post-processing still required" in stable mode, preventing agents from reporting completion after autocorrect alone.
+- `writePreferences` no longer writes `report_style` when default mode is not `review`, so users get asked when they first use review mode.
+- Save location default changed from `user` to `project`.
+
+### Improved (README)
+- Restructured README.md and README.zh.md opening to match baoyu-skills pattern (title → language switch → description → prerequisites).
+- Simplified Quick Install to a single command.
+
 ## 1.5.1 - 2026-03-21
 
 ### Improved (daftai-chinese-copywriting)

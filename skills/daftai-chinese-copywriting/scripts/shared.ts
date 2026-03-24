@@ -12,6 +12,8 @@ export interface Preferences {
   defaultMode: Mode;
   reportStyle: ReportStyle;
   language: string;
+  chunkThreshold: number;
+  chunkMaxWords: number;
 }
 
 export interface ProtectedContent {
@@ -40,6 +42,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   defaultMode: "stable",
   reportStyle: "brief",
   language: "zh",
+  chunkThreshold: 4000,
+  chunkMaxWords: 5000,
 };
 
 export function getProjectPreferencesPath(cwd: string = process.cwd()): string {
@@ -57,11 +61,17 @@ export function writePreferences(filePath: string, preferences: Preferences): vo
     "---",
     `version: ${preferences.version}`,
     `default_mode: ${preferences.defaultMode}`,
-    `report_style: ${preferences.reportStyle}`,
+  ];
+  if (preferences.defaultMode === "review") {
+    lines.push(`report_style: ${preferences.reportStyle}`);
+  }
+  lines.push(
     `language: ${preferences.language}`,
+    `chunk_threshold: ${preferences.chunkThreshold}`,
+    `chunk_max_words: ${preferences.chunkMaxWords}`,
     "---",
     "",
-  ];
+  );
 
   fs.writeFileSync(filePath, lines.join("\n"), "utf8");
 }
@@ -75,6 +85,8 @@ export function loadPreferences(filePath: string): Preferences {
     defaultMode: toMode(parsed.default_mode, DEFAULT_PREFERENCES.defaultMode),
     reportStyle: toReportStyle(parsed.report_style, DEFAULT_PREFERENCES.reportStyle),
     language: toStringValue(parsed.language, DEFAULT_PREFERENCES.language),
+    chunkThreshold: toNumber(parsed.chunk_threshold, DEFAULT_PREFERENCES.chunkThreshold),
+    chunkMaxWords: toNumber(parsed.chunk_max_words, DEFAULT_PREFERENCES.chunkMaxWords),
   };
 }
 
@@ -243,6 +255,10 @@ export function renderSummary(params: {
   lines.push(`Result: ${params.changed ? "content updated" : "already clean"}`);
   if (params.outputPath) {
     lines.push(`Output: ${params.outputPath}`);
+  }
+  if (params.mode === "stable") {
+    lines.push("");
+    lines.push("⚠ autocorrect pass complete. AI post-processing (Step 4–6) still required — do NOT report completion yet.");
   }
   return lines.join("\n");
 }

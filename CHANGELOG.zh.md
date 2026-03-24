@@ -2,6 +2,20 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.2 - 2026-03-24
+
+### 改进 (daftai-chinese-copywriting)
+- 新增 Defaults 配置表，明确 `chunk_threshold` (4000) 和 `chunk_max_words` (5000) 默认值，agent 不再猜测分块大小。
+- 新增 `references/subagent-prompt-template.md`，为分块 AI 后处理提供精确的 subagent 指令模板（含绝对路径）。
+- 重写 Step 6 分块流程，从模糊的"can use subagents"改为强制使用 prompt template 的精确指令。
+- `renderSummary` 在 stable 模式下新增"AI 后处理尚未完成"提醒，防止 agent 跑完 autocorrect 就报完成。
+- `writePreferences` 在非 review 模式下不再写入 `report_style`，用户首次使用 review 模式时会被询问。
+- Save location 默认值从 `user` 改为 `project`。
+
+### 改进 (README)
+- README.md 和 README.zh.md 开头结构调整为 baoyu-skills 风格（标题 → 语言切换 → 简介 → 环境要求）。
+- Quick Install 精简为单行命令。
+
 ## 1.5.1 - 2026-03-21
 
 ### 改进 (daftai-chinese-copywriting)
