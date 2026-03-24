@@ -1,4 +1,4 @@
-# 中文文案排版指北（规则摘录）
+# 中文文案排版指北（规则）
 
 > 来源：[sparanoid/chinese-copywriting-guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines/blob/master/README.zh-Hans.md)
 
