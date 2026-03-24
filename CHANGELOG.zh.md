@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.3 - 2026-03-25
+
+### 改进 (daftai-chinese-copywriting)
+- `description` 移除实现细节（auto-install、模式列表、规则来源），只保留触发信号。
+- 补充中文触发关键词："校对"、"检查排版"、"中英文空格"、"全角半角"。
+
 ## 1.5.2 - 2026-03-24
 
 ### 改进 (daftai-chinese-copywriting)

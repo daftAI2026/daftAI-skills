@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.3 - 2026-03-25
+
+### Improved (daftai-chinese-copywriting)
+- Trimmed `description` to remove implementation details (auto-install, mode list, rule source) — keep only trigger signals.
+- Added Chinese trigger keywords: "校对", "检查排版", "中英文空格", "全角半角".
+
 ## 1.5.2 - 2026-03-24
 
 ### Improved (daftai-chinese-copywriting)

@@ -2,10 +2,9 @@
 name: daftai-chinese-copywriting
 description: >
   Checks and fixes Chinese copywriting with autocorrect-backed workflows for text
-  and single-file Markdown/TXT inputs. Auto-installs autocorrect when needed,
-  supports review/stable/quick modes, and uses the upstream Chinese copywriting
-  guidelines as the rule source. Use when user asks to normalize Chinese
+  and single-file Markdown/TXT inputs. Use when user asks to normalize Chinese
   punctuation, spacing, full-width/half-width usage, or copywriting style.
+  Also triggers for "校对", "检查排版", "中英文空格", "全角半角".
 metadata:
   openclaw:
     requires:
