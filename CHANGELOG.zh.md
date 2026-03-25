@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.5 - 2026-03-26
+
+### 改进 (daftai-chinese-copywriting)
+- 模式选择增加明确触发词映射表：「校对、修正、排版」→ stable，「检查、看看有没有问题」→ review，「快速修正、autocorrect」→ quick，避免"校对"被误推断为 review。
+- Chunked 后处理改为输出新文件 `chunk-{NN}-corrected.md`（参考 baoyu-translate 模式），合并时读 `chunk-*-corrected.md`，避免覆盖源 chunk 导致 `edit_file` 匹配失败。
+
 ## 1.5.4 - 2026-03-25
 
 ### 改进 (daftai-chinese-copywriting)

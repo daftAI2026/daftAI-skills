@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.5 - 2026-03-26
+
+### Improved (daftai-chinese-copywriting)
+- Added explicit trigger word mapping for mode selection: "校对/修正/排版" → stable, "检查/看看有没有问题" → review, "快速修正/autocorrect" → quick. Prevents "校对" from being incorrectly inferred as review mode.
+- Chunked post-processing now outputs to new files `chunk-{NN}-corrected.md` (following baoyu-translate pattern), merge reads `chunk-*-corrected.md`. Avoids overwriting source chunks which caused `edit_file` match failures.
+
 ## 1.5.4 - 2026-03-25
 
 ### Improved (daftai-chinese-copywriting)

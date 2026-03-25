@@ -55,7 +55,15 @@ Resolve `${BUN_X}` runtime: if `bun` is installed → `bun`; if only `npx` avail
 
 ### Mode Selection
 
-When the user's wording clearly means "check / look for issues" (e.g., 检查、check、看看有没有问题), infer `review` mode directly — **skip first-time setup** (review is read-only). For all other cases, follow the normal EXTEND.md / first-time setup flow.
+Infer mode from the user's wording:
+
+| Trigger words | Mode | Rationale |
+|---------------|------|-----------|
+| 检查、check、看看有没有问题、lint、有什么问题 | `review` | Read-only, just report issues |
+| 校对、修正、排版、格式化、fix、纠正、规范化 | `stable` | Check + fix with AI post-processing |
+| 快速修正、quick fix、autocorrect | `quick` | Pure autocorrect, no AI |
+
+If the user's wording matches `review`, skip first-time setup (review is read-only). For `stable` / `quick`, follow the normal EXTEND.md / first-time setup flow. If no keyword matches, fall back to the user's configured `default_mode` (default: `stable`).
 
 ### Modes
 
@@ -107,15 +115,15 @@ When the user's wording clearly means "check / look for issues" (e.g., 检查、
   - Repeated punctuation (！！、？？) → deduplicate
   - Full-width punctuation followed by extra space → remove space
   - Other violations listed in the guidelines
-  **Single-pass** (word count < chunk_threshold): Read entire file, apply fixes, write back to the same output file.
+  **Single-pass** (word count < chunk_threshold): Read entire file, apply all fixes, save corrected content to the same output file.
   **Chunked** (word count >= chunk_threshold): Use subagents in parallel via [references/subagent-prompt-template.md](references/subagent-prompt-template.md).
     - Spawn one subagent **per chunk**, all in parallel
     - Each subagent spawn prompt MUST use **absolute paths** for all file references
     - Replace `{SKILL_DIR}`, `{chunks_dir}`, `{NN}` placeholders in the template with actual absolute paths before spawning
-    - Each subagent reads the rules file, reads its assigned chunk, applies fixes, writes corrected content back to the same chunk file
+    - Each subagent reads the rules file, reads its assigned chunk, applies fixes, saves to `chunk-{NN}-corrected.md`
     - If Task tool is unavailable, process chunks sequentially inline
     After all chunks are processed, merge:
-    Read all chunk-*.md files from the chunks/ directory in sorted order, concatenate with \n\n, write to {corrected-file}. If chunks/frontmatter.md exists, prepend it.
+    Read all `chunk-*-corrected.md` files from the chunks/ directory in sorted order, concatenate with \n\n, write to {corrected-file}. If chunks/frontmatter.md exists, prepend it.
 - [ ] Step 7: Report output file path to user
 ```
 

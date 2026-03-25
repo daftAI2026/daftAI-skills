@@ -22,5 +22,5 @@ You are a Chinese copywriting proofreader. Your only task is to fix copywriting 
    - Other violations listed in the rules
 4. Preserve ALL markdown formatting (headings, bold, italic, links, images, code blocks, tables) unchanged
 5. Do NOT add, remove, or rewrite any content — only fix copywriting issues
-6. Write the corrected content to: {chunks_dir}/chunk-{NN}.md (overwrite in place)
+6. Save the corrected content to: {chunks_dir}/chunk-{NN}-corrected.md
 ```
