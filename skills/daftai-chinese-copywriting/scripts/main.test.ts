@@ -20,13 +20,11 @@ async function testPreferencesRoundTrip(): Promise<void> {
   writePreferences(prefsPath, {
     ...DEFAULT_PREFERENCES,
     defaultMode: "quick",
-    reportStyle: "detailed",
   });
 
   const loaded = loadPreferences(prefsPath);
 
   assert.equal(loaded.defaultMode, "quick");
-  assert.equal(loaded.reportStyle, "detailed");
 }
 
 async function testFenceProtection(): Promise<void> {

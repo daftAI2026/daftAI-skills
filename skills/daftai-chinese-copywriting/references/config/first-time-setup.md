@@ -7,13 +7,14 @@ description: First-time setup flow for daftai-chinese-copywriting preferences
 
 When no EXTEND.md is found, ask all setup questions before running copywriting checks.
 
-This is a blocking step. Do not start `review`, `quick`, or `stable` first. Do not auto-fill defaults before asking. Do not silently create `EXTEND.md`.
+This is a blocking step. Do not start `quick` or `stable` first. Do not auto-fill defaults before asking. Do not silently create `EXTEND.md`.
+
+**Exception**: `review` mode inferred from user intent (e.g., "检查", "check") skips this setup entirely — review is read-only and does not require preferences.
 
 ## Questions
 
-1. Default mode: `stable`, `quick`, or `review`
-2. Report style: `brief` or `detailed` — **only ask when default mode is `review`**
-3. Save location: `project` or `user` (default: `project`)
+1. Default mode: `stable` or `quick` (default: `stable`)
+2. Save location: `project` or `user` (default: `project`)
 
 ## Save Paths
 
@@ -25,7 +26,6 @@ This is a blocking step. Do not start `review`, `quick`, or `stable` first. Do n
 ## Defaults
 
 - `default_mode: stable`
-- `report_style: brief`
 - `language: zh`
 
 If the user answers "use your recommended settings", "use defaults", or equivalent after the setup questions are asked, treat that as explicit consent to use the recommended/default answers for all setup items, then save them explicitly.

@@ -2,6 +2,14 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.4 - 2026-03-25
+
+### 改进 (daftai-chinese-copywriting)
+- review 模式推断：用户说"检查"、"check"、"看看有没有问题"时自动进入 review 模式，跳过首次设置。
+- review 输出报告文件 `{filename}-review.md`，包含 autocorrect lint + AI 审查的合并结果，使用固定模板（`references/review-report-template.md`）。
+- 移除 `report_style` 配置项（`brief` / `detailed`），review 统一输出结构化检查报告。
+- 首次设置从 2-3 个问题精简为 2 个（默认模式、保存位置），且仅在 `quick` / `stable` 模式触发。
+
 ## 1.5.3 - 2026-03-25
 
 ### 改进 (daftai-chinese-copywriting)

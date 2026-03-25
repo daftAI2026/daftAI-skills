@@ -18,7 +18,6 @@ import {
   writePreferences,
   type Mode,
   type Preferences,
-  type ReportStyle,
 } from "./shared";
 
 async function main(): Promise<void> {
@@ -78,14 +77,12 @@ async function main(): Promise<void> {
     const summary = renderSummary({
       mode,
       input,
-      reportStyle: preferenceState.preferences.reportStyle,
       engine: "autocorrect",
       preferencesPath: i === 0 ? preferenceState.sourcePath : null,
       preferencesCreated: i === 0 && preferenceState.created,
       installAttempted: i === 0 && engineState.installAttempted,
       changed,
       lintOutput: runResult.lintOutput,
-      correctedContent,
       outputPath,
     });
 
@@ -111,7 +108,6 @@ function runInit(args: string[]): void {
   const preferences: Preferences = {
     ...DEFAULT_PREFERENCES,
     defaultMode: toMode(opts["mode"]) ?? DEFAULT_PREFERENCES.defaultMode,
-    reportStyle: toReportStyle(opts["report-style"]) ?? DEFAULT_PREFERENCES.reportStyle,
   };
 
   const scope = opts["scope"] === "project" ? "project" : "user";
@@ -128,18 +124,11 @@ function printHelp(): void {
   console.log("  npx tsx scripts/main.ts review <input...>");
   console.log("  npx tsx scripts/main.ts stable <input...>");
   console.log("  npx tsx scripts/main.ts quick <input...>");
-  console.log("  npx tsx scripts/main.ts init [--mode <mode>] [--report-style <style>] [--scope <user|project>]");
+  console.log("  npx tsx scripts/main.ts init [--mode <mode>] [--scope <user|project>]");
   console.log("");
   console.log("Input:");
   console.log("  - Direct text");
   console.log("  - One or more .md / .txt file paths");
-}
-
-function toReportStyle(value: string | undefined): ReportStyle | undefined {
-  if (value === "brief" || value === "detailed") {
-    return value;
-  }
-  return undefined;
 }
 
 function toMode(value: string | undefined): Mode | undefined {

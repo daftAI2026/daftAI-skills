@@ -2,6 +2,14 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.4 - 2026-03-25
+
+### Improved (daftai-chinese-copywriting)
+- Review mode inference: when user says "检查", "check", or "看看有没有问题", auto-enter review mode and skip first-time setup.
+- Review now outputs a report file `{filename}-review.md` combining autocorrect lint + AI review findings, using a fixed template (`references/review-report-template.md`).
+- Removed `report_style` preference (`brief` / `detailed`) — review always outputs a structured report.
+- First-time setup simplified to 2 questions (default mode, save location), only triggered for `quick` / `stable` modes.
+
 ## 1.5.3 - 2026-03-25
 
 ### Improved (daftai-chinese-copywriting)

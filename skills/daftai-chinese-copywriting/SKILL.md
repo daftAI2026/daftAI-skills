@@ -41,7 +41,7 @@ Resolve `${BUN_X}` runtime: if `bun` is installed → `bun`; if only `npx` avail
 
 | Setting | Default | EXTEND.md key | Description |
 |---------|---------|---------------|-------------|
-| Mode | `stable` | `default_mode` | Workflow mode |
+| Mode | `stable` | `default_mode` | Workflow mode (`stable` or `quick`; `review` is inferred from user intent) |
 | Chunk threshold | `4000` | `chunk_threshold` | Word count to trigger chunked processing |
 | Chunk max words | `5000` | `chunk_max_words` | Max words per chunk |
 
@@ -53,21 +53,28 @@ Resolve `${BUN_X}` runtime: if `bun` is installed → `bun`; if only `npx` avail
 
 ## Workflow
 
+### Mode Selection
+
+When the user's wording clearly means "check / look for issues" (e.g., 检查、check、看看有没有问题), infer `review` mode directly — **skip first-time setup** (review is read-only). For all other cases, follow the normal EXTEND.md / first-time setup flow.
+
 ### Modes
 
 | Mode | Behavior | Output |
 |------|----------|--------|
-| `review` | Check only. Output lint summary and suggested corrections. | No file written. |
+| `review` | Check only. autocorrect lint + AI review, output report. | `{filename}-review.md` |
 | `quick` | Pure `autocorrect --fix`. Fast, tool-only. | `{filename}-corrected.{ext}` |
 | `stable` | `autocorrect --fix` + AI post-processing. Catches issues autocorrect misses. | `{filename}-corrected.{ext}` |
 
 ### `review` workflow
 
 ```
-- [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
+- [ ] Step 0: Skip first-time setup (review is read-only, no EXTEND.md required)
 - [ ] Step 1: Detect autocorrect and auto-install if missing
 - [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts review <input>
-- [ ] Step 3: Report lint results to user
+- [ ] Step 3: Read references/rules/copywriting-guidelines.md for the full rule set
+- [ ] Step 4: AI review — review the original content against the guidelines, combine with autocorrect lint findings
+- [ ] Step 5: Format report using references/review-report-template.md, save to {filename}-review.md
+- [ ] Step 6: Report results to user
 ```
 
 ### `quick` workflow
@@ -125,19 +132,20 @@ Priority: user explicit input > project EXTEND.md > user EXTEND.md > built-in de
 
 ### First-time setup (BLOCKING)
 
-When neither EXTEND.md exists, the agent **MUST** complete first-time setup before any correction workflow step:
+When neither EXTEND.md exists, the agent **MUST** complete first-time setup before `quick` or `stable` workflows.
+
+**Exception**: `review` mode (inferred from user intent) skips this setup entirely — it is read-only.
 
 1. Ask the user (in one message) their preferences:
-   - Default mode: `stable` / `quick` / `review` (default: `stable`)
-   - Report style: `brief` / `detailed` (default: `brief`) — **only ask when default mode is `review`**
+   - Default mode: `stable` / `quick` (default: `stable`)
    - Save location: `project` (.daftAI-skills/...) or `user` (~/.daftAI-skills/...) (default: `project`)
-2. Write the EXTEND.md file via the script: `npx tsx ${SKILL_DIR}/scripts/main.ts init --mode <mode> --report-style <style> --scope <user|project>`
+2. Write the EXTEND.md file via the script: `npx tsx ${SKILL_DIR}/scripts/main.ts init --mode <mode> --scope <user|project>`
 3. Confirm to the user: "Preferences saved to [path]"
 4. Continue with the requested workflow
 
 Do not auto-fill defaults before asking. Do not silently create a user-level or project-level EXTEND.md.
 
-After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers to the four setup items, save EXTEND.md, confirm the saved path, and continue.
+After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers, save EXTEND.md, confirm the saved path, and continue.
 
 ## Dependencies
 

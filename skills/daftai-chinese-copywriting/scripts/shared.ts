@@ -3,14 +3,12 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 export type Mode = "review" | "stable" | "quick";
-export type ReportStyle = "brief" | "detailed";
 export type InputKind = "text" | "file";
 export type SaveScope = "user" | "project";
 
 export interface Preferences {
   version: number;
   defaultMode: Mode;
-  reportStyle: ReportStyle;
   language: string;
   chunkThreshold: number;
   chunkMaxWords: number;
@@ -40,7 +38,6 @@ export const SKILL_NAME = "daftai-chinese-copywriting";
 export const DEFAULT_PREFERENCES: Preferences = {
   version: 1,
   defaultMode: "stable",
-  reportStyle: "brief",
   language: "zh",
   chunkThreshold: 4000,
   chunkMaxWords: 5000,
@@ -62,9 +59,6 @@ export function writePreferences(filePath: string, preferences: Preferences): vo
     `version: ${preferences.version}`,
     `default_mode: ${preferences.defaultMode}`,
   ];
-  if (preferences.defaultMode === "review") {
-    lines.push(`report_style: ${preferences.reportStyle}`);
-  }
   lines.push(
     `language: ${preferences.language}`,
     `chunk_threshold: ${preferences.chunkThreshold}`,
@@ -83,7 +77,6 @@ export function loadPreferences(filePath: string): Preferences {
   return {
     version: toNumber(parsed.version, DEFAULT_PREFERENCES.version),
     defaultMode: toMode(parsed.default_mode, DEFAULT_PREFERENCES.defaultMode),
-    reportStyle: toReportStyle(parsed.report_style, DEFAULT_PREFERENCES.reportStyle),
     language: toStringValue(parsed.language, DEFAULT_PREFERENCES.language),
     chunkThreshold: toNumber(parsed.chunk_threshold, DEFAULT_PREFERENCES.chunkThreshold),
     chunkMaxWords: toNumber(parsed.chunk_max_words, DEFAULT_PREFERENCES.chunkMaxWords),
@@ -127,7 +120,7 @@ export function ensurePreferencesConfigured(
   }
 
   throw new Error(
-    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `npx tsx scripts/main.ts init --mode <stable|quick|review> --report-style <brief|detailed> --scope <user|project>` before running review, quick, or stable.",
+    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `npx tsx scripts/main.ts init --mode <stable|quick|review> --scope <user|project>` before running review, quick, or stable.",
   );
 }
 
@@ -213,17 +206,21 @@ export function computeOutputPath(filePath: string): string {
   return path.join(dir, `${base}-corrected${ext}`);
 }
 
+export function computeReviewOutputPath(filePath: string): string {
+  const dir = path.dirname(filePath);
+  const base = path.basename(filePath, path.extname(filePath));
+  return path.join(dir, `${base}-review.md`);
+}
+
 export function renderSummary(params: {
   mode: Mode;
   input: ResolvedInput;
-  reportStyle: ReportStyle;
   engine: string;
   preferencesPath: string | null;
   preferencesCreated: boolean;
   installAttempted: boolean;
   changed: boolean;
   lintOutput?: string;
-  correctedContent?: string;
   outputPath?: string;
 }): string {
   const lines: string[] = [];
@@ -241,11 +238,7 @@ export function renderSummary(params: {
 
   if (params.mode === "review") {
     lines.push(`Result: ${params.changed ? "issues found" : "no issues found"}`);
-    if (params.changed && params.reportStyle === "detailed" && params.correctedContent) {
-      lines.push("");
-      lines.push("Suggested content:");
-      lines.push(params.correctedContent);
-    } else if (params.changed && params.lintOutput) {
+    if (params.changed && params.lintOutput) {
       lines.push("");
       lines.push(params.lintOutput.trim());
     }
@@ -304,13 +297,6 @@ function toStringValue(value: string | undefined, fallback: string): string {
 
 function toMode(value: string | undefined, fallback: Mode): Mode {
   if (value === "review" || value === "stable" || value === "quick") {
-    return value;
-  }
-  return fallback;
-}
-
-function toReportStyle(value: string | undefined, fallback: ReportStyle): ReportStyle {
-  if (value === "brief" || value === "detailed") {
     return value;
   }
   return fallback;
