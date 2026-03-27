@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 
 import * as fs from "node:fs";
 
@@ -9,12 +9,12 @@ import {
   ensurePreferencesConfigured,
   getProjectPreferencesPath,
   getUserPreferencesPath,
-  protectFencedCodeBlocks,
+  protectSyntax,
   renderSummary,
   resolveInputs,
   resolveMode,
   resolvePreferences,
-  restoreFencedCodeBlocks,
+  restoreSyntax,
   writePreferences,
   type Mode,
   type Preferences,
@@ -53,7 +53,7 @@ async function main(): Promise<void> {
       console.log("");
     }
 
-    const protectedContent = protectFencedCodeBlocks(input.content);
+    const protectedContent = protectSyntax(input.content);
     const runResult = runAutocorrect({
       mode,
       content: protectedContent.content,
@@ -62,7 +62,7 @@ async function main(): Promise<void> {
     });
 
     const correctedContent = runResult.correctedContent
-      ? restoreFencedCodeBlocks(runResult.correctedContent, protectedContent.blocks)
+      ? restoreSyntax(runResult.correctedContent, protectedContent.blocks)
       : undefined;
     const changed = correctedContent !== undefined
       ? correctedContent !== input.content
@@ -121,10 +121,10 @@ function runInit(args: string[]): void {
 
 function printHelp(): void {
   console.log("Usage:");
-  console.log("  npx tsx scripts/main.ts review <input...>");
-  console.log("  npx tsx scripts/main.ts stable <input...>");
-  console.log("  npx tsx scripts/main.ts quick <input...>");
-  console.log("  npx tsx scripts/main.ts init [--mode <mode>] [--scope <user|project>]");
+  console.log("  bun scripts/main.ts review <input...>");
+  console.log("  bun scripts/main.ts stable <input...>");
+  console.log("  bun scripts/main.ts quick <input...>");
+  console.log("  bun scripts/main.ts init [--mode <mode>] [--scope <user|project>]");
   console.log("");
   console.log("Input:");
   console.log("  - Direct text");

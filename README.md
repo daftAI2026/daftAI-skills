@@ -36,7 +36,7 @@ Each skill has its own `SKILL.md` with detailed instructions. The AI assistant w
 ```
 User: Extract subtitles from this video
 → AI loads daftai-extracting-video-subtitles skill
-→ npx tsx scripts/extract_subtitles.ts video.mp4 en
+→ bun scripts/extract_subtitles.ts video.mp4 en
 → Output: video.srt
 ```
 

@@ -10,7 +10,6 @@ metadata:
     requires:
       anyBins:
         - bun
-        - npx
 ---
 
 # Chinese Copywriting
@@ -24,7 +23,7 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 **Agent Execution Instructions**:
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`
 2. Script path = `${SKILL_DIR}/scripts/<script-name>.ts`
-3. Execute via `npx tsx ${SKILL_DIR}/scripts/<script-name>.ts`
+3. Execute via `bun ${SKILL_DIR}/scripts/<script-name>.ts`
 4. Replace all `${SKILL_DIR}` in this document with actual values
 
 **Script Reference**:
@@ -32,10 +31,10 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 |--------|---------|
 | `scripts/main.ts` | CLI entry for review/stable/quick workflows |
 | `scripts/autocorrect.ts` | Detect, install, and run `autocorrect` |
-| `scripts/shared.ts` | Preferences, input handling, and Markdown fence protection |
+| `scripts/shared.ts` | Preferences, input handling, and syntax protection (code/math/links) |
 | `scripts/chunk.ts` | Markdown-aware chunking for long texts |
 
-Resolve `${BUN_X}` runtime: if `bun` is installed → `bun`; if only `npx` available → `npx -y bun`. `scripts/chunk.ts` must be executed via `${BUN_X}` (not `npx tsx`) because it depends on `markdown-it` which is installed under `scripts/node_modules/`.
+All scripts are executed via `bun`. `scripts/chunk.ts` depends on `markdown-it` which is installed under `scripts/node_modules/`. Before AI post-processing, `protectSyntax` replaces fenced code blocks, inline code, block/inline math (`$$`/`$`), and link/image URLs with placeholders; `restoreSyntax` reverses this after processing.
 
 ## Defaults
 
@@ -78,7 +77,7 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 ```
 - [ ] Step 0: Skip first-time setup (review is read-only, no EXTEND.md required)
 - [ ] Step 1: Detect autocorrect and auto-install if missing
-- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts review <input>
+- [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts review <input>
 - [ ] Step 3: Read references/rules/copywriting-guidelines.md for the full rule set
 - [ ] Step 4: AI review — review the original content against the guidelines, combine with autocorrect lint findings
 - [ ] Step 5: Format report using references/review-report-template.md, save to {filename}-review.md
@@ -90,7 +89,7 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 ```
 - [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
 - [ ] Step 1: Detect autocorrect and auto-install if missing
-- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts quick <input>
+- [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts quick <input>
 - [ ] Step 3: Report output file path to user
 ```
 
@@ -99,13 +98,13 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 ```
 - [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
 - [ ] Step 1: Detect autocorrect and auto-install if missing
-- [ ] Step 2: Run: npx tsx ${SKILL_DIR}/scripts/main.ts stable <input>
+- [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts stable <input>
 - [ ] Step 3: Read the output file ({filename}-corrected.{ext})
 - [ ] Step 4: Assess content length — estimate word count of the corrected file
       If word count < chunk_threshold (default 4000): proceed to Step 5 (single-pass)
       If word count >= chunk_threshold: proceed to Step 4.1 (chunked processing)
 - [ ] Step 4.1 (chunked only): Split the corrected file into chunks:
-      Run: ${BUN_X} ${SKILL_DIR}/scripts/chunk.ts "{corrected-file}" --max-words 5000 --output-dir "{corrected-file-dir}"
+      Run: bun ${SKILL_DIR}/scripts/chunk.ts "{corrected-file}" --max-words 5000 --output-dir "{corrected-file-dir}"
       This outputs chunk-01.md, chunk-02.md, ... in a chunks/ subdirectory.
       Note the absolute path of the chunks/ directory for use in Step 6.
 - [ ] Step 5: Read references/rules/copywriting-guidelines.md for the full rule set
@@ -147,7 +146,7 @@ When neither EXTEND.md exists, the agent **MUST** complete first-time setup befo
 1. Ask the user (in one message) their preferences:
    - Default mode: `stable` / `quick` (default: `stable`)
    - Save location: `project` (.daftAI-skills/...) or `user` (~/.daftAI-skills/...) (default: `project`)
-2. Write the EXTEND.md file via the script: `npx tsx ${SKILL_DIR}/scripts/main.ts init --mode <mode> --scope <user|project>`
+2. Write the EXTEND.md file via the script: `bun ${SKILL_DIR}/scripts/main.ts init --mode <mode> --scope <user|project>`
 3. Confirm to the user: "Preferences saved to [path]"
 4. Continue with the requested workflow
 
@@ -177,10 +176,10 @@ cd "${SKILL_DIR}/scripts" && bun install
 ## Usage
 
 ```bash
-npx tsx ${SKILL_DIR}/scripts/main.ts review "你好world"
-npx tsx ${SKILL_DIR}/scripts/main.ts stable "/path/to/file.md"
-npx tsx ${SKILL_DIR}/scripts/main.ts stable "/path/to/a.md" "/path/to/b.md" "/path/to/c.txt"
-npx tsx ${SKILL_DIR}/scripts/main.ts quick "/path/to/file.txt"
+bun ${SKILL_DIR}/scripts/main.ts review "你好world"
+bun ${SKILL_DIR}/scripts/main.ts stable "/path/to/file.md"
+bun ${SKILL_DIR}/scripts/main.ts stable "/path/to/a.md" "/path/to/b.md" "/path/to/c.txt"
+bun ${SKILL_DIR}/scripts/main.ts quick "/path/to/file.txt"
 ```
 
 ## Extension Support

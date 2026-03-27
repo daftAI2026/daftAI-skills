@@ -1,10 +1,10 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * Extract timed SRT subtitles from video/audio files using OpenAI Whisper CLI.
  * Handles complex filenames by copying to temp directory.
  *
- * Usage: npx tsx extract_subtitles.ts <video_file> [language] [model]
- * Example: npx tsx extract_subtitles.ts video.mp4 en turbo
+ * Usage: bun extract_subtitles.ts <video_file> [language] [model]
+ * Example: bun extract_subtitles.ts video.mp4 en turbo
  */
 
 import * as fs from "fs";
@@ -199,7 +199,7 @@ export function extractSubtitles(opts: ExtractSubtitlesOptions): string {
 // CLI entry
 if (require.main === module) {
   if (process.argv.length < 3) {
-    console.log(`Usage: npx tsx extract_subtitles.ts <video_file> [language] [model]`);
+    console.log(`Usage: bun extract_subtitles.ts <video_file> [language] [model]`);
     console.log(`\nArguments:`);
     console.log(`  video_file  - Input video/audio file path`);
     console.log(`  language    - Language code, default: ${DEFAULT_LANGUAGE} (options: zh, ja, ko, fr, de, es, etc.)`);
@@ -210,9 +210,9 @@ if (require.main === module) {
     console.log(`  2-30 min   → turbo`);
     console.log(`  > 30 min   → base`);
     console.log(`\nExamples:`);
-    console.log(`  npx tsx extract_subtitles.ts video.mp4`);
-    console.log(`  npx tsx extract_subtitles.ts video.mp4 zh`);
-    console.log(`  npx tsx extract_subtitles.ts video.mp4 en turbo`);
+    console.log(`  bun extract_subtitles.ts video.mp4`);
+    console.log(`  bun extract_subtitles.ts video.mp4 zh`);
+    console.log(`  bun extract_subtitles.ts video.mp4 en turbo`);
     process.exit(1);
   }
 

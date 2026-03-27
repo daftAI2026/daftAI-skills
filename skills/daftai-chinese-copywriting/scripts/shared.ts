@@ -120,7 +120,7 @@ export function ensurePreferencesConfigured(
   }
 
   throw new Error(
-    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `npx tsx scripts/main.ts init --mode <stable|quick|review> --scope <user|project>` before running review, quick, or stable.",
+    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `bun scripts/main.ts init --mode <stable|quick|review> --scope <user|project>` before running review, quick, or stable.",
   );
 }
 
@@ -172,32 +172,56 @@ export function resolveInputs(rawArgs: string[], cwd: string = process.cwd()): R
   }];
 }
 
-export function protectFencedCodeBlocks(content: string): ProtectedContent {
+export function protectSyntax(content: string): ProtectedContent {
   const blocks: Array<{ token: string; original: string }> = [];
-  let blockIndex = 0;
+  let idx = 0;
 
-  const protectedContent = content.replace(/```[\s\S]*?```/g, (match) => {
-    const lines = match.split("\n");
-    const token = lines.map((_, lineIndex) => {
-      return lineIndex === 0
-        ? `__DAFTAI_FENCE_BLOCK_${blockIndex}__`
-        : `__DAFTAI_FENCE_BLOCK_${blockIndex}_PAD_${lineIndex}__`;
-    }).join("\n");
-    blocks.push({ token, original: match });
-    blockIndex += 1;
+  const replace = (tag: string, original: string, preserveLines = false): string => {
+    if (preserveLines) {
+      const lines = original.split("\n");
+      const token = lines.map((_, li) =>
+        li === 0 ? `__DAFTAI_${tag}_${idx}__` : `__DAFTAI_${tag}_${idx}_L${li}__`
+      ).join("\n");
+      blocks.push({ token, original });
+      idx += 1;
+      return token;
+    }
+    const token = `__DAFTAI_${tag}_${idx}__`;
+    blocks.push({ token, original });
+    idx += 1;
     return token;
+  };
+
+  let s = content;
+  // 1. Fenced code blocks (preserve line count for autocorrect compatibility)
+  s = s.replace(/```[\s\S]*?```/g, (m) => replace("FENCE", m, true));
+  // 2. Block math $$...$$
+  s = s.replace(/\$\$[\s\S]*?\$\$/g, (m) => replace("BMATH", m, true));
+  // 3. Inline code `...`
+  s = s.replace(/`[^`\n]+`/g, (m) => replace("CODE", m));
+  // 4. Inline math $...$  (not preceded/followed by $)
+  s = s.replace(/(?<!\$)\$(?!\$|\s)([^\n$]+?)(?<!\s)\$(?!\$)/g, (m) => replace("IMATH", m));
+  // 5. Image/link URLs — protect only the (url) part, keep [text] for copywriting rules
+  s = s.replace(/(!?\[[^\]]*\])\(([^)]+)\)/g, (_, text, url) => {
+    const urlToken = replace("URL", url);
+    return `${text}(${urlToken})`;
   });
 
-  return { content: protectedContent, blocks };
+  return { content: s, blocks };
 }
 
-export function restoreFencedCodeBlocks(content: string, blocks: ProtectedContent["blocks"]): string {
+export function restoreSyntax(content: string, blocks: ProtectedContent["blocks"]): string {
   let restored = content;
   for (const block of blocks) {
-    restored = restored.replaceAll(block.token, block.original);
+    restored = restored.replaceAll(block.token, () => block.original);
   }
   return restored;
 }
+
+/** @deprecated Use protectSyntax instead */
+export const protectFencedCodeBlocks = protectSyntax;
+/** @deprecated Use restoreSyntax instead */
+export const restoreFencedCodeBlocks = restoreSyntax;
 
 export function computeOutputPath(filePath: string): string {
   const dir = path.dirname(filePath);

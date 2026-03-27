@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * 检测字幕文件的语言
  * 支持从文件名和内容检测
@@ -100,7 +100,7 @@ export function detectLanguage(filePath: string): string {
 // CLI 入口
 if (require.main === module) {
   if (process.argv.length < 3) {
-    console.log("用法: npx tsx detect_language.ts <字幕文件>");
+    console.log("用法: bun detect_language.ts <字幕文件>");
     process.exit(1);
   }
 

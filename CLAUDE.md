@@ -35,7 +35,7 @@ Each skill contains:
 
 ## Running Scripts
 
-All scripts are TypeScript, executed via `npx tsx` (no build step).
+All scripts are TypeScript, executed via `bun` (no build step).
 
 ### Runtime Detection
 
@@ -43,23 +43,23 @@ Before running any script, the agent MUST detect the runtime **once per session*
 
 ```bash
 # Detect runtime (run once, reuse result)
-if command -v npx &>/dev/null; then
-  RUNTIME="npx tsx"
+if command -v bun &>/dev/null; then
+  RUNTIME="bun"
 else
-  echo "Error: npx not found. Install Node.js: https://nodejs.org/"
+  echo "Error: bun not found. Install Bun: https://bun.sh/"
   exit 1
 fi
 ```
 
 | Priority | Condition | Runtime | Notes |
 |----------|-----------|---------|-------|
-| 1 | `npx` available | `npx tsx` | Standard execution via npm |
-| 2 | Not found | Error + install guide | Suggest installing Node.js |
+| 1 | `bun` available | `bun` | Standard execution via Bun |
+| 2 | Not found | Error + install guide | Suggest installing Bun |
 
 ### Script Execution
 
 ```bash
-npx tsx skills/<skill>/scripts/<script>.ts [options]
+bun skills/<skill>/scripts/<script>.ts [options]
 ```
 
 Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `os`). No npm packages required.
@@ -68,7 +68,7 @@ Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `os`).
 
 ## Key Dependencies
 
-- **Node.js / npx tsx**: TypeScript runtime for all scripts
+- **Bun**: TypeScript runtime for all scripts
 - **FFmpeg**: Required by `daftai-video-subtitler` for subtitle burning
 - **Whisper**: Required by `daftai-extracting-video-subtitles` for speech-to-text
 - **Chrome**: Required by `daftai-url-to-markdown` for CDP page rendering
@@ -177,7 +177,7 @@ Every SKILL.md with scripts MUST include this section:
 **Agent Execution Instructions**:
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`
 2. Script path = `${SKILL_DIR}/scripts/<script-name>.ts`
-3. Execute via `npx tsx ${SKILL_DIR}/scripts/<script-name>.ts`
+3. Execute via `bun ${SKILL_DIR}/scripts/<script-name>.ts`
 4. Replace all `${SKILL_DIR}` in this document with actual values
 
 **Script Reference**:
@@ -187,7 +187,7 @@ Every SKILL.md with scripts MUST include this section:
 | `scripts/other.ts` | Other functionality |
 ```
 
-When referencing scripts in workflow sections, use `npx tsx ${SKILL_DIR}/scripts/<name>.ts` so agents can resolve the correct path.
+When referencing scripts in workflow sections, use `bun ${SKILL_DIR}/scripts/<name>.ts` so agents can resolve the correct path.
 
 ### Progressive Disclosure
 

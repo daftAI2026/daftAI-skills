@@ -63,16 +63,16 @@ test -f "$HOME/.daftai-skills/daftAI-url-to-markdown/EXTEND.md" && echo "user"
 
 ```bash
 # Auto mode (default) - capture and download images
-npx -y bun ${SKILL_DIR}/scripts/main.ts <url>
+bun ${SKILL_DIR}/scripts/main.ts <url>
 
 # Wait mode - wait for user signal before capture
-npx -y bun ${SKILL_DIR}/scripts/main.ts <url> --wait
+bun ${SKILL_DIR}/scripts/main.ts <url> --wait
 
 # Skip image downloading
-npx -y bun ${SKILL_DIR}/scripts/main.ts <url> --no-images
+bun ${SKILL_DIR}/scripts/main.ts <url> --no-images
 
 # Save to specific file
-npx -y bun ${SKILL_DIR}/scripts/main.ts <url> -o output.md
+bun ${SKILL_DIR}/scripts/main.ts <url> -o output.md
 ```
 
 ## Options

@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * 烧录字幕到视频
  * 支持字体检测、自动回退、H.264 编码
@@ -355,7 +355,7 @@ if (require.main === module) {
   const { positional, flags } = parseCliArgs(process.argv);
 
   if (positional.length < 3 || flags["help"] || flags["h"]) {
-    console.log(`用法: npx tsx burn_subtitles.ts <视频> <字幕> <输出> [选项]`);
+    console.log(`用法: bun burn_subtitles.ts <视频> <字幕> <输出> [选项]`);
     console.log(`\n必填参数:`);
     console.log(`  视频   - 输入视频文件路径`);
     console.log(`  字幕   - 字幕文件路径（SRT/VTT/ASS/SSA）`);
@@ -372,9 +372,9 @@ if (require.main === module) {
     console.log(`  --source-position <位置>     来源位置，默认 top-left`);
     console.log(`  --source-opacity <数字>      来源透明度 0-1，默认 ${DEFAULT_SOURCE_OPACITY}`);
     console.log(`\n示例:`);
-    console.log(`  npx tsx burn_subtitles.ts video.mp4 subtitle.srt output.mp4`);
-    console.log(`  npx tsx burn_subtitles.ts video.mp4 subtitle.srt output.mp4 --font-size 24`);
-    console.log(`  npx tsx burn_subtitles.ts video.mp4 subtitle.srt output.mp4 --watermark-text "@daftAI" --watermark-position top-left`);
+    console.log(`  bun burn_subtitles.ts video.mp4 subtitle.srt output.mp4`);
+    console.log(`  bun burn_subtitles.ts video.mp4 subtitle.srt output.mp4 --font-size 24`);
+    console.log(`  bun burn_subtitles.ts video.mp4 subtitle.srt output.mp4 --watermark-text "@daftAI" --watermark-position top-left`);
     process.exit(1);
   }
 

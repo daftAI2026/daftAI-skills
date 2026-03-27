@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * 将 VTT 字幕转换为 SRT 格式
  */
@@ -79,7 +79,7 @@ export function vttToSrt(vttPath: string, srtPath: string): string {
 // CLI 入口
 if (require.main === module) {
   if (process.argv.length < 4) {
-    console.log("用法: npx tsx convert_vtt_to_srt.ts <input.vtt> <output.srt>");
+    console.log("用法: bun convert_vtt_to_srt.ts <input.vtt> <output.srt>");
     process.exit(1);
   }
 

@@ -12,7 +12,7 @@ description: >
 Translate subtitle files between languages with accuracy validation.
 
 > **Scripts**: All scripts are in `scripts/` relative to this SKILL.md.
-> **CRITICAL**: When running any `npx tsx scripts/...` command, you MUST set the working directory (`cwd`) to this skill's base directory. Do NOT run from the user's project directory.
+> **CRITICAL**: When running any `bun scripts/...` command, you MUST set the working directory (`cwd`) to this skill's base directory. Do NOT run from the user's project directory.
 
 ## Workflow
 
@@ -65,7 +65,7 @@ Input → [Step 1: Validate] → File exists, format check
 
 1. Auto-detect source language:
    ```bash
-   npx tsx scripts/detect_language.ts "<subtitle_path>"
+   bun scripts/detect_language.ts "<subtitle_path>"
    ```
    - From filename (e.g., `subtitles_en.srt` → `en`)
    - From content (Chinese characters → `zh`, Latin → `en`, etc.)
@@ -86,7 +86,7 @@ Input → [Step 1: Validate] → File exists, format check
 
 If input is VTT format:
 ```bash
-npx tsx scripts/convert_vtt_to_srt.ts "<input.vtt>" "<output.srt>"
+bun scripts/convert_vtt_to_srt.ts "<input.vtt>" "<output.srt>"
 ```
 
 If input is already SRT → use directly.
@@ -186,7 +186,7 @@ If issues are found → fix in place and re-run count validation.
 **Output path**: `<output_dir>/<filename>_bilingual.srt`
 
 ```bash
-npx tsx scripts/merge_bilingual_subtitles.ts \
+bun scripts/merge_bilingual_subtitles.ts \
   "<top_subtitle.srt>" \
   "<bottom_subtitle.srt>" \
   "<output_dir>/<filename>_bilingual.srt"

@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * 合并中文和英文字幕为双语 SRT 文件
  * 中文在上，英文在下
@@ -86,9 +86,9 @@ export function mergeBilingualSubtitles(
 // CLI 入口
 if (require.main === module) {
   if (process.argv.length < 5) {
-    console.log("用法: npx tsx merge_bilingual_subtitles.ts <上方字幕> <下方字幕> <输出文件>");
+    console.log("用法: bun merge_bilingual_subtitles.ts <上方字幕> <下方字幕> <输出文件>");
     console.log("\n示例（中文在上，英文在下）:");
-    console.log("  npx tsx merge_bilingual_subtitles.ts subtitles_zh.srt subtitles_en.srt bilingual.srt");
+    console.log("  bun merge_bilingual_subtitles.ts subtitles_zh.srt subtitles_en.srt bilingual.srt");
     process.exit(1);
   }
 

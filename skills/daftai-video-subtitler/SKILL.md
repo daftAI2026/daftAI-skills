@@ -11,7 +11,7 @@ description: >
 Burn (hardcode) subtitle files into local video.
 
 > **Scripts**: All scripts are in `scripts/` relative to this SKILL.md.
-> **CRITICAL**: When running any `npx tsx scripts/...` command, you MUST set the working directory (`cwd`) to this skill's base directory. Do NOT run from the user's project directory.
+> **CRITICAL**: When running any `bun scripts/...` command, you MUST set the working directory (`cwd`) to this skill's base directory. Do NOT run from the user's project directory.
 
 ## Priority Chain
 
@@ -117,7 +117,7 @@ test -f "$HOME/.daftAI-skills/daftAI-video-subtitler/EXTEND.md" && echo "user"
 
 5. VTT → SRT conversion only when merging or translating:
    ```bash
-   npx tsx scripts/convert_vtt_to_srt.ts "<vtt_path>" "<srt_output>"
+   bun scripts/convert_vtt_to_srt.ts "<vtt_path>" "<srt_output>"
    ```
 
 6. Auto-detect language:
@@ -187,7 +187,7 @@ Use single AskUserQuestion with multiple questions when confirmation is needed.
 **Output path**: `<output_dir>/<video_name>_bilingual.srt` (e.g., `output/video_bilingual.srt`)
 
 ```bash
-npx tsx scripts/merge_bilingual_subtitles.ts \
+bun scripts/merge_bilingual_subtitles.ts \
   "<top_subtitle.srt>" \
   "<bottom_subtitle.srt>" \
   "<output_dir>/<video_name>_bilingual.srt"
@@ -202,7 +202,7 @@ Order: from preferences `bilingual.order`, fallback to default (Chinese top, Eng
 **Goal**: Hardcode subtitles into video
 
 ```bash
-npx tsx scripts/burn_subtitles.ts \
+bun scripts/burn_subtitles.ts \
   "<video_path>" \
   "<subtitle_path>" \
   "<output_path>" \

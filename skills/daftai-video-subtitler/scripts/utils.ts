@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * 通用工具函数
  * 提供时间格式转换、文件名清理、路径处理等功能

@@ -58,7 +58,7 @@ which ffprobe
 ### Step 4: Run Extraction
 
 ```bash
-npx tsx scripts/extract_subtitles.ts "<video_path>" [language] [model]
+bun scripts/extract_subtitles.ts "<video_path>" [language] [model]
 ```
 
 **Parameters:**
@@ -106,23 +106,23 @@ Script automatically reports:
 **Basic extraction:**
 ```
 User: 帮我提取这个视频的字幕
-→ npx tsx scripts/extract_subtitles.ts "video.mp4" en
+→ bun scripts/extract_subtitles.ts "video.mp4" en
 ```
 
 **With language specified:**
 ```
 User: Extract English subtitles from this video
-→ npx tsx scripts/extract_subtitles.ts "video.mp4" en
+→ bun scripts/extract_subtitles.ts "video.mp4" en
 ```
 
 **Chinese video:**
 ```
 User: 提取中文字幕
-→ npx tsx scripts/extract_subtitles.ts "video.mp4" zh
+→ bun scripts/extract_subtitles.ts "video.mp4" zh
 ```
 
 **Long video with specific model:**
 ```
 User: 提取这个一小时视频的字幕
-→ npx tsx scripts/extract_subtitles.ts "video.mp4" en base
+→ bun scripts/extract_subtitles.ts "video.mp4" en base
 ```

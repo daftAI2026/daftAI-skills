@@ -36,7 +36,7 @@ npx skills add daftAI2026/daftAI-skills
 ```
 用户：帮我提取这个视频的字幕
 → AI 加载 daftai-extracting-video-subtitles skill
-→ npx tsx scripts/extract_subtitles.ts video.mp4 en
+→ bun scripts/extract_subtitles.ts video.mp4 en
 → 输出：video.srt
 ```
 
