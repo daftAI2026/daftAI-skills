@@ -2,6 +2,17 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.5.6 - 2026-03-27
+
+### Improved (daftai-chinese-copywriting, daftai-video-subtitler, daftai-subtitle-translator, daftai-extracting-video-subtitles, daftai-url-to-markdown)
+- Consolidated runtime execution: all skills now use `bun` exclusively (removed `npx` references)
+- Updated `SKILL.md` Script Directory sections to reflect `bun` execution model
+- Enhanced documentation in AGENTS.md, CLAUDE.md, README.md to align with Bun runtime
+
+### Improved (daftai-chinese-copywriting)
+- Enhanced `scripts/shared.ts` with `protectSyntax` and `restoreSyntax` functions for more robust syntax preservation (code blocks, inline code, math, links)
+- Improved test coverage in `main.test.ts` with comprehensive workflow testing
+
 ## 1.5.5 - 2026-03-26
 
 ### Improved (daftai-chinese-copywriting)

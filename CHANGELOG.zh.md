@@ -2,6 +2,17 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.5.6 - 2026-03-27
+
+### 改进 (daftai-chinese-copywriting, daftai-video-subtitler, daftai-subtitle-translator, daftai-extracting-video-subtitles, daftai-url-to-markdown)
+- 统一运行时执行方式：所有技能现使用 `bun` 执行（移除 `npx` 引用）
+- 更新 `SKILL.md` 脚本目录部分以反映 Bun 运行时模型
+- 增强 AGENTS.md、CLAUDE.md、README.md 文档以对齐 Bun 运行时
+
+### 改进 (daftai-chinese-copywriting)
+- 增强 `scripts/shared.ts`，添加 `protectSyntax` 和 `restoreSyntax` 函数用于更强健的语法保护（代码块、行内代码、数学公式、链接）
+- 改进 `main.test.ts` 测试覆盖，包括全面的工作流测试
+
 ## 1.5.5 - 2026-03-26
 
 ### 改进 (daftai-chinese-copywriting)
