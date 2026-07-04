@@ -18,7 +18,9 @@ skills/
 │   └── daftai-extracting-video-subtitles/  # Extract subtitles from video via Whisper
 │
 └── [utility-skills]                    # Content utilities
-    └── daftai-url-to-markdown/             # Fetch URL and convert to markdown with images
+    ├── daftai-url-to-markdown/             # Fetch URL and convert to markdown with images
+    ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
+    └── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
 ```
 
 **Plugin Categories**:
@@ -32,6 +34,8 @@ Each skill contains:
 - `SKILL.md` — YAML front matter (name, description) + workflow documentation
 - `scripts/` — TypeScript implementations
 - `references/` — Glossaries, config schemas, workflow details (optional)
+- `agents/` — Product-specific skill metadata (optional)
+- `CLAUDE.md` — GEB module map for skills with architecture-level files (optional)
 
 ## Running Scripts
 
@@ -70,6 +74,7 @@ Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `os`).
 
 - **Bun**: TypeScript runtime for all scripts
 - **FFmpeg**: Required by `daftai-video-subtitler` for subtitle burning
+- **Potrace + librsvg/Inkscape**: Required by `daftai-image-to-svg` for path tracing and candidate measurement
 - **Whisper**: Required by `daftai-extracting-video-subtitles` for speech-to-text
 - **Chrome**: Required by `daftai-url-to-markdown` for CDP page rendering
 - **No npm packages**: Self-contained TypeScript, no external dependencies

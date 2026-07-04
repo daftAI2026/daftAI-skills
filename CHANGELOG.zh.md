@@ -2,6 +2,19 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.6.0 - 2026-07-04
+
+### 新增 (daftai-image-to-svg)
+- 新 Skill：将透明或纯色底单色 PNG/SVG 图像转换为经过误差量化的纯路径真矢量 SVG。
+- 支持白底、红底、绿底及其他纯色背景自动去底。
+- 支持 Potrace 阈值与参数扫描，可按 `mae`、`rmse`、`iou` 目标选择最佳候选。
+- 新增 `--keep-candidates`，调参时可保留候选 SVG/PNG 过程文件。
+- 输出预览 PNG 与 JSON 报告，记录颜色、背景去除、Potrace 参数、MAE/RMSE/IoU 和 SVG 结构验证。
+
+### 改进 (README, AGENTS)
+- 在 utility skills marketplace 分类注册 `daftai-image-to-svg`。
+- 在 README、README.zh、AGENTS.md、CLAUDE.md 中补充 Potrace + librsvg/Inkscape 依赖与新 skill 结构。
+
 ## 1.5.6 - 2026-03-27
 
 ### 改进 (daftai-chinese-copywriting, daftai-video-subtitler, daftai-subtitle-translator, daftai-extracting-video-subtitles, daftai-url-to-markdown)

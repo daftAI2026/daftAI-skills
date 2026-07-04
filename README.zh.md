@@ -26,6 +26,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | 使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕 |
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
+| [daftai-image-to-svg](skills/daftai-image-to-svg/) | 将透明或纯色底单色 PNG/SVG 转换为经过误差量化的纯路径真矢量 SVG |
 
 ## 使用方式
 
@@ -73,10 +74,15 @@ daftAI-skills/
     ├── daftai-url-to-markdown/
     │   ├── SKILL.md
     │   └── scripts/          # TypeScript 工具脚本
-    └── daftai-chinese-copywriting/
+    ├── daftai-chinese-copywriting/
+    │   ├── SKILL.md
+    │   ├── scripts/          # TypeScript 工具脚本
+    │   └── references/       # 配置文档
+    └── daftai-image-to-svg/
         ├── SKILL.md
-        ├── scripts/          # TypeScript 工具脚本
-        └── references/       # 配置文档
+        ├── CLAUDE.md         # 模块地图
+        ├── agents/           # Codex 元数据
+        └── scripts/          # TypeScript 转换器与测试
 ```
 
 ## 贡献

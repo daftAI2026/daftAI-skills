@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Skills shared by daftAI for improving daily work efficiency",
-    "version": "1.5.6"
+    "version": "1.6.0"
   },
   "plugins": [
     {
@@ -26,7 +26,8 @@
       "strict": false,
       "skills": [
         "./skills/daftai-url-to-markdown",
-        "./skills/daftai-chinese-copywriting"
+        "./skills/daftai-chinese-copywriting",
+        "./skills/daftai-image-to-svg"
       ]
     }
   ]

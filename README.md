@@ -26,6 +26,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | Extract timed SRT subtitles from video/audio files using OpenAI Whisper |
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | Fetch any URL and convert to markdown using Chrome CDP, with automatic image downloading |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | Check and fix Chinese copywriting (punctuation, spacing, full-width/half-width) using autocorrect |
+| [daftai-image-to-svg](skills/daftai-image-to-svg/) | Convert transparent or solid-background single-color PNG/SVG artwork into measured, path-only SVG output |
 
 ## Usage
 
@@ -73,10 +74,15 @@ daftAI-skills/
     ├── daftai-url-to-markdown/
     │   ├── SKILL.md
     │   └── scripts/          # TypeScript utilities
-    └── daftai-chinese-copywriting/
+    ├── daftai-chinese-copywriting/
+    │   ├── SKILL.md
+    │   ├── scripts/          # TypeScript utilities
+    │   └── references/       # Config docs
+    └── daftai-image-to-svg/
         ├── SKILL.md
-        ├── scripts/          # TypeScript utilities
-        └── references/       # Config docs
+        ├── CLAUDE.md         # Module map
+        ├── agents/           # Codex metadata
+        └── scripts/          # TypeScript converter and tests
 ```
 
 ## Contributing

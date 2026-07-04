@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image to SVG"
+  short_description: "Convert images into true vector SVG"
+  default_prompt: "Use $daftai-image-to-svg to convert this transparent or solid-background PNG/SVG into a verified true-vector SVG, optimizing for IoU when outline overlap matters."

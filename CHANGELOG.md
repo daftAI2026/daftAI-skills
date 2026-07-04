@@ -2,6 +2,19 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.6.0 - 2026-07-04
+
+### Added (daftai-image-to-svg)
+- New skill: convert transparent or solid-background single-color PNG/SVG artwork into measured path-only SVG output.
+- Added pure-color background removal for white, red, green, and other flat-background artwork.
+- Added Potrace threshold and parameter scanning with selectable objectives: `mae`, `rmse`, and `iou`.
+- Added optional `--keep-candidates` output for preserving measured candidate SVG/PNG files during tuning.
+- Added preview PNG and JSON report output with color, background removal, Potrace parameters, MAE/RMSE/IoU, and SVG structure validation.
+
+### Improved (README, AGENTS)
+- Registered `daftai-image-to-svg` in the utility skills marketplace category.
+- Documented Potrace + librsvg/Inkscape dependencies and the new skill structure in README, README.zh, AGENTS.md, and CLAUDE.md.
+
 ## 1.5.6 - 2026-03-27
 
 ### Improved (daftai-chinese-copywriting, daftai-video-subtitler, daftai-subtitle-translator, daftai-extracting-video-subtitles, daftai-url-to-markdown)
