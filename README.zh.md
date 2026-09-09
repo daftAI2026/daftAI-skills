@@ -27,6 +27,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
 | [daftai-image-to-svg](skills/daftai-image-to-svg/) | 将透明或纯色底单色 PNG/SVG 转换为经过误差量化的纯路径真矢量 SVG |
+| [daftai-gpt-image-2-5-prompt-optimizer](skills/daftai-gpt-image-2-5-prompt-optimizer/) | 依据在线官方参考，将自然语言优化为 GPT Image 2.5 提示词；只输出文字，不生图 |
 
 ## 使用方式
 
@@ -48,6 +49,14 @@ npx skills add daftAI2026/daftAI-skills
 → AI 加载 daftai-video-subtitler skill
 → 检测环境 → 扫描字幕 → 烧录到视频
 → 输出：video_zh.mp4
+```
+
+### 示例：优化生图提示词
+
+```text
+用户：用 daftai-gpt-image-2-5-prompt-optimizer 优化：雨后巷子里的橘猫，水彩明信片，不要字。
+→ AI 读取官方 GPT Image 2.5 指南，返回可以直接复制的提示词
+→ 首次需要 Bun 与网络，之后复用本地参考缓存；不需要生图 API Key
 ```
 
 ## 项目结构
@@ -78,11 +87,17 @@ daftAI-skills/
     │   ├── SKILL.md
     │   ├── scripts/          # TypeScript 工具脚本
     │   └── references/       # 配置文档
-    └── daftai-image-to-svg/
+    ├── daftai-image-to-svg/
+    │   ├── SKILL.md
+    │   ├── CLAUDE.md         # 模块地图
+    │   ├── agents/           # Codex 元数据
+    │   └── scripts/          # TypeScript 转换器与测试
+    └── daftai-gpt-image-2-5-prompt-optimizer/
         ├── SKILL.md
         ├── CLAUDE.md         # 模块地图
         ├── agents/           # Codex 元数据
-        └── scripts/          # TypeScript 转换器与测试
+        ├── scripts/          # 轻量 TypeScript 抓取器与测试
+        └── references/       # 来源规则、本地忽略缓存与原创验收场景
 ```
 
 ## 贡献

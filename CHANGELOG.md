@@ -2,6 +2,18 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.7.0 - 2026-09-10
+
+### Added (daftai-gpt-image-2-5-prompt-optimizer)
+- New prompt-only skill for GPT Image 2.5 with English instructions and Chinese discovery keywords.
+- Selects relevant official examples, preserves reference-image roles, and resolves aspect-ratio requirements before drafting.
+- Offers conditional beginner guidance and prefers native question dialogs without mandatory first-run configuration.
+- Adds a lightweight TypeScript fetcher: downloads the complete official 2.5 section once, reuses a local cache, and supports explicit refresh.
+- Excludes official cached content from Git and distribution; includes source rules, original acceptance cases, and six passing fetcher tests.
+
+### Improved
+- Registers the skill in utility-skills and updates bilingual READMEs, Codex metadata, and architecture maps.
+
 ## 1.6.0 - 2026-07-04
 
 ### Added (daftai-image-to-svg)

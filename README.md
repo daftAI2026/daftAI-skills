@@ -27,6 +27,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | Fetch any URL and convert to markdown using Chrome CDP, with automatic image downloading |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | Check and fix Chinese copywriting (punctuation, spacing, full-width/half-width) using autocorrect |
 | [daftai-image-to-svg](skills/daftai-image-to-svg/) | Convert transparent or solid-background single-color PNG/SVG artwork into measured, path-only SVG output |
+| [daftai-gpt-image-2-5-prompt-optimizer](skills/daftai-gpt-image-2-5-prompt-optimizer/) | Optimize natural-language requests into GPT Image 2.5 prompts using live official guidance; returns text, not images |
 
 ## Usage
 
@@ -48,6 +49,14 @@ User: Burn Chinese subtitles into this video
 → AI loads daftai-video-subtitler skill
 → Detects environment, scans subtitles, burns to video
 → Output: video_zh.mp4
+```
+
+### Example: Optimize an Image Prompt
+
+```text
+User: Use daftai-gpt-image-2-5-prompt-optimizer: a watercolor postcard of an orange cat in a rainy alley, no text.
+→ AI reads the official GPT Image 2.5 guidance, then returns a ready-to-copy prompt
+→ Requires Bun and internet on first use; later runs reuse the local cache, with no image API key
 ```
 
 ## Project Structure
@@ -78,11 +87,17 @@ daftAI-skills/
     │   ├── SKILL.md
     │   ├── scripts/          # TypeScript utilities
     │   └── references/       # Config docs
-    └── daftai-image-to-svg/
+    ├── daftai-image-to-svg/
+    │   ├── SKILL.md
+    │   ├── CLAUDE.md         # Module map
+    │   ├── agents/           # Codex metadata
+    │   └── scripts/          # TypeScript converter and tests
+    └── daftai-gpt-image-2-5-prompt-optimizer/
         ├── SKILL.md
         ├── CLAUDE.md         # Module map
         ├── agents/           # Codex metadata
-        └── scripts/          # TypeScript converter and tests
+        ├── scripts/          # Lightweight TypeScript fetcher and tests
+        └── references/       # Source rules, local ignored cache and acceptance cases
 ```
 
 ## Contributing

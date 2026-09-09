@@ -20,10 +20,13 @@ skills/
 └── [utility-skills]                    # Content utilities
     ├── daftai-url-to-markdown/             # Fetch URL and convert to markdown with images
     ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
-    └── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
+    ├── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
+    └── daftai-gpt-image-2-5-prompt-optimizer/ # Optimize image prompts using live official references
 ```
 
 **Plugin Categories**:
+
+Module navigation: [skills/CLAUDE.md](skills/CLAUDE.md). The GPT Image 2.5 prompt optimizer returns text only: a Bun script fetches the complete official 2.5 reference once, then reuses a Git-ignored local cache. No image generation or source article is bundled.
 
 | Category | Description |
 |----------|-------------|
