@@ -33,19 +33,21 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`.
 2. Detect Bun once per session with `command -v bun`; if missing, report the requirement instead of silently installing it.
 3. Set working directory to `${SKILL_DIR}`.
-4. Execute `bun ${SKILL_DIR}/scripts/fetch-guide.ts` and read the file at the returned path.
+4. Execute `bun ${SKILL_DIR}/scripts/fetch-guide.ts` and read the returned `indexPath`, not the full-source `path`.
 5. Replace every `${SKILL_DIR}` with the actual absolute path.
 
 | Script | Purpose |
 |---|---|
-| `scripts/fetch-guide.ts` | Reuse the local reference or fetch the complete GPT Image 2.5 section; `--refresh` explicitly updates it |
+| `scripts/fetch-guide.ts` | Prepare the source cache and verbatim section index; `--refresh` explicitly updates the source |
+| `scripts/split-guide.ts` | Deterministic verbatim section slicing and index generation; invoked by the fetcher, not an LLM |
+| `scripts/split-guide.test.ts` | Lossless slicing and index tests; run `bun test ${SKILL_DIR}/scripts/split-guide.test.ts` |
 | `scripts/fetch-guide.test.ts` | Offline extraction and caching tests; run `bun test ${SKILL_DIR}/scripts/fetch-guide.test.ts` |
 
 ## Workflow
 
 ### 1. Prepare the official reference
 
-Do this before drafting or asking creative-brief questions: run the fetcher above. It checks `references/cache/official-gpt-image-2-5.md`, reuses a valid cache without networking, and downloads the complete 2.5 section only when missing. Read the returned file in full, using chunks if tool output is truncated. A path receipt is not the reference itself.
+Do this before drafting or asking creative-brief questions: run the fetcher above. It checks `references/cache/official-gpt-image-2-5.md`, reuses a valid cache without networking, and downloads the complete 2.5 section only when missing. It also creates or repairs verbatim section files from that local source without downloading it again. Read the returned `indexPath`, then the linked Overview and Prompting fundamentals sections. Do not read the complete source or every section by default. A path receipt is not the reference itself.
 
 Follow [references/official-guide.md](references/official-guide.md) for source boundaries and failures. Reuse the cache across sessions; use `--refresh` only when the user requests an update or approves repair of an invalid cache. Never present an unverified general rewrite as an official-guide-based result.
 
@@ -87,7 +89,7 @@ Resolve aspect ratio in this order:
 3. A style, identity, or palette reference alone does not determine output ratio. Use an explicit destination requirement when supplied. Otherwise leave the ratio unspecified, or offer a clearly labeled suggestion if useful; do not force a ratio question for every request.
 4. With multiple incompatible composition references and no designated base, ask which image defines the canvas. Do not arbitrarily inherit the first image's dimensions.
 
-Before writing the prompt, select the closest example from the verified official 2.5 guide by task and constraints, not merely by a shared subject. Read its instructions and example prompt. Add a second example only when it addresses a distinct requirement, such as exact text within an editing task.
+Before writing the prompt, select the closest example from the verified official 2.5 guide by task and constraints, not merely by a shared subject. Use the generated index to read its complete section file plus any listed parent context. Preserve explanations, prompt blocks, settings, and image links; these files are direct source slices, not summaries. Follow references to earlier examples or input images through the index when needed. Sequential refinement workflows remain intact so later steps retain prerequisites. Add a second example only when it addresses a distinct requirement, such as exact text within an editing task.
 
 Use these section titles as navigation hints, verifying they exist in the actual reference rather than treating this table as a substitute for reading:
 
@@ -119,7 +121,7 @@ Apply relevant methods from the verified guide using original wording:
 - Separate edits from preservation constraints. Assign each reference image a numbered role.
 - Keep simple prompts short; use sections only when complexity warrants them. Avoid filler quality claims and unrelated platform syntax.
 
-API settings are not prompt syntax. Omit settings by default. If requested, or necessary for a delivery requirement such as transparency, verify the 2.5 parameter section and place a short settings note outside the prompt. Never imply that prose alone guarantees a technical output property.
+API settings are not prompt syntax. Omit settings by default. If requested, or necessary for a delivery requirement such as transparency, read the indexed 2.5 Model parameters section and place a short settings note outside the prompt. Never imply that prose alone guarantees a technical output property.
 
 ### 5. Check and deliver
 

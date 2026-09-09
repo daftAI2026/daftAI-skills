@@ -10,10 +10,13 @@
 - `agents/openai.yaml`: Codex 发现元数据，提供显示名称与显式调用示例。
 - `agents/CLAUDE.md`: 元数据模块地图，保持 UI 入口与技能职责一致。
 
-- `scripts/fetch-guide.ts`: 首次获取完整 2.5 栏目；缓存命中不联网，显式刷新，失败不覆盖旧内容。
+- `scripts/fetch-guide.ts`: 首次获取完整 2.5 栏目，缓存命中不联网；编排切分器并返回按需读取索引。
 - `scripts/fetch-guide.test.ts`: 原创离线样本覆盖提取与缓存边界。
 - `scripts/CLAUDE.md`: 抓取模块地图。
 - `.gitignore`: 阻止官方参考缓存进入版本控制。
+
+- `scripts/split-guide.ts`: 逐字切分本地参考并生成任务索引；独立示例分开，连续编辑流程保留整体。
+- `scripts/split-guide.test.ts`: 无损切片与派生缓存回归测试。
 
 依赖边界
 

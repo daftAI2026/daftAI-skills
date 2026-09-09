@@ -20,9 +20,11 @@ This file is an original retrieval protocol, not an official guide or translatio
 
 1. Run `scripts/fetch-guide.ts` using the full command in SKILL.md. A valid local cache takes priority, without a network freshness check. Only a missing cache triggers the fixed official Markdown endpoint.
 2. The script isolates the complete 2.5 section using official MDX headers or Markdown model headings. It retains all subsections, examples, settings, and image links, excluding subsequent legacy-model sections. It does not crawl linked pages.
-3. It checks required sections, variant names, and closed code fences. Timeouts, HTTP failures, oversized responses, or changed structure fail instead of caching an error page.
-4. Read the complete returned file. Apply relevant prompt methods and examples; consult parameters when needed. Migration instructions are not prompt content. Do not reuse an official example as the user's original prompt.
-5. If the cache is invalid, explain the problem and obtain approval to repair it with `--refresh`. Do not retry indefinitely. Failed refreshes preserve the previous file.
+3. On download or cache hit, the script splits the local source into `sections-<content-hash>/` and returns `indexPath`. Generate images, Edit images, and More workflows are sliced at example headings, with parent introductions kept as context files. Other top-level sections stay intact, including sequential refinement and runnable workflows. Code-fenced headings are never cut points. Concatenating slices in index order reproduces the local source exactly; no summarization, rewriting, or image downloading occurs.
+4. It checks required sections, variant names, and closed code fences. Timeouts, HTTP failures, oversized responses, or changed structure fail instead of caching an error page.
+5. Read the index and baseline sections, then only matching example files with their parent context. Follow cross-references through the index; source links and anchors remain unchanged. Consult parameters only when needed. Do not load the full source or all examples by default. Do not reuse an official example as the user's original prompt.
+6. Missing or modified derived files are repaired locally on the next run. Changed source content produces a new section directory; the returned index identifies the current generation. All derived files remain Git-ignored and must not be distributed.
+7. If the source cache is invalid, explain the problem and obtain approval to repair it with `--refresh`. Do not retry indefinitely. Failed refreshes preserve the previous file.
 
 These checks detect common failures, not every possible truncation. Stop using the reference and report the issue if the content is visibly incomplete.
 

@@ -1,6 +1,6 @@
 /**
- * [INPUT]: 依赖 Node fs/path/url 与 Bun 的 Web API，读取固定官方 Markdown 来源和本地参考缓存。
- * [OUTPUT]: 提供 extractGuide、ensureGuide 和 CLI；输出缓存路径，不向终端倾倒官方正文。
+ * [INPUT]: 依赖 Node fs/path/url 与 Bun 的 Web API，以及 split-guide 的逐字切分能力。
+ * [OUTPUT]: 提供 extractGuide、ensureGuide 和 CLI；输出原文路径、切分索引与章节数量，不倾倒正文。
  * [POS]: 技能的来源获取边界；缓存命中不联网，失败不覆盖旧内容，不抓取其他网站或图片。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -8,6 +8,7 @@
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ensureSections } from "./split-guide";
 
 export const SOURCE = "https://developers.openai.com/api/docs/guides/image-prompting.md";
 const CACHE = resolve(dirname(fileURLToPath(import.meta.url)), "../references/cache/official-gpt-image-2-5.md");
@@ -68,13 +69,13 @@ export async function ensureGuide(
   path = CACHE,
   refresh = false,
   fetcher: typeof fetch = fetch,
-): Promise<{ path: string; status: "cached" | "downloaded" }> {
+): Promise<{ path: string; status: "cached" | "downloaded"; indexPath: string; sectionCount: number }> {
   if (!refresh) {
     try {
       const cached = await readFile(path, "utf8");
       if (!cached.includes(`Source: ${SOURCE}\n`)) throw new Error("缓存缺少来源");
       extractGuide(cached);
-      return { path, status: "cached" };
+      return { path, status: "cached", ...await ensureSections(path, cached) };
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw new Error(`缓存不可用；请检查后用 --refresh 重新抓取：${(error as Error).message}`);
@@ -91,7 +92,7 @@ export async function ensureGuide(
   } finally {
     await rm(temporary, { force: true });
   }
-  return { path, status: "downloaded" };
+  return { path, status: "downloaded", ...await ensureSections(path, content) };
 }
 
 if (import.meta.main) {

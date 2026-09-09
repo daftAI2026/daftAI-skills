@@ -18,6 +18,8 @@ Load the skill in an independent session and provide each request. Explicitly co
 | Style-only ratio | A square palette reference; “Make a 16:9 banner, using only these colors.” | Keep 16:9; do not inherit the square reference's ratio or composition |
 | Incompatible preservation | A portrait reference; “Keep the full layout unchanged, but make it square.” | Clarify cropping versus canvas extension or ratio change rather than silently damaging the layout |
 | No close example | A request with no corresponding example in the cached guide | Use prompting fundamentals honestly; do not fabricate a section title or force an unrelated example |
+| Progressive disclosure | Request a palette-based style transfer with an existing cache | Read the index, baseline rules, matching example and parent context, not the full source or all unrelated sections |
+| Dependent example | Request an edit matching a later official workflow step | Read the intact sequence and required cross-references; preserve starting-image context |
 | Beginner, no brief | “How do I use this skill?” | Prepare the reference first; explain the text-only result briefly; invite a rough subject description with optional use/style details; no provider, key, or persistent-setup questions |
 | Brief already sufficient | “Optimize: one orange cat in a rain-washed alley, watercolor postcard, no text.” | Draft directly, even on first use; preserve count, medium, and no-text constraint; do not force variant selection |
 | Guided mode | “Walk me through writing a prompt. I want an invitation with a fox.” | Ask only useful missing details together; do not ask for the known subject again; accept delegated creative decisions |

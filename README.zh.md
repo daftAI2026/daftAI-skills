@@ -55,7 +55,7 @@ npx skills add daftAI2026/daftAI-skills
 
 ```text
 用户：用 daftai-gpt-image-2-5-prompt-optimizer 优化：雨后巷子里的橘猫，水彩明信片，不要字。
-→ AI 读取官方 GPT Image 2.5 指南，返回可以直接复制的提示词
+→ AI 生成本地章节索引，按需读取基础规则与匹配的官方示例，返回可复制的提示词
 → 首次需要 Bun 与网络，之后复用本地参考缓存；不需要生图 API Key
 ```
 

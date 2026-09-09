@@ -55,7 +55,7 @@ User: Burn Chinese subtitles into this video
 
 ```text
 User: Use daftai-gpt-image-2-5-prompt-optimizer: a watercolor postcard of an orange cat in a rainy alley, no text.
-→ AI reads the official GPT Image 2.5 guidance, then returns a ready-to-copy prompt
+→ AI prepares a local section index, reads baseline rules and matching official examples, then returns a ready-to-copy prompt
 → Requires Bun and internet on first use; later runs reuse the local cache, with no image API key
 ```
 

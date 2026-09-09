@@ -2,6 +2,15 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.7.1 - 2026-09-10
+
+### Improved (daftai-gpt-image-2-5-prompt-optimizer)
+- Adds deterministic TypeScript splitting of the cached official guide into verbatim sections and a navigation index, without summarization.
+- Preserves example explanations, prompts, settings, links, parent context, and complete sequential workflows.
+- Loads baseline rules and relevant examples on demand instead of reading the entire guide.
+- Repairs derived files locally and isolates refreshed sections by source content hash; all official content remains Git-ignored.
+- Adds lossless reconstruction, code-fence boundary, index reuse, and cache-repair tests; nine tests pass.
+
 ## 1.7.0 - 2026-09-10
 
 ### Added (daftai-gpt-image-2-5-prompt-optimizer)
