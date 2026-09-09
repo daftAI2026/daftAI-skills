@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 Node fs/path/url 与 Bun 的 Web API，以及 split-guide 的逐字切分能力。
- * [OUTPUT]: 提供 extractGuide、ensureGuide 和 CLI；输出原文路径、切分索引与章节数量，不倾倒正文。
- * [POS]: 技能的来源获取边界；缓存命中不联网，失败不覆盖旧内容，不抓取其他网站或图片。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

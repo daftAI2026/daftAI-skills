@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 bun:test、Node 临时目录与 fetch-guide 的公开函数；样本均为原创结构片段。
- * [OUTPUT]: 验证提取边界、缓存命中不联网、刷新失败不覆盖及网络错误拒绝。
- * [POS]: 抓取入口的离线回归测试，不保存官方正文、不访问生产网络。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import { afterEach, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";

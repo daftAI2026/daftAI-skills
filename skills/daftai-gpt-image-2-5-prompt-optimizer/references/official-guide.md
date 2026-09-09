@@ -1,10 +1,3 @@
-<!--
-[INPUT]: 依赖 OpenAI 官方 Image prompting 页面及 scripts/fetch-guide.ts 的抓取与缓存能力。
-[OUTPUT]: 提供限定 GPT Image 2.5 的读取范围、核验条件与失败处理，官方正文只存放在忽略提交的本地缓存。
-[POS]: SKILL.md 的来源边界；隔离网页版本变化，防止旧模型内容混入优化流程。
-[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
--->
-
 # Official Reference Retrieval
 
 ## Source

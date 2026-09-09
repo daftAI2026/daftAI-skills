@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 Node fs/path/crypto，接收已核验的本地官方原文；不联网、不调用 LLM。
- * [OUTPUT]: 提供 splitGuide 与 ensureSections，输出逐字切片、父级上下文关系和按标题导航的索引。
- * [POS]: fetch-guide 的派生缓存层；保留连续编辑流程整体，避免把前后步骤切断。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";

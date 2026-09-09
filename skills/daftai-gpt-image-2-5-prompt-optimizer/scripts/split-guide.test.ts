@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 bun:test、Node 临时文件与 split-guide；仅使用原创结构样本。
- * [OUTPUT]: 验证无损重组、代码块防误切、上下文映射、连续工作流保留及派生缓存修复。
- * [POS]: 切分器回归测试，不访问网络、不保存官方正文到版本控制。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

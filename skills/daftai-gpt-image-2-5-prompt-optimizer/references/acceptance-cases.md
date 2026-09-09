@@ -1,10 +1,3 @@
-<!--
-[INPUT]: 依赖 SKILL.md 的输出契约及模拟用户请求、来源可用性条件。
-[OUTPUT]: 提供人工行为验收标准，不以固定措辞或图像质量作为通过条件。
-[POS]: 技能维护的回归样例；独立于运行时来源读取，不包含官方示例。
-[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
--->
-
 # Original Acceptance Cases
 
 Load the skill in an independent session and provide each request. Explicitly constrain network access for offline cases. Inspect actual responses and tool calls, not just instruction text. No case may invoke image generation or commit/distribute the official cache.

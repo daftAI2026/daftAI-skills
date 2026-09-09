@@ -7,13 +7,6 @@ description: >
   or write prompts for GPT Image 2.5 Flare or Sunburst. Produces text, not images.
 ---
 
-<!--
-[INPUT]: 依赖用户需求、可选参考图、scripts/fetch-guide.ts 的本地缓存与 references/official-guide.md 的来源规则。
-[OUTPUT]: 输出可复制的 GPT Image 2.5 提示词，不执行图像生成或编辑。
-[POS]: 技能唯一工作流入口；参考文件负责来源边界，本文件负责按需新手引导、意图保真与交付。
-[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
--->
-
 # GPT Image 2.5 Prompt Optimizer
 
 Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Support new scenes, reference-assisted creation, and editing instructions without promising an absolute “best” prompt.
