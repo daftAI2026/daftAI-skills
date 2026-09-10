@@ -3,7 +3,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 const SPLIT_EXAMPLES = new Set(["Generate images", "Edit images", "More workflows"]);
-const FORMAT_VERSION = "1";
+export const LAYOUT = "gpt-image-2-5/v1";
 
 interface Heading { title: string; level: number; offset: number }
 export interface GuideSection {
@@ -71,13 +71,13 @@ async function writeIfChanged(path: string, content: string) {
 
 export async function ensureSections(sourcePath: string, source: string) {
   const sections = splitGuide(source);
-  const digest = createHash("sha256").update(FORMAT_VERSION).update(source).digest("hex");
-  const directory = join(dirname(sourcePath), `sections-${digest.slice(0, 16)}`);
+  const directory = dirname(sourcePath);
   await mkdir(directory, { recursive: true });
   for (const section of sections) await writeIfChanged(join(directory, section.file), section.text);
   const basics = sections.filter(s => ["Overview", "Prompting fundamentals"].includes(s.title));
   const metadata = source.match(/^<!--[\s\S]*?-->/)?.[0] ?? "";
   const index = `${metadata}\n\n# GPT Image 2.5 Reference Index\n\n` +
+    `Layout: ${LAYOUT}\n` +
     `Local generated navigation only. Source SHA-256: ${createHash("sha256").update(source).digest("hex")}\n\n` +
     `Read first: ${basics.map(s => `[${s.title}](${s.file})`).join(", ")}.\n\n` +
     "Then read only the matching task section(s) and any listed parent context. Sections contain verbatim source slices, not summaries. " +

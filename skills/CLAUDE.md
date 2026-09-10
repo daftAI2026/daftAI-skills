@@ -9,7 +9,7 @@
 - `daftai-url-to-markdown/SKILL.md`: Chrome CDP 网页捕获入口，保存正文与配套图片。
 - `daftai-chinese-copywriting/SKILL.md`: autocorrect 排版入口，区分只读检查与文件修正。
 - `daftai-image-to-svg/SKILL.md`: 单色位图描摹入口，交付经过误差验证的纯路径 SVG。
-- `daftai-gpt-image-2-5-prompt-optimizer/SKILL.md`: 提示词优化入口，首次抓取完整 2.5 官方参考，之后复用忽略提交的本地缓存，不生图。
+- `daftai-gpt-image-2-5-prompt-optimizer/SKILL.md`: 提示词优化入口，对照已发布的本地布局读取 2.5 官方参考，缺失才抓取，不生图。
 
 分类注册由 `../.claude-plugin/marketplace.json` 维护；各技能独立加载，局部成员由对应模块地图描述。
 

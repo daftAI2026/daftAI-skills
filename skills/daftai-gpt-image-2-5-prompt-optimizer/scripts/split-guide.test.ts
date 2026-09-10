@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { ensureSections, splitGuide } from "./split-guide";
+import { LAYOUT, ensureSections, splitGuide } from "./split-guide";
 
 const source = `<!-- Source: original test fixture -->
 ## GPT Image 2.5 prompting guide
@@ -60,11 +60,12 @@ test("preserves CRLF and unknown sections without guessing how to subdivide them
   expect(() => splitGuide(source + "```text\nunfinished")).toThrow("Unclosed");
 });
 
-test("stable index, missing-file repair, and new source generations", async () => {
+test("stable index, missing-file repair, and in-place source updates", async () => {
   const dir = await mkdtemp(join(tmpdir(), "split-guide-test-"));
   try {
     const path = join(dir, "source.md");
     const first = await ensureSections(path, source);
+    expect(first.indexPath).toBe(join(dir, "INDEX.md"));
     const mtime = (await stat(first.indexPath)).mtimeMs;
     const again = await ensureSections(path, source);
     expect(again.indexPath).toBe(first.indexPath);
@@ -78,9 +79,13 @@ test("stable index, missing-file repair, and new source generations", async () =
     await ensureSections(path, source);
     expect(await readFile(slicePath, "utf8")).toBe(slice.text);
     const index = await readFile(first.indexPath, "utf8");
+    expect(index).toContain(`Layout: ${LAYOUT}`);
     expect(index).toContain("Second turn");
     expect(index).toContain(slice.context!);
     const changed = await ensureSections(path, source + "New ending.\n");
-    expect(changed.indexPath).not.toBe(first.indexPath);
+    expect(changed.indexPath).toBe(first.indexPath);
+    expect(await readFile(changed.indexPath, "utf8")).not.toBe(index);
+    const last = splitGuide(source + "New ending.\n").at(-1)!;
+    expect(await readFile(join(dir, last.file), "utf8")).toContain("New ending.");
   } finally { await rm(dir, { recursive: true, force: true }); }
 });

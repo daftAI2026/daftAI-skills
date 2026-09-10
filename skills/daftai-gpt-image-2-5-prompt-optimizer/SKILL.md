@@ -17,7 +17,7 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 - This skill produces prompt text only. Do not invoke image generation merely because an image-generation tool is available.
 - If the user asks only to optimize or write a prompt, return the prompt and stop. Do not routinely ask whether they want to generate an image.
 - If the user explicitly asks both to optimize the prompt and generate the image, complete the prompt first, then allow the host agent to invoke its image-generation capability as a separate step. Do not ask for a second confirmation.
-- Do not request API keys, install dependencies silently, or create image output files. The fetcher may write a Git-ignored reference cache.
+- Do not request API keys, install dependencies silently, or create image output files. A Git-ignored local official reference may be written under `references/gpt-image-2-5/`.
 - Target GPT Image 2.5. Preserve an explicitly selected Flare or Sunburst variant; otherwise do not require variant selection or switch model families.
 - Use the current request and conversation, not persistent preferences. No configuration file or mandatory first-run setup is needed. This version does not read or write persistent preferences.
 - Write questions and final prompts in the user's language unless they request another language. English skill instructions do not imply English-only output.
@@ -30,23 +30,43 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`.
 2. Detect Bun once per session with `command -v bun`; if missing, report the requirement instead of silently installing it.
 3. Set working directory to `${SKILL_DIR}`.
-4. Execute `bun ${SKILL_DIR}/scripts/fetch-guide.ts` and read the returned `indexPath`, not the full-source `path`.
+4. Follow Workflow §1. Run `bun ${SKILL_DIR}/scripts/fetch-guide.ts` only when the published layout check fails, or when the user requested `--refresh`.
 5. Replace every `${SKILL_DIR}` with the actual absolute path.
 
 | Script | Purpose |
 |---|---|
-| `scripts/fetch-guide.ts` | Prepare the source cache and verbatim section index; `--refresh` explicitly updates the source |
+| `scripts/fetch-guide.ts` | Write the published layout when it is missing or invalid; download only if `source.md` is absent; `--refresh` updates the source |
 | `scripts/split-guide.ts` | Deterministic verbatim section slicing and index generation; invoked by the fetcher, not an LLM |
 | `scripts/split-guide.test.ts` | Lossless slicing and index tests; run `bun test ${SKILL_DIR}/scripts/split-guide.test.ts` |
-| `scripts/fetch-guide.test.ts` | Offline extraction and caching tests; run `bun test ${SKILL_DIR}/scripts/fetch-guide.test.ts` |
+| `scripts/fetch-guide.test.ts` | Offline extraction and local-reference tests; run `bun test ${SKILL_DIR}/scripts/fetch-guide.test.ts` |
 
 ## Workflow
 
-### 1. Prepare the official reference
+### 1. Check the published local layout; fetch only if it fails
 
-Do this before drafting or asking creative-brief questions: run the fetcher above. It checks `references/cache/official-gpt-image-2-5.md`, reuses a valid cache without networking, and downloads the complete 2.5 section only when missing. It also creates or repairs verbatim section files from that local source without downloading it again. Read the returned `indexPath`, then the linked Overview and Prompting fundamentals sections. Do not read the complete source or every section by default. A path receipt is not the reference itself.
+Do this before drafting or asking creative-brief questions. [references/official-guide.md](references/official-guide.md) is a retrieval protocol, not the official guide.
 
-Follow [references/official-guide.md](references/official-guide.md) for source boundaries and failures. Reuse the cache across sessions; use `--refresh` only when the user requests an update or approves repair of an invalid cache. Never present an unverified general rewrite as an official-guide-based result.
+The local official reference is gitignored and always uses this layout:
+
+`${SKILL_DIR}/references/gpt-image-2-5/`
+
+| Path | Pass if |
+|---|---|
+| `source.md` | File exists |
+| `INDEX.md` | File exists, contains `Layout: gpt-image-2-5/v1`, and links Overview and Prompting fundamentals |
+| The "Read first" files named in `INDEX.md` | Those files exist beside `INDEX.md` |
+
+Compare only against this layout. Do not treat a path receipt, `references/official-guide.md`, or any other folder under `references/` as a pass.
+
+| Result | Action |
+|---|---|
+| All rows pass | Read `INDEX.md`, then Overview and Prompting fundamentals. Do not run `fetch-guide.ts`. Do not announce downloading, crawling, or preparing the official guide. |
+| Any row fails | Run `bun ${SKILL_DIR}/scripts/fetch-guide.ts`. Only a missing `source.md` downloads. Re-check the same layout, then read `INDEX.md`. |
+| User requested an update | Run the same command with `--refresh`. |
+
+Do not read the complete source or every section by default. A path receipt is not the reference itself.
+
+Follow [references/official-guide.md](references/official-guide.md) for source boundaries and failures. Never present an unverified general rewrite as an official-guide-based result.
 
 ### 2. Guide beginners only when needed
 

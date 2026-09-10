@@ -55,8 +55,8 @@ User: Burn Chinese subtitles into this video
 
 ```text
 User: Use daftai-gpt-image-2-5-prompt-optimizer: a watercolor postcard of an orange cat in a rainy alley, no text.
-→ AI prepares a local section index, reads baseline rules and matching official examples, then returns a ready-to-copy prompt
-→ Requires Bun and internet on first use; later runs reuse the local cache, with no image API key
+→ If `references/gpt-image-2-5/` already matches the published layout, AI reads the local index; otherwise it fetches once
+→ Later runs reuse that local official reference, with no image API key
 ```
 
 ## Project Structure
@@ -97,7 +97,7 @@ daftAI-skills/
         ├── CLAUDE.md         # Module map
         ├── agents/           # Codex metadata
         ├── scripts/          # Lightweight TypeScript fetcher and tests
-        └── references/       # Source rules, local ignored cache and acceptance cases
+        └── references/       # Source rules, local official reference layout, and acceptance cases
 ```
 
 ## Contributing

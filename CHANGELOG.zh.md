@@ -2,6 +2,14 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.7.3 - 2026-09-10
+
+### 改进 (daftai-gpt-image-2-5-prompt-optimizer)
+- Agent 先对照 `references/gpt-image-2-5/` 的已发布布局（`source.md` 与稳定 `INDEX.md`），检查失败才运行抓取脚本。
+- 去掉依赖内容哈希的章节目录，使标准文件在跑脚本前即可核对；已有 `references/cache/` 会无网络迁移。
+- 本地官方参考不再叫 cache，避免在已有布局时仍宣称正在抓取或准备指南。
+- 新增旧路径迁移测试，十项测试通过。
+
 ## 1.7.2 - 2026-09-10
 
 ### 改进 (daftai-gpt-image-2-5-prompt-optimizer)

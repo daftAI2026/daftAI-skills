@@ -2,6 +2,14 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.7.3 - 2026-09-10
+
+### Improved (daftai-gpt-image-2-5-prompt-optimizer)
+- Agents compare a published local layout under `references/gpt-image-2-5/` (`source.md`, stable `INDEX.md`) and run the fetcher only when that check fails.
+- Replaces hash-named section directories so the expected files are known before any script run; existing `references/cache/` copies migrate without networking.
+- Stops treating the local official reference as a disposable cache, so a present layout is not announced as fetching or preparing the guide.
+- Adds a legacy-path migration test; ten tests pass.
+
 ## 1.7.2 - 2026-09-10
 
 ### Improved (daftai-gpt-image-2-5-prompt-optimizer)

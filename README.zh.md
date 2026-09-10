@@ -55,8 +55,8 @@ npx skills add daftAI2026/daftAI-skills
 
 ```text
 用户：用 daftai-gpt-image-2-5-prompt-optimizer 优化：雨后巷子里的橘猫，水彩明信片，不要字。
-→ AI 生成本地章节索引，按需读取基础规则与匹配的官方示例，返回可复制的提示词
-→ 首次需要 Bun 与网络，之后复用本地参考缓存；不需要生图 API Key
+→ 若 `references/gpt-image-2-5/` 已符合发布布局，则直接读本地索引；否则才抓取一次
+→ 之后复用该本地官方参考；不需要生图 API Key
 ```
 
 ## 项目结构
@@ -97,7 +97,7 @@ daftAI-skills/
         ├── CLAUDE.md         # 模块地图
         ├── agents/           # Codex 元数据
         ├── scripts/          # 轻量 TypeScript 抓取器与测试
-        └── references/       # 来源规则、本地忽略缓存与原创验收场景
+        └── references/       # 来源规则、本地官方参考布局与原创验收场景
 ```
 
 ## 贡献

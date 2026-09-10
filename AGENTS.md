@@ -26,7 +26,7 @@ skills/
 
 **Plugin Categories**:
 
-Module navigation: [skills/CLAUDE.md](skills/CLAUDE.md). The GPT Image 2.5 prompt optimizer returns text only: a Bun script fetches the complete official 2.5 reference once, then creates verbatim section files and an index for selective reading from a Git-ignored local cache. No image generation or source article is bundled.
+Module navigation: [skills/CLAUDE.md](skills/CLAUDE.md). The GPT Image 2.5 prompt optimizer returns text only: agents compare a published layout under `references/gpt-image-2-5/` and a Bun script fetches the official 2.5 section only when that layout is missing. No image generation or source article is bundled.
 
 | Category | Description |
 |----------|-------------|

@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { ensureGuide, extractGuide } from "./fetch-guide";
+import { dirname, join } from "node:path";
+import { SOURCE, ensureGuide, extractGuide } from "./fetch-guide";
 
 const body = `
 ## Overview
@@ -44,11 +44,27 @@ test("拒绝 HTML、截断和重复目标栏目", () => {
   expect(() => extractGuide(fixture.replace("## Check the result", "Missing"))).toThrow();
   expect(() => extractGuide(fixture + fixture)).toThrow();
 });
-test("首次抓取，随后命中缓存不联网", async () => {
+test("首次抓取，随后命中本地参考不联网", async () => {
   const path = await cachePath();
-  expect((await ensureGuide(path, false, respond(fixture))).status).toBe("downloaded");
+  const first = await ensureGuide(path, false, respond(fixture));
+  expect(first.status).toBe("downloaded");
+  expect(first.indexPath).toBe(join(dirname(path), "INDEX.md"));
   const fail = (async () => { throw new Error("不应联网"); }) as typeof fetch;
   expect((await ensureGuide(path, false, fail)).status).toBe("cached");
+});
+test("旧 cache 路径迁到稳定布局且不联网", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "image-guide-legacy-"));
+  directories.push(dir);
+  const legacy = join(dir, "cache", "official-gpt-image-2-5.md");
+  const path = join(dir, "gpt-image-2-5", "source.md");
+  await mkdir(dirname(legacy), { recursive: true });
+  await writeFile(legacy, `<!--\nSource: ${SOURCE}\nFetched: 2026-01-01T00:00:00.000Z\n-->\n\n${extractGuide(fixture)}`);
+  const fail = (async () => { throw new Error("不应联网"); }) as typeof fetch;
+  const result = await ensureGuide(path, false, fail);
+  expect(result.status).toBe("cached");
+  expect(result.indexPath).toBe(join(dir, "gpt-image-2-5", "INDEX.md"));
+  expect(await readFile(path, "utf8")).toContain("Draw a violet kite.");
+  expect(await readFile(result.indexPath, "utf8")).toContain("Layout: gpt-image-2-5/v1");
 });
 test("显式刷新替换缓存，失败保留原文", async () => {
   const path = await cachePath();
