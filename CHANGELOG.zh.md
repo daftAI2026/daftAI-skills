@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.7.2 - 2026-09-10
+
+### 改进 (daftai-gpt-image-2-5-prompt-optimizer)
+- 默认仍只输出提示词：不因宿主有生图工具就调用，交付提示词后也不追问是否生图。
+- 用户明确要求“优化并生成”时，先完成提示词，再由宿主 Agent 作为独立步骤生图，不再二次确认。
+
 ## 1.7.1 - 2026-09-10
 
 ### 改进 (daftai-gpt-image-2-5-prompt-optimizer)

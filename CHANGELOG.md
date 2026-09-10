@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.7.2 - 2026-09-10
+
+### Improved (daftai-gpt-image-2-5-prompt-optimizer)
+- Default remains prompt text only: do not invoke image generation just because a tool is available, and do not ask whether to generate an image after delivering a prompt.
+- If the user explicitly asks to optimize and generate, complete the prompt first, then allow the host agent to generate as a separate step without a second confirmation.
+
 ## 1.7.1 - 2026-09-10
 
 ### Improved (daftai-gpt-image-2-5-prompt-optimizer)

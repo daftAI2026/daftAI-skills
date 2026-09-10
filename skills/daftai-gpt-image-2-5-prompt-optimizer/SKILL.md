@@ -4,7 +4,8 @@ description: >
   Optimizes natural-language image requests and rough prompts into ready-to-use
   GPT Image 2.5 prompts using the official prompting guide as a live reference.
   Use when users ask to improve image prompts, 优化生图提示词, 把想法变成提示词,
-  or write prompts for GPT Image 2.5 Flare or Sunburst. Produces text, not images.
+  or write prompts for GPT Image 2.5 Flare or Sunburst. Produces prompt text,
+  not images, unless the user explicitly asks to generate.
 ---
 
 # GPT Image 2.5 Prompt Optimizer
@@ -13,7 +14,10 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 
 ## Scope
 
-- Return prompt text, not images. Do not invoke image generation, request API keys, install dependencies silently, or create image output files. The fetcher may write a Git-ignored reference cache.
+- This skill produces prompt text only. Do not invoke image generation merely because an image-generation tool is available.
+- If the user asks only to optimize or write a prompt, return the prompt and stop. Do not routinely ask whether they want to generate an image.
+- If the user explicitly asks both to optimize the prompt and generate the image, complete the prompt first, then allow the host agent to invoke its image-generation capability as a separate step. Do not ask for a second confirmation.
+- Do not request API keys, install dependencies silently, or create image output files. The fetcher may write a Git-ignored reference cache.
 - Target GPT Image 2.5. Preserve an explicitly selected Flare or Sunburst variant; otherwise do not require variant selection or switch model families.
 - Use the current request and conversation, not persistent preferences. No configuration file or mandatory first-run setup is needed. This version does not read or write persistent preferences.
 - Write questions and final prompts in the user's language unless they request another language. English skill instructions do not imply English-only output.

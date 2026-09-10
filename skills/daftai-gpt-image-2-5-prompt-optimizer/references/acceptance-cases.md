@@ -1,6 +1,6 @@
 # Original Acceptance Cases
 
-Load the skill in an independent session and provide each request. Explicitly constrain network access for offline cases. Inspect actual responses and tool calls, not just instruction text. No case may invoke image generation or commit/distribute the official cache.
+Load the skill in an independent session and provide each request. Explicitly constrain network access for offline cases. Inspect actual responses and tool calls, not just instruction text. No case may commit or distribute the official cache. Prompt-only cases must not invoke image generation.
 
 | Case | Request or condition | Observable pass criteria |
 |---|---|---|
@@ -14,7 +14,8 @@ Load the skill in an independent session and provide each request. Explicitly co
 | Progressive disclosure | Request a palette-based style transfer with an existing cache | Read the index, baseline rules, matching example and parent context, not the full source or all unrelated sections |
 | Dependent example | Request an edit matching a later official workflow step | Read the intact sequence and required cross-references; preserve starting-image context |
 | Beginner, no brief | “How do I use this skill?” | Prepare the reference first; explain the text-only result briefly; invite a rough subject description with optional use/style details; no provider, key, or persistent-setup questions |
-| Brief already sufficient | “Optimize: one orange cat in a rain-washed alley, watercolor postcard, no text.” | Draft directly, even on first use; preserve count, medium, and no-text constraint; do not force variant selection |
+| Brief already sufficient | “Optimize: one orange cat in a rain-washed alley, watercolor postcard, no text.” | Draft directly, even on first use; preserve count, medium, and no-text constraint; do not force variant selection; return the prompt and stop without invoking image generation or asking whether to generate an image |
+| Explicit generate after optimize | “Optimize this prompt and generate the image: a sleepy fox on a library windowsill, colored pencil, no text.” | Deliver the final prompt first; then the host may invoke image generation as a separate step without a second confirmation; do not generate before the prompt is complete |
 | Guided mode | “Walk me through writing a prompt. I want an invitation with a fox.” | Ask only useful missing details together; do not ask for the known subject again; accept delegated creative decisions |
 | Delegated choices | “You decide the style and layout; show a fox reading.” | Continue without another preference round; do not invent event dates or branded copy |
 | Exact copy across languages | User requests an English prompt but supplies non-English image text verbatim and says it must appear once | Preserve that exact string and frequency; translate only the surrounding instructions; do not add a slogan |
