@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Skills shared by daftAI for improving daily work efficiency",
-    "version": "1.8.0"
+    "version": "1.9.0"
   },
   "plugins": [
     {
@@ -14,6 +14,7 @@
       "source": "./",
       "strict": false,
       "skills": [
+        "./skills/daftai-video-compositor",
         "./skills/daftai-video-subtitler",
         "./skills/daftai-subtitle-translator",
         "./skills/daftai-extracting-video-subtitles"

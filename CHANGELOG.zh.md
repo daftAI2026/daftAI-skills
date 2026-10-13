@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.9.0 - 2026-10-14
+
+### 新增
+- 新增 `daftai-video-compositor`，把本地视频嵌进截图的指定区域，保留原音轨，并只交付一个 MP4。
+- 登记到 video-skills。
+
 ## 1.8.0 - 2026-10-14
 
 ### 新增

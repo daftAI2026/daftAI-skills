@@ -15,6 +15,7 @@ Skills are organized into plugin categories in `marketplace.json`:
 ```
 skills/
 ├── [video-skills]                      # Video and subtitle processing
+│   ├── daftai-video-compositor/            # Embed video into a screenshot aperture
 │   ├── daftai-video-subtitler/             # Burn subtitles into videos (FFmpeg)
 │   ├── daftai-subtitle-translator/         # Translate subtitle files between languages
 │   └── daftai-extracting-video-subtitles/  # Extract subtitles from video via Whisper
@@ -82,7 +83,7 @@ Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `os`).
 ## Key Dependencies
 
 - **Bun**: TypeScript runtime for all scripts
-- **FFmpeg**: Required by `daftai-video-subtitler` for subtitle burning
+- **FFmpeg**: Required by `daftai-video-subtitler` for subtitle burning and by `daftai-video-compositor` for screenshot composition
 - **Potrace + librsvg/Inkscape**: Required by `daftai-image-to-svg` for path tracing and candidate measurement
 - **Whisper**: Required by `daftai-extracting-video-subtitles` for speech-to-text
 - **Chrome**: Required by `daftai-url-to-markdown` for CDP page rendering

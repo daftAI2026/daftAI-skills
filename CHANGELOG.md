@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.9.0 - 2026-10-14
+
+### Added
+- Adds `daftai-video-compositor` to embed a local video into a measured screenshot aperture, preserve original audio, and publish one MP4.
+- Registers the skill under video-skills.
+
 ## 1.8.0 - 2026-10-14
 
 ### Added

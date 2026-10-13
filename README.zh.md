@@ -22,6 +22,7 @@ npx skills add daftAI2026/daftAI-skills
 | Skill | 描述 |
 |-------|------|
 | [daftai-cloudflare-billing-audit](skills/daftai-cloudflare-billing-audit/) | 只读、离线检查 Cloudflare 项目的账单风险，按产品加载案例依据；需要 Bun，平台保障与限制见技能说明。 |
+| [daftai-video-compositor](skills/daftai-video-compositor/) | 把本地视频嵌进截图的精确矩形或圆角区域，保留版式和原音轨。需要 Bun、FFmpeg 和 FFprobe。 |
 | [daftai-video-subtitler](skills/daftai-video-subtitler/) | 本地视频字幕烧录工具，支持 SRT/VTT/ASS 格式、双语字幕合并和翻译 |
 | [daftai-subtitle-translator](skills/daftai-subtitle-translator/) | 字幕文件翻译（SRT/VTT），支持术语一致性检查 |
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | 使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕 |
@@ -71,6 +72,11 @@ daftAI-skills/
 ├── AGENTS.md             # AI 助手指南
 ├── .gitignore
 └── skills/
+    ├── daftai-video-compositor/
+    │   ├── SKILL.md
+    │   ├── CLAUDE.md         # 合成模块地图
+    │   ├── agents/           # Codex 元数据
+    │   └── scripts/          # TypeScript 合成器、遮罩与测试
     ├── daftai-video-subtitler/
     │   ├── SKILL.md
     │   ├── scripts/          # TypeScript 工具脚本

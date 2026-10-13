@@ -1,0 +1,4 @@
+interface:
+  display_name: "Screenshot Video Compositor"
+  short_description: "Embed videos precisely into screenshot layouts"
+  default_prompt: "Use $daftai-video-compositor to embed this video into the exact region of this screenshot, preserve the layout and original audio, and save only the final video to Downloads."
