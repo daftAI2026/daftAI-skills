@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.8.0 - 2026-10-14
+
+### 新增
+- 新增 `daftai-cloudflare-billing-audit`，按产品加载参考，以只读扫描辅助追踪费用放大路径，保留证据与未知项。
+- 注册 developer-tools 分类，加入原生平台测试与独立安装检查。
+
 ## 1.7.3 - 2026-09-10
 
 ### 改进 (daftai-gpt-image-2-5-prompt-optimizer)

@@ -8,6 +8,8 @@ AI agent skills for video/subtitle processing and content utilities. All skills 
 
 ## Architecture
 
+Cloudflare project audit lives in `developer-tools` at `skills/daftai-cloudflare-billing-audit/`. It runs offline and reads only the explicit target; it does not execute the target project or access billing accounts. `.github/workflows/cloudflare-billing-audit.yml` validates the native-platform and installed-skill contracts.
+
 Skills are organized into plugin categories in `marketplace.json`:
 
 ```
@@ -17,11 +19,14 @@ skills/
 │   ├── daftai-subtitle-translator/         # Translate subtitle files between languages
 │   └── daftai-extracting-video-subtitles/  # Extract subtitles from video via Whisper
 │
-└── [utility-skills]                    # Content utilities
+├── [utility-skills]                    # Content utilities
     ├── daftai-url-to-markdown/             # Fetch URL and convert to markdown with images
     ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
     ├── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
     └── daftai-gpt-image-2-5-prompt-optimizer/ # Optimize image prompts using live official references
+│
+└── [developer-tools]
+    └── daftai-cloudflare-billing-audit/     # Offline Cloudflare project billing diagnostics
 ```
 
 **Plugin Categories**:
@@ -32,6 +37,7 @@ Module navigation: [skills/CLAUDE.md](skills/CLAUDE.md). The GPT Image 2.5 promp
 |----------|-------------|
 | `video-skills` | Skills that process video or subtitle files (burning, translating, extracting) |
 | `utility-skills` | Helper tools for content processing (URL conversion, etc.) |
+| `developer-tools` | Read-only Cloudflare project billing diagnostics |
 
 Each skill contains:
 - `SKILL.md` — YAML front matter (name, description) + workflow documentation

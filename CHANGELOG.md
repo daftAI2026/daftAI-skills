@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.8.0 - 2026-10-14
+
+### Added
+- Adds `daftai-cloudflare-billing-audit` with selective product references, bounded read-only scanning, evidence-linked findings and explicit unknowns.
+- Registers developer-tools and adds native-platform tests with an isolated installed-skill smoke test.
+
 ## 1.7.3 - 2026-09-10
 
 ### Improved (daftai-gpt-image-2-5-prompt-optimizer)

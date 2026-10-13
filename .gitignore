@@ -45,3 +45,6 @@ EXTEND.md
 
 # Internal docs (research, notes)
 docs/
+
+# Cloudflare audit outputs contain project metadata, not distributable skill files
+skills/daftai-cloudflare-billing-audit/audit-results/

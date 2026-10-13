@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Skills shared by daftAI for improving daily work efficiency",
-    "version": "1.7.3"
+    "version": "1.8.0"
   },
   "plugins": [
     {
@@ -29,6 +29,15 @@
         "./skills/daftai-chinese-copywriting",
         "./skills/daftai-image-to-svg",
         "./skills/daftai-gpt-image-2-5-prompt-optimizer"
+      ]
+    },
+    {
+      "name": "developer-tools",
+      "description": "Read-only project diagnostics and developer workflows",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/daftai-cloudflare-billing-audit"
       ]
     }
   ]

@@ -1,0 +1,48 @@
+# [INPUT]: 技能脚本、产品参考与公开安装器
+# [OUTPUT]: 三平台原生回归和安装后回归结果
+# [POS]: 只读 CI；不发布、不读取项目凭据
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+name: Cloudflare billing audit
+on:
+  push:
+    branches: [main, codex/cloudflare-billing-audit]
+    paths: ['skills/daftai-cloudflare-billing-audit/**', '.github/workflows/cloudflare-billing-audit.yml']
+  pull_request:
+    paths: ['skills/daftai-cloudflare-billing-audit/**', '.github/workflows/cloudflare-billing-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.4.3'
+      - name: Native tests
+        working-directory: skills/daftai-cloudflare-billing-audit
+        run: bun test scripts/*.test.ts
+      - name: Install through the public CLI and test the installed skill
+        env:
+          DO_NOT_TRACK: '1'
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/billing-skill-install"
+          cd "$RUNNER_TEMP/billing-skill-install"
+          npx --yes skills@1.7.2 add "$GITHUB_WORKSPACE" --skill daftai-cloudflare-billing-audit --agent codex --copy --yes
+          INSTALLED="$PWD/.agents/skills/daftai-cloudflare-billing-audit"
+          test -f "$INSTALLED/SKILL.md"
+          test -f "$INSTALLED/references/durable-objects.md"
+          cd "$INSTALLED"
+          bun scripts/installed-smoke.ts --skill-dir "$PWD" --output "$RUNNER_TEMP/native-smoke-${{ matrix.os }}.json"
