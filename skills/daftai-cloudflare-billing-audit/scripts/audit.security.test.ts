@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import nodeTest, { after } from 'node:test';
+import { MAX_INVENTORY_BYTES } from './audit-types.ts';
 import type { AuditOptions, AuditReport } from './audit-types.ts';
 
 const api: typeof import('./audit.ts') = await import(process.env.AUDIT_MODULE ?? './audit.ts');
@@ -259,7 +260,7 @@ for (const variant of ['sensitive-file', 'sensitive-ancestor', 'symlink-file', '
     else if (variant === 'symlink-ancestor') { target = path.join(area, 'actual/inventory.json'); write(area, 'actual/inventory.json', 'FAKE_INVENTORY_VALUE'); fs.symlinkSync(path.join(area, 'actual'), path.join(area, 'linked')); inventory = path.join(area, 'linked/inventory.json'); }
     else {
       inventory = target = path.join(area, 'inventory.json');
-      if (variant === 'oversize') { const fd = fs.openSync(target, 'w'); fs.ftruncateSync(fd, 4 * 1024 * 1024 + 1); fs.closeSync(fd); }
+      if (variant === 'oversize') { const fd = fs.openSync(target, 'w'); fs.ftruncateSync(fd, MAX_INVENTORY_BYTES + 1); fs.closeSync(fd); }
       else if (variant === 'directory') fs.mkdirSync(target);
       else execFileSync('mkfifo', [target]);
     }

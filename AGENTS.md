@@ -8,7 +8,7 @@ AI agent skills for video/subtitle processing and content utilities. All skills 
 
 ## Architecture
 
-Cloudflare project audit lives in `developer-tools` at `skills/daftai-cloudflare-billing-audit/`. It runs offline and reads only the explicit target; it does not execute the target project or access billing accounts. `.github/workflows/cloudflare-billing-audit.yml` validates the native-platform and installed-skill contracts.
+Cloudflare project audit lives in `developer-tools` at `skills/daftai-cloudflare-billing-audit/`. It runs offline and reads only the explicit target; it does not execute the target project or access billing accounts. `.github/workflows/cloudflare-billing-audit.yml` validates the native-platform and installed-skill contracts. `.gitattributes` keeps this skill LF-normalized for matching installed-artifact hashes across platforms.
 
 Skills are organized into plugin categories in `marketplace.json`:
 
