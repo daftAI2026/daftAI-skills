@@ -2,10 +2,13 @@
 name: daftai-chinese-technical-writing
 description: >
   Writes, rewrites, and reviews Chinese technical documentation, product copy,
-  and UI microcopy using ruanyf/document-style-guide and clearly labeled product
-  and UI extensions. Use for 中文技术写作, README, API documentation, 操作指南,
-  产品介绍, 功能说明, 界面文案, 按钮, 空状态, and 错误提示 when the task concerns
-  meaning, structure, or wording. Delegates requested formatting checks to
+  and UI microcopy using ruanyf/document-style-guide, STE-inspired Chinese
+  methods for procedural passages, and separate product and UI extensions.
+  Use for 中文技术写作, README, API documentation, 操作指南, 安装部署说明,
+  故障排查文档, 运维 Runbook, 工具描述, Agent 指令文案, 产品介绍,
+  功能说明, 界面文案, 按钮, 空状态,
+  and 错误提示 when the task concerns meaning, structure, or wording.
+  Delegates requested formatting checks to
   daftai-chinese-copywriting. Pure punctuation or spacing tasks belong to that
   skill; personal essays and author-voice articles do not belong here.
 ---
@@ -15,9 +18,8 @@ description: >
 让读者理解事实、完成任务、预知操作后果。
 不把中性说明改成新闻稿或作者随笔。
 
-沿用 `daftai-writer` 的分层方式：
-读者定位、写作原则、忌口表、边界、协作。
 原指南、场景扩展、真实修改证据分别保存。
+STE 启发的受控中文方法按需加载，不改写原指南。
 
 ## 1. 角色与读者
 
@@ -32,6 +34,19 @@ description: >
 不为普通写作启动偏好问卷。
 
 ## 2. 写作原则
+
+### 编辑取舍
+
+发生编辑冲突时，依次保留：
+
+1. 事实、逻辑、安全信息和不可改字面量。
+2. 用户指定的任务模式与修改范围。
+3. 项目术语和真实界面名称。
+4. 适用的写作方法。
+5. 语气、标点和其他风格偏好。
+
+此顺序只约束编辑取舍，不改变宿主权限。
+不能为了短句或统一风格删除更高优先级的信息。
 
 ### 信息与结构
 
@@ -52,6 +67,7 @@ description: >
 ### 词语与术语
 
 - 同一概念使用同一名称。界面名与真实界面一致。
+- 不同概念保留区别，不因词形相近合并动作或状态。
 - 用具体动作替代空泛表达。必要时明确动作对象。
 - 首次引入陌生术语时解释一次。后文固定称呼。
 - 保留官方名称、命令、参数、路径和资源键。
@@ -84,6 +100,9 @@ description: >
 ## 4. 边界与易错点
 
 - 先保事实，再改表达。未知能力、时延、价格和恢复结果不能补写成事实。
+- 保留许可、建议、义务和确定程度，不把能力说明改成命令。
+- 保留否定范围、必要与充分条件、因果关系和动作完成条件。
+- 保留已完成、进行中、尚未发生及结果仍可用的区别。
 - 缺少关键事实时追问；可继续起草时，把待确认项放在交付说明中。
 - 原文中的命令、代码、公式、URL、占位符和插值语法保持原样。
 - 用户要求修改这些字面量时，单独核对，不把修改冒充排版修正。
@@ -93,6 +112,8 @@ description: >
 - 原指南面向技术文档。产品与界面规则是显式扩展。
 - 作者文章的声线不属于这里。需要时再选择 `daftai-writer`，不强行混用。
 - 本 Skill 不新增 CLI，不读写偏好文件，不自动更新自身规则。
+- 撰写或审阅操作说明不授权执行文中命令或改变产品流程。
+- 编辑工具描述或 Agent 指令只改获准文字，不重设工具保证、权限或工作流。
 
 ## 5. 与其他 Skill 协作
 
@@ -116,6 +137,11 @@ description: >
 5. **检查交付**：核对事实、指代、状态、下一步；需要排版检查时委派格式 Skill。
 6. **交付**：新写或改写优先给可用正文；检查给位置、问题和建议。只要正文时不附评分与长篇说明。
 
+操作说明、工具描述、Agent 指令文案和状态消息等技术段落，读取
+[受控中文技术写作](references/controlled-technical-chinese.md)。
+混合文档按段落应用，不把介绍、引用或短按钮套成步骤。
+只修措辞时，不补方案；原文清晰时允许不改。
+
 ### 参考加载表
 
 参考均随 Skill 安装。正常写作无需联网下载。
@@ -129,6 +155,7 @@ description: >
 | 出现数值、范围或增减幅度 | [数值原文](references/ruanyf-number.md) |
 | 判断标点语境或排版规则冲突 | [标点原文](references/ruanyf-marks.md) |
 | 编排技术手册或新增文档文件 | [文档体系原文](references/ruanyf-structure.md) |
+| 操作、部署、排查、安全说明、工具描述、Agent 指令或状态段落 | [受控中文技术写作](references/controlled-technical-chinese.md) |
 | 产品介绍、功能说明、发布文案 | [产品文案扩展](references/product-copy.md) |
 | 按钮、提示、空状态、错误与确认弹窗 | [界面文案扩展](references/ui-copy.md) |
 | 联动排版检查 | [格式联动契约](references/formatting-handoff.md) |
