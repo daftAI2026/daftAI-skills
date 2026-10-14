@@ -47,8 +47,8 @@ Stop when relevant chargeable paths and guards are established, or when safe acc
 
 ## Reports, writing and interaction
 
-Keep one final agent-report.md/agent-report.json pair. Use report schema 3 under report-schema.md; scope-index schema 2.0 and connectedEvidence schema 1 are independent versions. Distinguish indexed, read, reviewed and lexically scanned scope. Record actual index references and successful receipt metadata without source text/Base64. Unvisited directories and unread ranges are not reviewed.
+Keep one final agent-report.md/agent-report.json pair. Use report schema 3 under report-schema.md; scope-index schema 2.0 and current connectedEvidence schema 2 are independent versions. Legacy connectedEvidence schema 1 remains readable; do not relabel old reports. Distinguish indexed, read, reviewed and lexically scanned scope. Record actual index references and successful receipt metadata without source text/Base64. Unvisited directories and unread ranges are not reviewed.
 
 After facts are frozen, complete the required writing stage under report-writing.md; resolve or obtain its Chinese dependency internally. Pass only editable expression, not indexes/source/Base64/telemetry. Preserve evidence IDs, ranges/hashes, amounts, statuses and unknowns. A missing dependency does not discard audit evidence; preserve the draft and report the writing delivery blocker.
 
-Show the highest-signal supported findings directly in chat with conditions, evidence and next actions; link both reports. Do not open a dialog for each finding or apply repairs. Only unresolved target/safe-output/required-access decisions need a concise question. With no supported finding, state that result and significant gaps, never “safe”.
+Show the highest-signal supported findings directly in chat with conditions, evidence and next actions; link both reports. Do not open a dialog for each finding or apply repairs. Use the first-use mode card under preferences.md when needed; otherwise only unresolved target/safe-output/required-access decisions need a concise question. With no supported finding, state that result and significant gaps, never “safe”.

@@ -2,6 +2,16 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.13.0 - 2026-10-15
+
+### Improved
+- Offers project-only or project-and-Cloudflare checks at first use, with current-only and remembered choices saved explicitly in user-level `EXTEND.json`.
+- Guides optional official MCP connection and login, preserving the project draft while waiting for authorization or an explicit skip.
+- Removes the audit's default collection and per-call duration ceilings while preserving request, page and row limits, explicit user time limits and host timeouts.
+
+### Fixed
+- Records current-state observations without fabricated historical windows; accepts connected evidence extension 2 while keeping legacy reports readable.
+
 ## 1.12.1 - 2026-10-15
 
 ### Fixed

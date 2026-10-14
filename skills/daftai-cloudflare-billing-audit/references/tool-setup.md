@@ -23,14 +23,6 @@ If installation fails or is prohibited, retain the evidence and draft report, st
 
 ## Optional official Cloudflare MCP
 
-MCP is not required for source review. Offer a single scoped online check only when it would resolve a material unknown; do not interrupt every audit with a setup dialog.
+After a Cloudflare choice, load [mcp-setup.md](mcp-setup.md) for official connection discovery, client registration and user-completed OAuth. Do not stop at an empty resource/plugin search. The reference includes the official endpoint and verified Codex CLI forms; other clients use their actual supported setup interface. Load it only for this optional path, not for project-only review or writing dependency setup.
 
-After user consent, first discover and reuse an existing official Cloudflare connection. A configured server may be remote; there need not be a locally installed server process. Check its actual availability, provenance and schema without reading tokens. Its name alone is not proof that it is official.
-
-If none is usable and setup is authorized, follow the current [Cloudflare MCP catalog](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/) and [official repository](https://github.com/cloudflare/mcp). The managed API server uses `https://mcp.cloudflare.com/mcp` with Streamable HTTP and user-completed OAuth. Do not clone or deploy its source, install every Cloudflare plugin, or assume installing Cloudflare skills also registered MCP in this host.
-
-Register only that URL through the host's supported MCP connection flow, outside the audited target. Show the intended configuration change and least permissions needed. Preserve unrelated settings and never store tokens in this skill, a report or project files. Open the official authorization flow for the user to approve; do not collect passwords, mint API tokens, or silently grant extra scopes. If the user already approved connection setup and the bounded read scope, do not ask the same question again. If consent covered reads only, obtain the missing setup permission before changing the client configuration.
-
-Client-specific syntax varies. Do not invent a universal config path, edit a whole user config blindly, or guess an unsupported CLI flag. If the host cannot register or reload the server, provide the official URL and its actual settings entry, preserve the offline result and report setup as incomplete.
-
-Connecting is not permission to call every available operation. After setup, discover the real tools and apply [connected-evidence.md](connected-evidence.md): named account/project/environment, approved time window and bounded read operations. Do not create monitoring, subscriptions, saved queries or production changes. Authentication refusal keeps online evidence unknown; do not turn it into a billing-risk finding.
+Missing or failed authentication is a user-action stage, not automatic permission to finish project-only. Explain the missing step, start the supported connection/login flow after setup consent, and wait for completion or an explicit skip/cancel. Preserve the project draft while waiting. Then verify available tools and enter [connected-evidence.md](connected-evidence.md) only with valid scoped authorization. Setup success is not query success.

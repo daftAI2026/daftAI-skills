@@ -1,22 +1,23 @@
 /**
  * [INPUT]: Agent 单独建立的可信授权/工具元数据，以及不可信的结构化响应
- * [OUTPUT]: 纯数据操作门禁、保留未知来源的最小证据摘要与累计额度校验；不执行任何工具
+ * [OUTPUT]: 操作与额度门禁、可选用户限时及最小证据摘要；不执行工具或设置超时
  * [POS]: 联网证据的确定性辅助契约；不是身份认证、沙箱或联网执行器
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 export const OPERATIONS = ['deployment-metadata', 'resource-metadata', 'usage-aggregate', 'telemetry-query', 'issues-list', 'issues-detail', 'notification-policies', 'notification-history'] as const;
 export type Operation = typeof OPERATIONS[number];
-export type Budget = { requests: number; pages: number; rows: number; timeMs: number };
+export type Budget = { requests: number; pages: number; rows: number; timeMs: number | null };
+export type Usage = Omit<Budget, 'timeMs'> & { timeMs: number };
 export type Scope = {
   accountId: string; projectId: string; environment: string; resourceId: string;
-  deploymentVersion: string; timeMode: 'interval' | 'snapshot'; windowStart: string; windowEnd: string;
+  deploymentVersion: string; timeMode: 'interval' | 'snapshot'; windowStart: string | null; windowEnd: string | null;
 };
 export type TrustedPlan = {
   mode: 'offline' | 'connected';
   consent?: { source: 'user'; explicit: true; scope: Scope; operations: Operation[];
     approvedBudget: Budget; expandedBudgetApproved?: boolean; expandedWindowApproved?: boolean; accountWideUsageApproved?: boolean; accountWideNotificationsApproved?: boolean;
     telemetryIncidentalWritesAccepted?: boolean };
-  budget: Budget; startedAtMs: number; deadlineMs: number;
+  budget: Budget; startedAtMs: number; deadlineMs: number | null;
   resourceLabel: string; environmentLabel: string;
 };
 export type VerifiedCapability = {
@@ -38,10 +39,11 @@ export type Reason = 'ok' | 'offline' | 'consent-missing' | 'scope-mismatch' | '
   | 'missing' | 'forbidden' | 'rate-limited' | 'tool-error' | 'truncated'
   | 'invalid-response' | 'no-issues-unsupported' | 'permission-missing';
 export type Decision = { allowed: boolean; reason: Reason };
-const scopeKeys: (keyof Scope)[] = ['accountId', 'projectId', 'environment', 'resourceId',
-  'deploymentVersion', 'timeMode', 'windowStart', 'windowEnd'];
-export const DEFAULT_CONNECTED_CEILING: Readonly<Budget> = Object.freeze({ requests: 10, pages: 3, rows: 100, timeMs: 60000 });
-const budgetKeys: (keyof Budget)[] = ['requests', 'pages', 'rows', 'timeMs'];
+const identityScopeKeys = ['accountId', 'projectId', 'environment', 'resourceId', 'deploymentVersion'] as const;
+const scopeKeys: (keyof Scope)[] = [...identityScopeKeys, 'timeMode', 'windowStart', 'windowEnd'];
+export const DEFAULT_CONNECTED_CEILING: Readonly<Budget> = Object.freeze({ requests: 10, pages: 3, rows: 100, timeMs: null });
+const workBudgetKeys = ['requests', 'pages', 'rows'] as const;
+const budgetKeys: (keyof Budget)[] = [...workBudgetKeys, 'timeMs'];
 const SAFE_ROUTES: Record<Operation, readonly string[]> = {
   'deployment-metadata': ['/accounts/{account_id}/workers/scripts/{script_name}/deployments',
     '/accounts/{account_id}/workers/scripts/{script_name}/versions'],
@@ -60,17 +62,25 @@ const count = (v: unknown): v is number => typeof v === 'number' && Number.isSaf
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 const iso = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(v)
   && Number.isFinite(Date.parse(v)) && new Date(v).toISOString() === v;
+function hasWindow(v: Scope): v is Scope & { windowStart: string; windowEnd: string } {
+  return v.windowStart !== null && v.windowEnd !== null;
+}
 function validScope(v: unknown): v is Scope {
-  return object(v) && scopeKeys.every(k => typeof v[k] === 'string' && (v[k] as string).length > 0
-    && (v[k] as string).length <= 256) && iso(v.windowStart) && iso(v.windowEnd)
-    && (v.timeMode === 'interval' || v.timeMode === 'snapshot')
-    && Date.parse(v.windowStart) < Date.parse(v.windowEnd);
+  if (!object(v) || !identityScopeKeys.every(k => typeof v[k] === 'string'
+    && (v[k] as string).length > 0 && (v[k] as string).length <= 256)
+    || (v.timeMode !== 'interval' && v.timeMode !== 'snapshot')) return false;
+  if (v.timeMode === 'snapshot' && v.windowStart === null && v.windowEnd === null) return true;
+  return iso(v.windowStart) && iso(v.windowEnd) && Date.parse(v.windowStart) < Date.parse(v.windowEnd);
 }
 function sameScope(a: Scope, b: unknown): boolean {
   return validScope(b) && scopeKeys.every(k => a[k] === b[k]);
 }
 function validBudget(v: unknown, positive = false): v is Budget {
-  return object(v) && budgetKeys.every(k => count(v[k]) && (!positive || (v[k] as number) > 0));
+  return object(v) && workBudgetKeys.every(k => count(v[k]) && (!positive || (v[k] as number) > 0))
+    && (v.timeMs === null || (count(v.timeMs) && (!positive || v.timeMs > 0)));
+}
+function validUsage(v: unknown): v is Usage {
+  return validBudget(v) && count(v.timeMs);
 }
 function validOperations(v: unknown): v is Operation[] {
   return Array.isArray(v) && v.length > 0 && v.every(x => OPERATIONS.includes(x));
@@ -82,7 +92,7 @@ const deny = (reason: Reason): Decision => ({ allowed: false, reason });
  * arguments against the real schema; route equality is not proof an endpoint is read-only.
  * This function has no I/O, clock, credential handling, tool invocation or mutable ledger. */
 export function checkConnectedOperation(plan: TrustedPlan, capability: VerifiedCapability | undefined,
-  intent: OperationIntent, used: Budget, nowMs: number): Decision {
+  intent: OperationIntent, used: Usage, nowMs: number): Decision {
   if (!plan || plan.mode !== 'connected') return deny('offline');
   const consent = plan.consent;
   if (!consent || consent.source !== 'user' || consent.explicit !== true || !validScope(consent.scope)
@@ -133,25 +143,30 @@ export function checkConnectedOperation(plan: TrustedPlan, capability: VerifiedC
   } else if (capability.source !== 'connector') return deny('schema-unverified');
   if (!validBudget(plan.budget, true) || !validBudget(consent.approvedBudget, true)
     || budgetKeys.some(k => plan.budget[k] !== consent.approvedBudget[k])
-    || (consent.expandedBudgetApproved !== true && budgetKeys.some(k => plan.budget[k] > DEFAULT_CONNECTED_CEILING[k]))
-    || (Date.parse(consent.scope.windowEnd) - Date.parse(consent.scope.windowStart) > 86400000
-      && consent.expandedWindowApproved !== true) || !validBudget(used) || !validBudget(intent.reserve)
-    || intent.reserve.requests < 1 || intent.reserve.pages < 1 || intent.reserve.timeMs < 1)
-    return deny('invalid-budget');
-  if (intent.scope.timeMode === 'snapshot' && (!count(nowMs)
+    || (consent.expandedBudgetApproved !== true && workBudgetKeys.some(k => plan.budget[k] > DEFAULT_CONNECTED_CEILING[k]))
+    || (hasWindow(consent.scope) && Date.parse(consent.scope.windowEnd) - Date.parse(consent.scope.windowStart) > 86400000
+      && consent.expandedWindowApproved !== true) || !validUsage(used) || !validBudget(intent.reserve)
+    || intent.reserve.requests < 1 || intent.reserve.pages < 1
+    || (intent.reserve.timeMs !== null && intent.reserve.timeMs < 1)
+    || (plan.budget.timeMs === null && plan.deadlineMs !== null)) return deny('invalid-budget');
+  const reserveTime = intent.reserve.timeMs ?? 0;
+  if (intent.scope.timeMode === 'snapshot' && hasWindow(intent.scope) && (!count(nowMs)
     || nowMs < Date.parse(intent.scope.windowStart)
-    || nowMs + intent.reserve.timeMs > Date.parse(intent.scope.windowEnd))) return deny('scope-mismatch');
-  if (!count(nowMs) || !count(plan.startedAtMs) || !count(plan.deadlineMs)
-    || plan.deadlineMs <= plan.startedAtMs || nowMs < plan.startedAtMs
-    || nowMs + intent.reserve.timeMs > plan.deadlineMs
-    || nowMs - plan.startedAtMs + intent.reserve.timeMs > plan.budget.timeMs) return deny('deadline');
-  if (budgetKeys.some(k => !Number.isSafeInteger(used[k] + intent.reserve[k])
-    || used[k] + intent.reserve[k] > plan.budget[k])) return deny('budget-exhausted');
+    || nowMs + reserveTime > Date.parse(intent.scope.windowEnd))) return deny('scope-mismatch');
+  if (!count(nowMs) || !count(plan.startedAtMs) || nowMs < plan.startedAtMs
+    || (plan.deadlineMs !== null && (!count(plan.deadlineMs) || plan.deadlineMs <= plan.startedAtMs
+      || nowMs + reserveTime > plan.deadlineMs))
+    || (plan.budget.timeMs !== null && nowMs - plan.startedAtMs + reserveTime > plan.budget.timeMs))
+    return deny('deadline');
+  if (workBudgetKeys.some(k => !Number.isSafeInteger(used[k] + intent.reserve[k])
+    || used[k] + intent.reserve[k] > plan.budget[k])
+    || (plan.budget.timeMs !== null && (!Number.isSafeInteger(used.timeMs + reserveTime)
+      || used.timeMs + reserveTime > plan.budget.timeMs))) return deny('budget-exhausted');
   return { allowed: true, reason: 'ok' };
 }
 
 export type TrustedReceipt = {
-  provenance: 'trusted-execution'; usage: Budget; observedAt: string; localDeploymentMatched: boolean;
+  provenance: 'trusted-execution'; usage: Usage; observedAt: string; localDeploymentMatched: boolean;
 };
 export type Observation = {
   evidenceId: string; operation: Operation; source: 'connector' | 'isolated-cli' | 'unknown';
@@ -170,7 +185,7 @@ const label = (v: unknown, kind: string) => typeof v === 'string' && new RegExp(
  * Numeric metrics are allowlisted summaries, not a guarantee of accurate billing or safe logs.
  * Caller records every requested item, including skipped/failed calls, and maintains actual usage. */
 export function summarizeConnectedEvidence(evidenceId: string, plan: TrustedPlan,
-  capability: VerifiedCapability | undefined, intent: OperationIntent, used: Budget,
+  capability: VerifiedCapability | undefined, intent: OperationIntent, used: Usage,
   nowMs: number, receipt: TrustedReceipt | undefined, response: unknown): Observation {
   const decision = checkConnectedOperation(plan, capability, intent, used, nowMs);
   const out: Observation = {
@@ -189,17 +204,20 @@ export function summarizeConnectedEvidence(evidenceId: string, plan: TrustedPlan
   };
   if (!decision.allowed) return out;
   if (!receipt) return { ...out, reason: 'missing' };
-  if (receipt.provenance !== 'trusted-execution' || !validBudget(receipt.usage)
+  if (receipt.provenance !== 'trusted-execution' || !validUsage(receipt.usage)
     || receipt.usage.requests < 1 || !iso(receipt.observedAt) || Date.parse(receipt.observedAt) < nowMs)
     return { ...out, reason: 'invalid-response' };
   const actual = receipt.usage;
   out.observedAt = receipt.observedAt;
   out.requests = actual.requests; out.pages = actual.pages; out.rows = actual.rows;
-  if (intent.scope.timeMode === 'snapshot' && (Date.parse(receipt.observedAt) < Date.parse(intent.scope.windowStart)
+  if (intent.scope.timeMode === 'snapshot' && hasWindow(intent.scope) && (Date.parse(receipt.observedAt) < Date.parse(intent.scope.windowStart)
     || Date.parse(receipt.observedAt) > Date.parse(intent.scope.windowEnd))) return { ...out, reason: 'scope-mismatch' };
-  if (Date.parse(receipt.observedAt) - nowMs > intent.reserve.timeMs
-    || budgetKeys.some(k => actual[k] > intent.reserve[k])) return { ...out, reason: 'budget-exhausted' };
-  if (Date.parse(receipt.observedAt) > plan.deadlineMs) return { ...out, reason: 'deadline' };
+  if ((intent.reserve.timeMs !== null && (Date.parse(receipt.observedAt) - nowMs > intent.reserve.timeMs
+      || actual.timeMs > intent.reserve.timeMs))
+    || workBudgetKeys.some(k => actual[k] > intent.reserve[k])) return { ...out, reason: 'budget-exhausted' };
+  if ((plan.deadlineMs !== null && Date.parse(receipt.observedAt) > plan.deadlineMs)
+    || (plan.budget.timeMs !== null && Date.parse(receipt.observedAt) - plan.startedAtMs > plan.budget.timeMs))
+    return { ...out, reason: 'deadline' };
   if (!object(response)) return { ...out, reason: 'missing' };
   if (response.httpStatus === 403) return { ...out, reason: 'forbidden' };
   if (response.httpStatus === 429) return { ...out, reason: 'rate-limited' };
@@ -228,7 +246,7 @@ export function summarizeConnectedEvidence(evidenceId: string, plan: TrustedPlan
 }
 
 export type ConnectedEvidence = {
-  schemaVersion: 1; mode: 'bounded-evidence'; status: 'observed' | 'partial' | 'unknown';
+  schemaVersion: 2; mode: 'bounded-evidence'; status: 'observed' | 'partial' | 'unknown';
   requests: number; budget: Budget; observations: Observation[];
   gaps: { evidenceId: string; reason: Reason }[];
 };
@@ -249,7 +267,7 @@ export function buildConnectedEvidence(observations: Observation[], budget: Budg
   const allUnknown = gaps.length === observations.length;
   if (countKeys.some(key => totals[key] > budget[key]))
     gaps.push({ evidenceId: 'collection-budget', reason: 'budget-exhausted' });
-  return { schemaVersion: 1, mode: 'bounded-evidence',
+  return { schemaVersion: 2, mode: 'bounded-evidence',
     status: allUnknown ? 'unknown' : gaps.length ? 'partial' : 'observed',
     requests: totals.requests,
     budget: { requests: budget.requests, pages: budget.pages, rows: budget.rows, timeMs: budget.timeMs },
@@ -262,9 +280,9 @@ export function isCompatibleReportEnvelope(report: unknown): boolean {
   if (report.schemaVersion === 3 && object(report.scanner) && report.scanner.mode === 'on-demand') {
     if (report.audit.mode === 'offline-read-only') return report.connectedEvidence === undefined;
     return report.audit.mode === 'offline-plus-connected-evidence' && object(report.connectedEvidence)
-      && report.connectedEvidence.schemaVersion === 1 && report.connectedEvidence.mode === 'bounded-evidence';
+      && [1, 2].includes(report.connectedEvidence.schemaVersion as number) && report.connectedEvidence.mode === 'bounded-evidence';
   }
   return report.schemaVersion === 2 && report.audit.mode === 'offline-plus-connected-evidence'
-    && object(report.connectedEvidence) && report.connectedEvidence.schemaVersion === 1
+    && object(report.connectedEvidence) && [1, 2].includes(report.connectedEvidence.schemaVersion as number)
     && report.connectedEvidence.mode === 'bounded-evidence';
 }

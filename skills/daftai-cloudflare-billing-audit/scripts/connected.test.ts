@@ -13,10 +13,10 @@ import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { checkConnectedOperation, summarizeConnectedEvidence, buildConnectedEvidence,
   isCompatibleReportEnvelope, type TrustedPlan, type VerifiedCapability,
-  type OperationIntent, type Budget, type TrustedReceipt } from './connected-contract.ts';
+  DEFAULT_CONNECTED_CEILING, type OperationIntent, type Budget, type Usage, type Scope, type TrustedReceipt } from './connected-contract.ts';
 const start = Date.parse('2026-01-02T00:00:00.000Z');
 function fixture() {
-  const scope = { accountId: 'synthetic-account', projectId: 'synthetic-worker', environment: 'production',
+  const scope: Scope = { accountId: 'synthetic-account', projectId: 'synthetic-worker', environment: 'production',
     resourceId: 'synthetic-resource', deploymentVersion: 'version-a', timeMode: 'snapshot' as const,
     windowStart: '2026-01-02T00:00:00.000Z', windowEnd: '2026-01-02T00:00:10.000Z' };
   const plan: TrustedPlan = { mode: 'connected', consent: { source: 'user', explicit: true, scope,
@@ -29,7 +29,7 @@ function fixture() {
   const intent: OperationIntent = { operation: 'deployment-metadata', toolId: capability.toolId,
     schemaFingerprint: capability.schemaFingerprint, method: capability.method, route: capability.route, scope: { ...scope }, purpose: 'read', savedQueryAction: 'none',
     reserve: { requests: 1, pages: 1, rows: 10, timeMs: 1000 } };
-  const used: Budget = { requests: 0, pages: 0, rows: 0, timeMs: 0 };
+  const used: Usage = { requests: 0, pages: 0, rows: 0, timeMs: 0 };
   const response = { httpStatus: 200, usage: { requests: 1, pages: 1, rows: 3, timeMs: 10 },
     truncated: false, hasMore: false, scope: { ...scope }, observedAt: new Date(start + 10).toISOString(),
     metrics: { requests: 23, errors: 2 } };
@@ -110,8 +110,8 @@ test('hard budgets reject invalid/nonfinite/exhausted limits and response overru
     for (const invalid of [NaN, Infinity, -1, 0, 0.5, Number.MAX_SAFE_INTEGER + 1]) {
       const f = fixture(); f.plan.budget[key] = invalid; assert.equal(f.check().allowed, false, `${key}:${invalid}`);
     }
-    const f = fixture(); f.used[key] = f.plan.budget[key]; assert.equal(f.check().reason, 'budget-exhausted');
-    const g = fixture(); g.receipt.usage[key] = g.intent.reserve[key] + 1;
+    const f = fixture(); f.used[key] = f.plan.budget[key]!; assert.equal(f.check().reason, 'budget-exhausted');
+    const g = fixture(); g.receipt.usage[key] = g.intent.reserve[key]! + 1;
     assert.equal(g.summarize(g.response).reason, 'budget-exhausted');
   }
   const f = fixture(); f.plan.deadlineMs = start + 1; assert.equal(f.check().reason, 'deadline');
@@ -353,4 +353,73 @@ test('on-demand report envelope preserves schema 3 in offline and connected mode
   const connectedEvidence = buildConnectedEvidence([f.summarize(f.response)], f.plan.budget);
   assert.equal(isCompatibleReportEnvelope({...report, audit:{mode:'offline-plus-connected-evidence'}, connectedEvidence}), true);
   assert.equal(isCompatibleReportEnvelope({...report, audit:{mode:'offline-plus-connected-evidence'}}), false);
+});
+
+
+// ---- 默认不设时间上限：单次工具超时和用户明确限时保持独立 ----
+function untimedFixture() {
+  const f = fixture();
+  f.plan.budget = { ...DEFAULT_CONNECTED_CEILING };
+  f.plan.consent!.approvedBudget = { ...f.plan.budget };
+  f.plan.deadlineMs = null;
+  f.plan.consent!.scope.windowStart = null;
+  f.plan.consent!.scope.windowEnd = null;
+  f.intent.scope = { ...f.plan.consent!.scope };
+  f.response.scope = { ...f.intent.scope };
+  f.intent.reserve.timeMs = null;
+  return f;
+}
+test('default collection has no deadline after analysis pauses of one, five, ten or thirty minutes', () => {
+  assert.equal(DEFAULT_CONNECTED_CEILING.timeMs, null);
+  for (const elapsed of [60001, 300000, 600000, 1800000]) {
+    const f = untimedFixture();
+    f.used.timeMs = 120000;
+    assert.deepEqual(checkConnectedOperation(f.plan, f.capability, f.intent, f.used, start + elapsed),
+      { allowed: true, reason: 'ok' });
+  }
+});
+test('no skill-imposed per-call timeout rejects a valid response taking more than sixty seconds', () => {
+  const f = untimedFixture();
+  f.receipt.observedAt = new Date(start + 180000).toISOString();
+  f.receipt.usage.timeMs = 180000;
+  assert.equal(f.summarize(f.response).status, 'observed');
+  const extension = buildConnectedEvidence([f.summarize(f.response)], f.plan.budget);
+  assert.equal(extension.schemaVersion, 2);
+  assert.equal(extension.budget.timeMs, null);
+  assert.equal(extension.observations[0]!.windowStart, null);
+});
+test('removing time defaults does not remove request, page, row or scope gates', () => {
+  for (const key of ['requests', 'pages', 'rows'] as const) {
+    const f = untimedFixture();f.used[key] = f.plan.budget[key];
+    assert.equal(f.check().reason, 'budget-exhausted');
+    const g = untimedFixture();g.receipt.usage[key] = g.intent.reserve[key] + 1;
+    assert.equal(g.summarize(g.response).reason, 'budget-exhausted');
+  }
+  const f = untimedFixture();f.intent.scope.resourceId = 'another-resource';
+  assert.equal(f.check().reason, 'scope-mismatch');
+});
+test('explicit collection and per-call time limits remain effective without a fixed default', () => {
+  const f = untimedFixture();
+  f.plan.budget.timeMs = 300000;f.plan.consent!.approvedBudget.timeMs = 300000;
+  f.plan.deadlineMs = start + 300000;f.intent.reserve.timeMs = 1000;
+  assert.equal(checkConnectedOperation(f.plan, f.capability, f.intent, f.used, start + 299001).reason, 'deadline');
+  const g = untimedFixture();g.intent.reserve.timeMs = 180000;
+  g.receipt.observedAt = new Date(start + 180001).toISOString();g.receipt.usage.timeMs = 180001;
+  assert.equal(g.summarize(g.response).reason, 'budget-exhausted');
+  assert.equal(g.summarize(g.response).requests, 1);
+});
+test('no-deadline plans reject invalid elapsed time and interval queries still require a statistical window', () => {
+  const f = untimedFixture();f.receipt.usage.timeMs = null as unknown as number;
+  assert.equal(f.summarize(f.response).reason, 'invalid-response');
+  const g = untimedFixture();g.intent.scope.timeMode = 'interval';g.plan.consent!.scope.timeMode = 'interval';
+  assert.equal(g.check().reason, 'consent-missing');
+  const h = untimedFixture();h.plan.deadlineMs = start + 60000;
+  assert.equal(h.check().reason, 'invalid-budget');
+});
+test('connected report envelopes accept legacy extension 1 and current extension 2, not unknown versions', () => {
+  for (const schemaVersion of [1, 2, 3]) {
+    const report = { schemaVersion: 3, audit: { mode: 'offline-plus-connected-evidence' }, scanner: { mode: 'on-demand' },
+      connectedEvidence: { schemaVersion, mode: 'bounded-evidence' } };
+    assert.equal(isCompatibleReportEnvelope(report), schemaVersion !== 3);
+  }
 });

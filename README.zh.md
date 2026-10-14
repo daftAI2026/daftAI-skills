@@ -21,7 +21,7 @@ npx skills add daftAI2026/daftAI-skills
 
 | Skill | 描述 |
 |-------|------|
-| [daftai-cloudflare-billing-audit](skills/daftai-cloudflare-billing-audit/) | 渐进式只读检查 Cloudflare 账单风险，按用户语言输出结构化报告，可选明确限定授权的线上取证；需要 Bun，平台边界见技能说明。 |
+| [daftai-cloudflare-billing-audit](skills/daftai-cloudflare-billing-audit/) | 渐进式只读检查 Cloudflare 账单风险，按用户语言输出结构化报告；可选只检查项目或通过官方 MCP 查询 Cloudflare，明确要求后将选择保存到 `EXTEND.json`。需要 Bun，平台边界见技能说明。 |
 | [daftai-video-compositor](skills/daftai-video-compositor/) | 把本地视频嵌进截图的精确矩形或圆角区域，保留版式和原音轨。需要 Bun、FFmpeg 和 FFprobe。 |
 | [daftai-video-subtitler](skills/daftai-video-subtitler/) | 本地视频字幕烧录工具，支持 SRT/VTT/ASS 格式、双语字幕合并和翻译 |
 | [daftai-subtitle-translator](skills/daftai-subtitle-translator/) | 字幕文件翻译（SRT/VTT），支持术语一致性检查 |

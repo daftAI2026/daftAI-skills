@@ -1,4 +1,5 @@
 {
   "schemaVersion": 1,
-  "reportLanguage": "auto"
+  "reportLanguage": "auto",
+  "onlineEvidence": "ask"
 }

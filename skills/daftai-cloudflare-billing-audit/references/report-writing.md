@@ -8,7 +8,7 @@ For Chinese output, resolve `daftai-chinese-technical-writing` through [tool-set
 
 Read its actual `SKILL.md` and applicable technical-document references at this final stage, not during source discovery. Do not copy its rules into a second maintained writing guide. For other languages, retain the requested language and apply this audit's report structure and factual checks; do not force Chinese wording or add a bilingual article. Another requested writer can add a review within its actual scope, but cannot replace the required Chinese dependency or change protected facts.
 
-`technicalWriting: "off"` is a legacy preference accepted for compatibility; it cannot disable this required report stage. Missing preferences require no questionnaire. If the required Chinese writer cannot be obtained, retain the draft and evidence, identify the writing blocker and recovery action, and do not claim completed writer review.
+`technicalWriting: "off"` is a legacy preference accepted for compatibility; it cannot disable this required report stage. Missing writing preferences require no writing questionnaire; resolve the audit-entry mode card through [preferences.md](preferences.md). If the required Chinese writer cannot be obtained, retain the draft and evidence, identify the writing blocker and recovery action, and do not claim completed writer review.
 
 ## Freeze facts before expression
 
