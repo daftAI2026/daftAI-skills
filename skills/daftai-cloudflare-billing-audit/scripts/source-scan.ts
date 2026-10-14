@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖纯字符串源码和候选计费规则
+ * [OUTPUT]: 提供有界词法候选与不支持语法提示
+ * [POS]: 离线线索模块；不解析调用图，不执行源码，不确认账单风险
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import type { CandidateFinding } from './audit-types.ts';
 import { DOCS } from './audit-types.ts';
 function lineAt(source: string, offset: number): number {

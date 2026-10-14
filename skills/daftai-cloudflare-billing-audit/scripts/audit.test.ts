@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖离线审计 API 和临时合成文件树
+ * [OUTPUT]: 验证配置解析、候选、辅助证据与未知覆盖
+ * [POS]: 核心回归测试；不访问账户或执行目标代码
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';

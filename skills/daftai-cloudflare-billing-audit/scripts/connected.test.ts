@@ -344,3 +344,13 @@ test('synthetic executable-config positive control works but unproven CLI gate n
     assert.equal(fs.existsSync(marker), false);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+test('on-demand report envelope preserves schema 3 in offline and connected modes', () => {
+  const report = {schemaVersion:3, audit:{mode:'offline-read-only'}, scanner:{mode:'on-demand'}};
+  assert.equal(isCompatibleReportEnvelope(report), true);
+  assert.equal(isCompatibleReportEnvelope({...report, connectedEvidence:{}}), false);
+  assert.equal(isCompatibleReportEnvelope({...report, scanner:{mode:'quick-scan'}}), false);
+  const f = fixture();
+  const connectedEvidence = buildConnectedEvidence([f.summarize(f.response)], f.plan.budget);
+  assert.equal(isCompatibleReportEnvelope({...report, audit:{mode:'offline-plus-connected-evidence'}, connectedEvidence}), true);
+  assert.equal(isCompatibleReportEnvelope({...report, audit:{mode:'offline-plus-connected-evidence'}}), false);
+});

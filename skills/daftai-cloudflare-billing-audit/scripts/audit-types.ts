@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 无运行时依赖；定义旧扫描库存和共用安全上限
+ * [OUTPUT]: 导出库存、配置、证据类型与单次操作限制
+ * [POS]: 纯契约模块；渐进读取不把快速扫描总量当成任务额度
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 export type UnknownItem = { code: string; detail: string; count?: number };
 export type Binding = { product: string; type: string; binding: string; role?: string };
 export type MainStatus = {
@@ -5,6 +11,7 @@ export type MainStatus = {
   source: string;
   status: string;
   path?: string;
+  specifier?: string;
 };
 export type EnvironmentInventory = {
   name: string;

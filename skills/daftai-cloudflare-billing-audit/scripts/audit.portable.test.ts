@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖真实宿主适配器和合成路径替换夹具
+ * [OUTPUT]: 验证便携路径边界、输出和读取一致性
+ * [POS]: 平台回归测试；显式区分原生覆盖与不可用能力
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';

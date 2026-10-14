@@ -1,8 +1,13 @@
+/**
+ * [INPUT]: 依赖 Node 文件系统、路径链检查与 fs-common 的身份/读取契约。
+ * [OUTPUT]: 导出 PortableFs，按稳定路径链读取、列举并写入受控文件。
+ * [POS]: 非 Linux 文件系统边界；逐级拒绝链接，并在读前后核对目录链与文件身份。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { digest, statIdentity, statFingerprint, isMissing } from './fs-common.ts';
-import { MAX_INVENTORY_BYTES } from './audit-types.ts';
-import type { StableStat } from './fs-common.ts';
+import { digest, statIdentity, statFingerprint, isMissing, validateReadRequest } from './fs-common.ts';
+import type { ByteRange, FileReadResult, StableStat } from './fs-common.ts';
 
 type ChainEntry = { path: string; real: string; stat: StableStat };
 const windows = process.platform === 'win32';
@@ -146,15 +151,21 @@ export class PortableFs {
       return { status: isMissing(error) ? 'missing' : 'other' };
     }
   }
-  readFile(relative: string, maxBytes: number, expected?: { stat: StableStat; statFingerprint?: string }): { text?: string; bytes?: number; sha256?: string; statFingerprint?: string; error?: string } {
+  readFile(relative: string, maxBytes: number, expected?: { stat: StableStat; statFingerprint?: string }, range?: ByteRange): FileReadResult {
     let fd: number | undefined;
     try {
-      if (!Number.isSafeInteger(maxBytes) || maxBytes < 0 || maxBytes > MAX_INVENTORY_BYTES) return { error: 'invalid-byte-limit' };
+      const validationError = validateReadRequest(maxBytes, range);
+      if (validationError) return { error: validationError };
       const { chain, file } = this.parent(relative);
       const before = fs.lstatSync(file, { bigint: true });
       if (before.isSymbolicLink() || !samePath(fs.realpathSync(file), file)) return { error: 'symlink' };
       if (!before.isFile()) return { error: 'not-regular-file' };
-      if (before.size > BigInt(maxBytes)) return { error: 'file-too-large' };
+      if (!range && before.size > BigInt(maxBytes)) return { error: 'file-too-large' };
+      if (range && before.size > BigInt(Number.MAX_SAFE_INTEGER)) return { error: 'file-size-unrepresentable' };
+      if (range && !(before.size === 0n && range.offset === 0) && BigInt(range.offset) >= before.size) return { error: 'range-out-of-bounds' };
+      const requestedBytes = range
+        ? Number((before.size - BigInt(range.offset)) < BigInt(range.length) ? before.size - BigInt(range.offset) : BigInt(range.length))
+        : maxBytes + 1;
       const token = fingerprint(chain);
       const beforeFingerprint = statFingerprint(before, token);
       if (expected && (statIdentity(expected.stat) !== statIdentity(before) || (expected.statFingerprint && expected.statFingerprint !== beforeFingerprint))) return { error: 'path-changed' };
@@ -165,20 +176,28 @@ export class PortableFs {
       if (!opened.isFile() || statIdentity(opened) !== statIdentity(before)) return { error: 'path-changed' };
       checkChain(chain); this.assertRootStable();
       if (!samePath(fs.realpathSync(file), file) || statIdentity(fs.lstatSync(file, { bigint: true })) !== statIdentity(opened)) return { error: 'path-changed' };
-      const buffer = Buffer.alloc(maxBytes + 1);
+      const buffer = Buffer.alloc(requestedBytes);
       let count = 0;
       while (count < buffer.length) {
-        const n = fs.readSync(fd, buffer, count, buffer.length - count, count);
+        const position = range ? range.offset + count : count;
+        const n = fs.readSync(fd, buffer, count, buffer.length - count, position);
         if (!n) break;
         count += n;
       }
-      if (count > maxBytes) return { error: 'file-too-large' };
+      if (!range && count > maxBytes) return { error: 'file-too-large' };
+      if (range && count !== requestedBytes) return { error: 'path-changed' };
       const after = fs.fstatSync(fd, { bigint: true });
       checkChain(chain); this.assertRootStable();
       const entry = fs.lstatSync(file, { bigint: true });
       if (!entry.isFile() || statIdentity(after) !== statIdentity(opened) || statIdentity(entry) !== statIdentity(opened) || !samePath(fs.realpathSync(file), file)) return { error: 'path-changed' };
       const content = buffer.subarray(0, count);
-      return { text: content.toString('utf8'), bytes: count, sha256: digest(content), statFingerprint: statFingerprint(after, token) };
+      return {
+        text: content.toString('utf8'),
+        bytes: count,
+        sha256: digest(content),
+        statFingerprint: statFingerprint(after, token),
+        ...(range ? { fileBytes: Number(after.size), contentBase64: content.toString('base64') } : {}),
+      };
     } catch (error) { return { error: error instanceof Error ? error.message : 'unreadable' }; }
     finally { if (fd !== undefined) fs.closeSync(fd); }
   }

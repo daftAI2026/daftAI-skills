@@ -19,10 +19,10 @@ test('JSON template is valid but not automatically written or activated', () => 
   const template = fs.readFileSync(new URL('../references/preferences.example.json', import.meta.url), 'utf8');
   assert.deepEqual(parseAuditPreferences(template), DEFAULT_AUDIT_PREFERENCES);
 });
-test('language tags and disabling optional writing are supported', () => {
+test('language tags and legacy off input normalize to mandatory writing', () => {
   for (const language of ['auto', 'zh', 'zh-Hans', 'en-US', 'ja', 'fr', 'de-DE', 'en-US-u-ca-gregory', 'zh-Hans-u-nu-hanidec']) {
     assert.deepEqual(parseAuditPreferences({ schemaVersion: 1, reportLanguage: language, technicalWriting: 'off' }),
-      { schemaVersion: 1, reportLanguage: language, technicalWriting: 'off' });
+      { schemaVersion: 1, reportLanguage: language, technicalWriting: 'auto' });
   }
 });
 test('invalid JSON, object shapes, versions and language tags are rejected', () => {

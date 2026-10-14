@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖真实 Linux 描述符与合成竞态夹具
+ * [OUTPUT]: 验证原生路径替换、链接及非普通文件拒绝
+ * [POS]: Linux 安全回归；非 Linux 跳过不等于原生验收
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';

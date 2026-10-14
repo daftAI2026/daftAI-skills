@@ -4,49 +4,6 @@
   "billflare": {
     "public_index": "https://billflare.dev/llms-full.txt",
     "evidence_scope": "Public source-attributed case/guide summaries, not independent billing audits, current prices or Cloudflare endorsements.",
-    "snapshot_provenance": {
-      "source": "read-only GitHub connector",
-      "ref": "main",
-      "commit_sha": "4d1ed91bc48585cdc9b7ee1411bd93e1ccf86799",
-      "files": [
-        {
-          "path": "AGENTS.md",
-          "blob_sha": "9762ac1e8f2e3f9f12d18192b30a6abe27786eac",
-          "read": true,
-          "content_reproduced": false
-        },
-        {
-          "path": "docs/data-model.md",
-          "blob_sha": "caa68af01fb4301728eb8bbc44796df212a2bb6e",
-          "read": true,
-          "content_reproduced": false
-        },
-        {
-          "path": "data/cases.json",
-          "blob_sha": "0696f5d394614213589e5f09ab560d0c3ea09d96",
-          "read": true
-        },
-        {
-          "path": "data/resources.json",
-          "blob_sha": "911703621d6aa15f68d788d836bc53938c5ff1c1",
-          "read": true
-        }
-      ],
-      "note": "Version provenance only; user-facing citations are public Billflare URLs. Private agent instructions/archives were not copied.",
-      "verification_history": [
-        {
-          "checked_at_utc": "2026-10-12T20:49:37Z",
-          "source": "read-only GitHub connector",
-          "ref": "main",
-          "commit_sha": "4d1ed91bc48585cdc9b7ee1411bd93e1ccf86799",
-          "file_blob_shas": {
-            "data/cases.json": "0696f5d394614213589e5f09ab560d0c3ea09d96",
-            "data/resources.json": "911703621d6aa15f68d788d836bc53938c5ff1c1"
-          },
-          "result": "Current main head and the two data file blobs were re-read on 2026-10-12; this matches the existing snapshot provenance. No private text was copied into product references."
-        }
-      ]
-    },
     "cases": [
       {
         "id": "willmoss-durable-object-alarm",
@@ -174,14 +131,7 @@
         ],
         "url": "https://billflare.dev/guides/layercache-cloudflare-cost-guard-skill",
         "evidence": "Community audit resource; no external severity scale imported.",
-        "verification_history": [
-          {
-            "checked_on": "2026-10-12",
-            "billflare_page": "Search-index result visible; direct page open returned Cache miss.",
-            "github_repo": "Public repository verified via read-only GitHub connector at main HEAD 321576feb23470cbbc36762093651aab5eb9eefe; skills/cloudflare-cost-guard/SKILL.md exists, declares v1.4.0, blob 46ef82d839ebf1f66ccf85eac4bafc358cce8faf.",
-            "interpretation": "Do not mark the repository deleted/unreachable; retain the Billflare ID as a source attribution, while distinguishing its direct-page fetch limitation."
-          }
-        ]
+        "verified_on": "2026-10-12"
       },
       {
         "id": "davezfr-four-layer-cost-protection",
@@ -245,13 +195,7 @@
         ],
         "url": "https://billflare.dev/guides/cloudflare-cost-guard",
         "evidence": "Current Billflare guide identifies Louis Cai and links the public repository; summarizes idle/terminal alarm handling, durable breaker state, retry bounds and tests. Community design guidance, not an independent audit or a Cloudflare endorsement.",
-        "verification_history": [
-          {
-            "checked_on": "2026-10-12",
-            "billflare_page": "Direct public page opened and author/repository link checked.",
-            "github_repo": "louis-cai/cloudflare-cost-guard; public default branch master; current commit d9ed95871d75696bddf4c814af831ffcfeb62bfb; SKILL.md blob 7fc955b68898e7c8626cd29791890c07457d4b9a; MIT license read."
-          }
-        ]
+        "verified_on": "2026-10-12"
       },
       {
         "id": "cloudflare-cost-playbook",
@@ -262,15 +206,22 @@
         ],
         "url": "https://billflare.dev/guides/cloudflare-cost-playbook",
         "evidence": "Billflare public index/llms-full summary identifies a community playbook combining incident retrospectives, agent review rules and a scoped Workers/R2 calculator; not a whole-account bill or hard cap.",
-        "verification_history": [
-          {
-            "checked_on": "2026-10-12",
-            "billflare_page": "Listed in public guides/index material; direct page open returned Cache miss.",
-            "github_repo": "KurosawaGeeker/cloudflare-cost-playbook; public default branch docs/cloudflare-cost-playbook; current commit 1602d03e0b89e24dc181637cba6a70f27755e3d7. README, SKILL.md and AGENTS.md read via read-only GitHub connector."
-          }
-        ]
+        "verified_on": "2026-10-12"
       }
-    ]
+    ],
+    "snapshot": {
+      "commit_sha": "4d1ed91bc48585cdc9b7ee1411bd93e1ccf86799",
+      "data_files": [
+        {
+          "path": "data/cases.json",
+          "blob_sha": "0696f5d394614213589e5f09ab560d0c3ea09d96"
+        },
+        {
+          "path": "data/resources.json",
+          "blob_sha": "911703621d6aa15f68d788d836bc53938c5ff1c1"
+        }
+      ]
+    }
   },
   "cloudflare_official_docs": [
     {
@@ -568,6 +519,14 @@
       "evidence": "Hibernation may reduce eligible idle WebSocket duration.",
       "source_id": "CF-DOC-DO-HIBERNATION",
       "title": "WebSocket hibernation with Durable Objects"
+    },
+    {
+      "product": "Workers",
+      "url": "https://developers.cloudflare.com/changelog/post/2026-10-13-cloudflare-mcp-events/",
+      "verified_on": "2026-10-14",
+      "evidence": "Workers Issues events use a signed client webhook, account or Worker scope, enabled Issues, Notifications Write and Workers Observability Write, and an Events-compatible client. Event subscriptions are persistent configuration, separate from bounded history reads.",
+      "source_id": "CF-DOC-MCP-ISSUES-EVENTS",
+      "title": "Cloudflare API MCP server sends Workers Issues as MCP Events"
     }
   ],
   "rules": [
@@ -833,12 +792,7 @@
       "commit_sha": "043b44e93d101a0eb2c53810400b273728cbf34c",
       "version_label": "v0.3.0",
       "license": "MIT",
-      "verification_history": [
-        {
-          "checked_on": "2026-10-12",
-          "method": "Billflare guide opened; original GitHub link followed; latest commit confirmed through read-only GitHub connector. Comparison agent read skill, execution/report references and demo expectation artifacts; no code executed."
-        }
-      ]
+      "verified_on": "2026-10-12"
     },
     {
       "source_id": "COMMUNITY-SKILL-KUROSAWAGEEKER-CLOUDFLARE-COST-PLAYBOOK",
@@ -849,7 +803,8 @@
       "default_branch": "docs/cloudflare-cost-playbook",
       "commit_sha": "1602d03e0b89e24dc181637cba6a70f27755e3d7",
       "license": "MIT",
-      "files_read": [
+      "verified_on": "2026-10-12",
+      "source_files": [
         {
           "path": "README.md",
           "blob_sha": "d033b003808e95bce1ea6ec48eec157f22644624"
@@ -862,12 +817,6 @@
           "path": "AGENTS.md",
           "blob_sha": "66576370eba11fead48e4dbf70eca9c4e18a47ee"
         }
-      ],
-      "verification_history": [
-        {
-          "checked_on": "2026-10-12",
-          "method": "Public repository metadata and three listed files fetched via read-only GitHub connector; no scripts, tests or installation run. Commit-pinned because no semantic version was recorded in the read files."
-        }
       ]
     },
     {
@@ -879,7 +828,8 @@
       "default_branch": "master",
       "commit_sha": "d9ed95871d75696bddf4c814af831ffcfeb62bfb",
       "license": "MIT",
-      "files_read": [
+      "verified_on": "2026-10-12",
+      "source_files": [
         {
           "path": "README.md",
           "blob_sha": "6c01d3b074867b4c549c280755f74f494da99a76"
@@ -900,12 +850,6 @@
           "path": "LICENSE",
           "blob_sha": "60e376084bb92f86893cc3fa98eb728351614d6c"
         }
-      ],
-      "verification_history": [
-        {
-          "checked_on": "2026-10-12",
-          "method": "Billflare page and original repository link verified; current master commit and source-file blob SHAs checked via read-only GitHub connector. Files were read as text only; no code/tests/installers were run."
-        }
       ]
     },
     {
@@ -918,7 +862,8 @@
       "commit_sha": "321576feb23470cbbc36762093651aab5eb9eefe",
       "version_label": "1.4.0",
       "license": "MIT",
-      "files_read": [
+      "verified_on": "2026-10-12",
+      "source_files": [
         {
           "path": "skills/cloudflare-cost-guard/SKILL.md",
           "blob_sha": "46ef82d839ebf1f66ccf85eac4bafc358cce8faf"
@@ -935,39 +880,7 @@
         {
           "path": "LICENSE"
         }
-      ],
-      "verification_history": [
-        {
-          "checked_on": "2026-10-12",
-          "method": "Public GitHub repository and current skill path verified; comparison agent read the listed source documents as text. Billflare search result summary was visible, but direct Billflare page open returned Cache miss."
-        }
       ]
-    }
-  ],
-  "research_verification_history": [
-    {
-      "checked_on": "2026-10-12",
-      "scope": "Community skill repositories and Cloudflare KV/DO/Queues technical documentation",
-      "billflare_main_commit": "4d1ed91bc48585cdc9b7ee1411bd93e1ccf86799",
-      "billflare_data_file_blobs": {
-        "data/cases.json": "0696f5d394614213589e5f09ab560d0c3ea09d96",
-        "data/resources.json": "911703621d6aa15f68d788d836bc53938c5ff1c1"
-      },
-      "community_repository_commits": {
-        "davezfr/audit-cloudflare-costs": "043b44e93d101a0eb2c53810400b273728cbf34c",
-        "KurosawaGeeker/cloudflare-cost-playbook": "1602d03e0b89e24dc181637cba6a70f27755e3d7",
-        "louis-cai/cloudflare-cost-guard": "d9ed95871d75696bddf4c814af831ffcfeb62bfb",
-        "layercache/agent-skills": "321576feb23470cbbc36762093651aab5eb9eefe"
-      },
-      "official_related_source_ids": [
-        "CF-DOC-KV-CONSISTENCY",
-        "CF-DOC-KV-WRITES",
-        "CF-DOC-DO-STORAGE",
-        "CF-DOC-DO-STATE-STORAGE",
-        "CF-DOC-QUEUES-RETRIES",
-        "CF-DOC-QUEUES-PRODUCERS"
-      ],
-      "note": "Versions and hashes are provenance, not reproduced private source content. Prices and third-party severity thresholds are not added."
     }
   ]
 }

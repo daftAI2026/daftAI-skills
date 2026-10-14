@@ -18,7 +18,7 @@ Read only when a settings file exists or the user asks to customize report outpu
 | --- | --- | --- |
 | `schemaVersion` | Required `1` | Settings format, unrelated to report or inventory schema versions. |
 | `reportLanguage` | `"auto"` or a BCP 47 locale of at most 64 characters accepted by `Intl.getCanonicalLocales`; default `"auto"` | Explicit output language in the current request wins, then a non-auto setting, current request language, conversation preference, and finally English. Unicode extension tags within that bound are supported; legacy/grandfathered tags rejected by that runtime are invalid. |
-| `technicalWriting` | `"auto"` or `"off"`; default `"auto"` | In auto, an available Chinese technical-writing skill may review a Chinese report after facts are frozen. Off skips this optional handoff. |
+| `technicalWriting` | `"auto"` or `"off"`; default `"auto"` | Legacy compatibility field. Old `off` input normalizes to `auto` without rewriting the saved file. Neither value disables the required final-writing stage or authorizes installation/network access. |
 
 The packaged `references/preferences.example.json` is a template, not an active user configuration. Write a real preference file only when the user explicitly requests saving preferences, outside the audited target; do not overwrite existing settings silently. New preferences use JSON. Keep the shipped template unchanged during an audit.
 

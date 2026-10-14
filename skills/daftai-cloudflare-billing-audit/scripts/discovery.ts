@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖平台目录元数据与统一排除规则
+ * [OUTPUT]: 提供敏感路径判断和兼容快速扫描的候选清单
+ * [POS]: 文件发现边界；渐进索引复用敏感路径规则，不递归调用旧扫描
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import fs from 'node:fs';
 import path from 'node:path';
 import type { AuditReport } from './audit-types.ts';
@@ -8,7 +14,7 @@ import { statFingerprint } from './fs-common.ts';
 export function isSensitivePath(name: string): boolean {
   const lower = name.toLowerCase();
   const extension = path.extname(lower);
-  return lower.startsWith('.env') || lower === '.dev.vars' || lower === '.npmrc' ||
+  return lower.startsWith('.env') || (lower === '.dev.vars' || lower.startsWith('.dev.vars.')) || lower === '.npmrc' ||
     /^\.?(?:secrets?|credentials?)(?:[._-]|$)/.test(lower) ||
     /(?:^|[._-])(?:secret|secrets|credential|credentials)(?:[._-]|$)/.test(lower) ||
     ['.pem', '.key', '.p12', '.pfx'].includes(extension);

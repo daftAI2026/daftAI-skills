@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖平台文件元数据和 JSONC/TOML 文本
+ * [OUTPUT]: 导出非执行配置解析、入口状态和共享辅助证据准入
+ * [POS]: 配置语义边界；不解析或导入依赖包，不推断生产部署
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import path from 'node:path';
 import type { AuditFs } from './audit-fs.ts';
 import type { Candidate } from './discovery.ts';
@@ -285,6 +291,8 @@ function safeMain(tree: AuditFs, workspace: string, configured: unknown, source:
   if (relative.split('/').some(isSensitivePath)) return { configured: true, source, status: 'excluded-sensitive-path', path: relative };
   const check = tree.inspectFile(relative);
   if (check.status === 'file') return { configured: true, source, status: 'exists', path: relative };
+  if ((check.status === 'missing' || (check.status === 'other' && !check.stat)) && (/^@[^/]+\/[^/]+(?:\/.*)?$/.test(configured) || /^[A-Za-z][A-Za-z0-9_-]*$/.test(configured)))
+    return { configured: true, source, status: 'package-entry-unresolved', specifier: configured };
   if (check.status === 'missing') return { configured: true, source, status: 'missing', path: relative };
   if (check.status === 'symlink') return { configured: true, source, status: 'symlink-not-followed', path: relative };
   return { configured: true, source, status: 'not-regular-file', path: relative };
@@ -335,6 +343,8 @@ export function parseWranglerEnvironments(tree: AuditFs, candidate: Candidate, r
   if (collectBindings(config).unknownBindingCount) unknowns.push({ code: 'unclassified-binding', detail: `Some binding declarations in ${candidate.relative} (base) could not be normalized.` });
   if (collectExecutionMetadata(config).unknownCount) unknowns.push({ code: 'unclassified-trigger-route-limit', detail: `Some trigger, route, or limit declarations in ${candidate.relative} (base) were not understood.` });
   if (config.main === undefined) unknowns.push({ code: 'main-not-declared', detail: `No main entry point is declared in ${candidate.relative}; source reachability is unknown.` });
+  for (const env of environments) if (env.main.status === 'package-entry-unresolved')
+    unknowns.push({ code: 'package-entry-unresolved', detail: `Package-like main in ${candidate.relative} (${env.name}) was not resolved; framework wiring and deployment validity remain unknown.` });
   return { path: candidate.relative, workspace: workspacePath, format, parserStatus, environments };
 }
 
@@ -347,6 +357,14 @@ export function hasD1Declaration(raw: unknown): boolean {
     const env = object(entry);
     return !!env && Array.isArray(env.d1_databases) && env.d1_databases.some((binding) => isObject(binding));
   });
+}
+
+export function hasWorkerConfigSignal(raw: unknown): boolean {
+  const config = object(raw);
+  if (!config) return false;
+  const scopes = [config, ...Object.values(object(config.env) ?? {}).map(object).filter(scope => scope !== undefined)];
+  return scopes.some(scope => (typeof scope.main === 'string' && scope.main.trim().length > 0)
+    || (typeof object(scope.assets)?.directory === 'string' && String(object(scope.assets)!.directory).trim().length > 0));
 }
 
 export function validAuxiliaryConfig(configPath: string, raw: unknown): boolean {

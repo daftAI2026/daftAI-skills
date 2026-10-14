@@ -259,6 +259,11 @@ export function buildConnectedEvidence(observations: Observation[], budget: Budg
 export function isCompatibleReportEnvelope(report: unknown): boolean {
   if (!object(report) || !object(report.audit)) return false;
   if (report.schemaVersion === 1) return report.audit.mode === 'offline-read-only' && report.connectedEvidence === undefined;
+  if (report.schemaVersion === 3 && object(report.scanner) && report.scanner.mode === 'on-demand') {
+    if (report.audit.mode === 'offline-read-only') return report.connectedEvidence === undefined;
+    return report.audit.mode === 'offline-plus-connected-evidence' && object(report.connectedEvidence)
+      && report.connectedEvidence.schemaVersion === 1 && report.connectedEvidence.mode === 'bounded-evidence';
+  }
   return report.schemaVersion === 2 && report.audit.mode === 'offline-plus-connected-evidence'
     && object(report.connectedEvidence) && report.connectedEvidence.schemaVersion === 1
     && report.connectedEvidence.mode === 'bounded-evidence';

@@ -3,7 +3,7 @@
 Every completed audit produces a paired human-readable and machine-readable report in the run's audit workspace:
 
 - `agent-report.md`: concise findings, coverage, and next steps.
-- `agent-report.json`: the same scope and agent-reviewed conclusions in the schema below, plus the scanner's candidate records preserved as raw JSON.
+- `agent-report.json`: the same scope and agent-reviewed conclusions in the schema below, plus any actual scanner candidates preserved as raw JSON.
 
 The helper's own `inventory.json` and `inventory.md` remain separate. Never turn scanner candidates into agent conclusions without checking them against allowed source/config evidence. Keep the files together under this skill's default `audit-results/` workspace or a user-requested output location outside the target tree.
 
@@ -13,7 +13,7 @@ Follow the response-language rule in `SKILL.md`. Localize Markdown headings, sum
 
 Keep JSON keys and machine-valued fields unchanged, including enum/sentinel values such as `confirmed`, `conditional`, `unknown`, `unresolved`, `not established`, and `offline-read-only`, evidence roles such as `trigger`, and product names and source types. Preserve IDs, paths, commands, URLs, fingerprints, and copied scanner metadata exactly, including English prose inside `scanner.unknowns` and `scanner.candidates[].raw`. Do not translate or rewrite `inventory.json` or `inventory.md`. In Markdown, label preserved raw candidate fields separately from any localized explanation; a translated paraphrase never replaces the raw record. No language metadata field or schema change is required.
 
-Optional technical-writing review follows [report-writing.md](report-writing.md) after evidence and conclusions are frozen. Only explanatory strings and Markdown expression may change; compare protected JSON fields and cross-format conclusions before delivery. Preferences are output choices, never evidence or authorization.
+Required final-writing review follows [report-writing.md](report-writing.md) after evidence and conclusions are frozen. Only explanatory strings and Markdown expression may change; compare protected JSON fields and cross-format conclusions before delivery. Preferences are output choices, never evidence or authorization.
 
 ## Markdown report sections
 
@@ -47,128 +47,33 @@ The section labels below describe required content, not fixed English headings; 
 
 ## JSON shape
 
-`scanner` in the agent report carries the helper's coverage metadata and exact safe inventory fields. `readSourceFiles` is the bounded JS/TS path list; `readAuxiliaryFiles` is the narrow SQL/YAML path list. Neither path list authorizes reopening a raw target path. The matching `reviewEvidenceFiles` entries carry each allowed content path's `kind`, `bytes`, `sha256`, and `statFingerprint`; `projectRootFingerprint` fingerprints the scanned root, not its full contents. Source or auxiliary text may be retrieved only with the helper's platform-selected `--read-file` mode, the exact relative path, and its `inventory.json`. The helper rechecks root/path identity and content/stat fingerprints before and after the bounded read. If the checks detect changed root, path, or content evidence, it emits no text, rejects the read, and the affected path remains unknown until a fresh inventory is made. The helper is not an atomic filesystem snapshot and does not promise absolute isolation from every same-permission concurrent writer. Preserve the actual `secureReadMode`: `descriptor-anchored` on Linux or `portable-stable-tree` on macOS/Windows. Portable pre/post checks require stable target, ancestor, and output trees and cannot prove that no outside-tree enumeration or read occurred during a hostile ABA replacement; report that limitation rather than implying Linux-equivalent protection. `scannedSourceFiles` is the subset whose lexical scan completed. Security-excluded, symlink, unreadable, oversize, or limit-skipped paths remain out of scope. SQL/YAML are safe-read and fingerprinted only, not parsed or executed, and the lists do not promise full coverage of either format. `scanner.candidates[].raw` must preserve the helper's exact candidate object (including its `CFBA-*` rule, suggested `matchesRuleId`, product, file, line, unknown trigger chain, condition, possible consequence, recommendation, and source links when present). `matchesRuleId` is only a suggested product-rule mapping; confirm it against the source and matched guide before using it in an agent finding. `candidateRef` is only a report-local cross-reference added beside that raw object. The helper's output is not authoritative evidence of reachability or billing.
+### Default progressive report (schema 3)
+
+Reuse the finding fields, sources, conclusion boundaries and Markdown sections above. Schema `3` uses `scanner.mode = "on-demand"`, not a fabricated quick-scan inventory. Its `indexes` reference actual index files with schema version, file SHA-256, directory, adapter and truncation. Its `reads` preserve successful receipt metadata exactly, without `text` or `contentBase64`. Preserve actual candidateScan findings as raw candidates only when produced. Evidence references the applicable index and read receipt. scope.reviewedPaths contains only content examined; scope.unreadRanges and scope.unvisitedDirectories name concrete remaining work. Indexed is not reviewed; read is not automatically traced.
 
 ```json
 {
-  "schemaVersion": 1,
-  "audit": {
-    "targetLabel": "",
-    "auditDate": "YYYY-MM-DD",
-    "outputDirectory": "",
-    "mode": "offline-read-only"
-  },
-  "scope": {
-    "workspaceRoots": [],
-    "configurationFiles": [],
-    "reviewedPaths": [],
-    "skippedPaths": [],
-    "limitations": []
-  },
-  "scanner": {
-    "status": "scanned",
-    "schemaVersion": "1.1",
-    "generatedAt": "YYYY-MM-DDTHH:mm:ss.sssZ",
-    "runtimePlatform": "",
-    "secureReadMode": "descriptor-anchored",
-    "projectRootFingerprint": "",
-    "projectLabel": "",
-    "coverage": [],
-    "inventoryFile": "inventory.json",
-    "limits": {
-      "maxDepth": 8,
-      "maxFiles": 500,
-      "maxEntries": 4000,
-      "maxTotalBytes": 2097152,
-      "maxFileBytes": 262144,
-      "maxCandidates": 200
-    },
-    "workspaces": [],
-    "readSourceFiles": [],
-    "readAuxiliaryFiles": [],
-    "reviewEvidenceFiles": [
-      {"path": "src/worker.ts", "kind": "source-js-ts", "bytes": 0, "sha256": "", "statFingerprint": ""}
-    ],
-    "sourceFilesScanned": 0,
-    "scannedSourceFiles": [],
-    "packageWorkspaces": [
-      {"manifest": "package.json", "patternCount": 0, "patterns": []}
-    ],
-    "configs": [
-      {
-        "path": "wrangler.jsonc",
-        "workspace": ".",
-        "format": "jsonc",
-        "parserStatus": "",
-        "environments": [
-          {
-            "name": "base",
-            "declarations": "local-only",
-            "main": {"configured": true, "source": "", "status": "", "path": ""},
-            "varsCount": 0,
-            "bindings": [{"product": "", "type": "", "binding": "", "role": ""}],
-            "triggers": {"cronCount": 0},
-            "routeCount": 0,
-            "limits": {}
-          }
-        ]
-      }
-    ],
-    "unknowns": [{"code": "", "detail": "", "count": 0}],
-    "skipped": {"symlinks": 0, "excludedPaths": 0, "unreadableOrOversize": 0, "nonRegularFiles": 0},
-    "candidates": [
-      {"candidateRef": "SC-01", "disposition": "unresolved", "raw": {}}
-    ]
-  },
-  "agentFindings": [
-    {
-      "findingId": "F-01",
-      "candidateRefs": ["SC-01"],
-      "ruleId": "unknown",
-      "product": "unknown",
-      "status": "conditional",
-      "riskStatement": "",
-      "evidence": [
-        {"path": "", "lines": "", "role": "trigger"}
-      ],
-      "triggerAndCondition": "",
-      "billableOperationAndUnit": {"operation": "unknown", "unit": "unknown", "sourceIds": []},
-      "scalingOrDuration": "",
-      "consequence": "",
-      "recommendation": "",
-      "sourceIds": [],
-      "uncertainty": ""
-    }
-  ],
-  "unknowns": [],
-  "sources": [
-    {
-      "sourceId": "",
-      "title": "",
-      "url": "",
-      "sourceType": "cloudflare-official-doc",
-      "guideId": null,
-      "caseId": null,
-      "verifiedDate": "YYYY-MM-DD"
-    }
-  ],
-  "estimate": null
+  "schemaVersion": 3,
+  "audit": {"targetLabel": "", "auditDate": "YYYY-MM-DD", "outputDirectory": "", "mode": "offline-read-only"},
+  "scope": {"workspaceRoots": [], "configurationFiles": [], "reviewedPaths": [], "skippedPaths": [], "unreadRanges": [], "unvisitedDirectories": [], "limitations": []},
+  "scanner": {"mode": "on-demand", "indexes": [], "reads": [], "candidates": []},
+  "agentFindings": [], "unknowns": [], "sources": [], "estimate": null
 }
 ```
 
-For an executed helper, `scanner.status` is one of `partial`, `inventory-only`, or `scanned`; use `not_run` only to record a blocked attempt, including unsupported adapters or unmet filesystem/stable-tree requirements. The example mode is illustrative; copy the executed helper's mode unchanged. The exact default limits are depth 8, 500 eligible files, 4,000 directory entries, 2 MiB total bytes, 256 KiB per file, and 200 candidates. `scope.reviewedPaths` must be a subset of `scanner.reviewEvidenceFiles[].path`; list parsed configuration files separately under `scope.configurationFiles`, since the helper parses those paths and the controlled content reader does not expose them. Preserve unsupported-syntax and auxiliary-scope unknowns even if manual review of a safe-read path supplies additional evidence. The target tree, its ancestors, and output location must remain stable during the scan and review; the helper is not an atomic filesystem snapshot or an absolute defense against every concurrent writer. If the scanner reports a content/identity mismatch, do not use that path as evidence and record the discrepancy as unknown. The controlled reader requires `--inventory <inventory.json> --read-file <exact-relative-path>`; exit 2 means safety/argument/platform refusal and exit 3 means the inventory, root, or file fingerprint is stale or changed. This includes legacy schema 1.0 inventories, which must be regenerated before reading. Refusals produce empty stdout. On exit 3, discard old path/candidate conclusions, regenerate inventory once against a stable tree, and only then consider a fresh controlled read; otherwise leave it unknown. Retrieved content stays in local audit context and must not be included in reports. Use empty arrays when the corresponding section is empty; never omit scope limitations merely because no finding was confirmed. In `estimate`, use `null` unless the user requested one. A requested estimate must capture access date, currency, plan, billing period, allowance and marginal rate sources, modeled units/volume, assumptions, and unresolved terms. Do not use cached prices as current evidence.
+Keep one report pair. An authorized connectedEvidence block may be appended under the existing independent connected contract; schema selection grants no access. Legacy quick-scan schemas 1/2 remain valid. Do not relabel an old report as progressive without acquiring its evidence.
 
-Top-level `unknowns` are agent-review unknowns and follow-up items; parser and coverage gaps from the helper stay under `scanner.unknowns`. Preserve both rather than collapsing a syntax-unsupported path into a clean result after manual review.
+### Compatibility and source records
 
-The helper inventory shape is defined by [scanner.md](scanner.md). Product evidence and source IDs are listed by the matched guide; use [sources.json](sources.json) during maintenance or when looking up a source ID. Keep `agentFindings` independent of helper `findings`; do not relabel them. Do not write reports or artifacts into the target tree or copy target source into the report workspace.
+Legacy quick-scan schemas 1/2 remain supported under [legacy-report-schema.md](legacy-report-schema.md); they are not the default acquisition workflow.
 
-Map source references as follows: use the exact `source_id` for a Cloudflare official document; for a public Billflare case or guide, use its stable `id` as `sourceId` and also fill `caseId` or `guideId` as applicable. A Billflare guide may summarize official material but remains a Billflare guide; do not label its URL as a Cloudflare-owned source. Preserve source type so an author-reported case cannot be mistaken for official confirmation.
+Each `sources` record keeps sourceId, title, public URL, sourceType, verifiedDate and applicable caseId/guideId. Official pages use the registry's source ID; public cases/guides use their stable content ID. A guide citing Cloudflare is still a guide, not an official Cloudflare source. Estimates stay null unless requested; then include current price sources, currency/period/plan, usage assumptions and unknown terms.
 
 ## Optional connected extension and compatibility
 
-Old reports remain `schemaVersion: 1` with `audit.mode: "offline-read-only"` and no `connectedEvidence`. Do not relabel them, translate raw scanner evidence, or require new fields. The scanner inventory schema and CLI are unchanged.
+Old reports remain `schemaVersion: 1` with `audit.mode: "offline-read-only"` and no `connectedEvidence`. Do not relabel them, translate raw scanner evidence, or require new fields. The legacy quick-scan inventory schema and CLI remain supported.
 
-If bounded online collection is authorized, including when every planned call is blocked, use `schemaVersion: 2` and `audit.mode: "offline-plus-connected-evidence"`, preserving all existing fields and adding `connectedEvidence`. Consumers supporting only version 1 must reject or explicitly ignore an unsupported version rather than treat online data as offline. An empty or failed online pass never invalidates the offline conclusions or hides unknowns.
+If bounded online collection is authorized, including when every planned call is blocked, keep `schemaVersion: 3` for an on-demand report; legacy quick-scan reports use `schemaVersion: 2`. Set `audit.mode: "offline-plus-connected-evidence"`, preserving all existing fields and adding `connectedEvidence`. Consumers supporting only version 1 must reject or explicitly ignore an unsupported version rather than treat online data as offline. An empty or failed online pass never invalidates the offline conclusions or hides unknowns.
 
 `connectedEvidence` is a separate section in the existing report, not a third output file. Its minimal machine structure is defined by `ConnectedEvidence` and `Observation` in `scripts/connected-contract.ts`: version/mode, overall observed/partial/unknown status, request count, approved budget, per-operation observations, and gaps. The helper only checks its narrow envelope, not the full report or provenance. It does not establish authorization from a boolean or authenticate the source.
 
@@ -178,8 +83,8 @@ One operation/scope observation represents its bounded page aggregate, not just 
 
 For each observation, preserve enum values, evidence IDs and numeric metrics unchanged. Document approved resource/environment labels, operation, source/schema reference, observation time, requested window, deployment correlation, actual request/page/row counts, status/reason, and data-delay/sampling/retention gaps. Use unknown when a fact is not established. Never invent a local-to-production version match. The Agent may add a sanitized natural-language explanation beside the structured summary, following the response-language policy; never persist raw response/log text or credentials. Record a per-category unavailable reason even when no network request ran.
 
-In Markdown, include a distinct online-evidence subsection under coverage, mapping observations to agent finding IDs and the documented billable operation/unit where warranted. Add optional `runtimeEvidenceRefs` (CE-* IDs) to agent findings only in version 2; do not replace source/config evidence or scanner candidates. Signals not linked to a billing mechanism belong under observations or unknowns, not confirmed billing findings. Configuration, invocation, metered usage, rated cost and invoice are different evidence levels.
+In Markdown, include a distinct online-evidence subsection under coverage, mapping observations to agent finding IDs and the documented billable operation/unit where warranted. Add optional `runtimeEvidenceRefs` (CE-* IDs) to agent findings only in connected versions 2/3; do not replace source/config evidence or scanner candidates. Signals not linked to a billing mechanism belong under observations or unknowns, not confirmed billing findings. Configuration, invocation, metered usage, rated cost and invoice are different evidence levels.
 
-User-authorized already-received events may be described in a sanitized `receivedEvents` array within `connectedEvidence`, with report-local event reference, safe resource label, occurrence/receipt time, known delivery identity or `unknown`, duplicate/provenance state, and billing-path references. No raw payload, callback URL, signature/key, or original account ID is required. Do not claim verified signatures unless the client actually verified them. Reuse a known delivery identity to recognize duplicates, never to authorize queries or subscriptions. An event-only review still uses version 2 and marks online requests zero. Its coverage is received events only, not complete history.
+User-authorized already-received events may be described in a sanitized `receivedEvents` array within `connectedEvidence`, with report-local event reference, safe resource label, occurrence/receipt time, known delivery identity or `unknown`, duplicate/provenance state, and billing-path references. No raw payload, callback URL, signature/key, or original account ID is required. Do not claim verified signatures unless the client actually verified them. Reuse a known delivery identity to recognize duplicates, never to authorize queries or subscriptions. An event-only review uses report version 3 for on-demand evidence or version 2 for legacy quick-scan evidence and marks online requests zero. Its coverage is received events only, not complete history.
 
 For an event-only review, author the extension directly with `requests: 0`, zero request/page/row/time budget, empty `observations`, and `receivedEvents` plus its unknowns; do not fabricate an account-call observation to satisfy the helper. `buildConnectedEvidence` intentionally requires at least one planned operation and is not used for event-only input. Set status from actually established event coverage, not a presumed complete issue history. The envelope checker is not a validator of event provenance.

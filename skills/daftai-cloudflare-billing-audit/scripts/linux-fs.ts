@@ -1,9 +1,14 @@
+/**
+ * [INPUT]: 依赖 Linux fd-relative filesystem API 与 fs-common 的身份/读取契约。
+ * [OUTPUT]: 导出 AnchoredFs，按固定目录描述符读取、列举并写入受控文件。
+ * [POS]: Linux 原生文件系统边界；拒绝链接，并在读前后核对路径与 inode。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { digest, statIdentity, sameDirectory, identityOf, isMissing, statFingerprint } from './fs-common.ts';
-import { MAX_INVENTORY_BYTES } from './audit-types.ts';
-import type { DirectoryIdentity, OpenDirectory, StableStat } from './fs-common.ts';
+import { digest, statIdentity, sameDirectory, identityOf, isMissing, statFingerprint, validateReadRequest } from './fs-common.ts';
+import type { ByteRange, DirectoryIdentity, FileReadResult, OpenDirectory, StableStat } from './fs-common.ts';
 function descriptorPrefix(): string {
   // 只读探测描述符路径语义；此适配器仅接收 Linux 宿主。
   if (process.platform !== 'linux') throw new Error('secure-path-access-unsupported');
@@ -247,8 +252,9 @@ export class AnchoredFs {
     } finally { this.closeDirectory(parent); }
   }
 
-  readFile(relative: string, maxBytes: number, expected?: { stat: StableStat; statFingerprint?: string }): { text?: string; bytes?: number; sha256?: string; statFingerprint?: string; error?: string } {
-    if (!Number.isSafeInteger(maxBytes) || maxBytes < 0 || maxBytes > MAX_INVENTORY_BYTES) return { error: 'invalid-byte-limit' };
+  readFile(relative: string, maxBytes: number, expected?: { stat: StableStat; statFingerprint?: string }, range?: ByteRange): FileReadResult {
+    const validationError = validateReadRequest(maxBytes, range);
+    if (validationError) return { error: validationError };
     const parts = relative.split('/');
     const name = parts.pop();
     if (!name || name === '.' || name === '..') return { error: 'unsafe-project-relative-path' };
@@ -260,33 +266,46 @@ export class AnchoredFs {
       const before = this.lstatAt(parent.fd, name);
       if (before.isSymbolicLink()) return { error: 'symlink' };
       if (!before.isFile()) return { error: 'not-regular-file' };
-      if (before.size > BigInt(maxBytes)) return { error: 'file-too-large' };
+      if (!range && before.size > BigInt(maxBytes)) return { error: 'file-too-large' };
+      if (range && before.size > BigInt(Number.MAX_SAFE_INTEGER)) return { error: 'file-size-unrepresentable' };
+      if (range && !(before.size === 0n && range.offset === 0) && BigInt(range.offset) >= before.size) return { error: 'range-out-of-bounds' };
+      const requestedBytes = range
+        ? Number((before.size - BigInt(range.offset)) < BigInt(range.length) ? before.size - BigInt(range.offset) : BigInt(range.length))
+        : maxBytes + 1;
       const parentToken = digest([...this.rootIdentities, ...parent.identities].map((item) => `${item.name}:${item.dev}:${item.ino}:${item.mode}`).join('|'));
       const currentFingerprint = statFingerprint(before, parentToken);
       if (expected && (before.dev !== expected.stat.dev || before.ino !== expected.stat.ino || (expected.statFingerprint && currentFingerprint !== expected.statFingerprint))) return { error: 'path-changed' };
       fd = this.openAt(parent.fd, name, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK);
       const openedStat = fs.fstatSync(fd, { bigint: true });
-      if (!openedStat.isFile() || openedStat.dev !== before.dev || openedStat.ino !== before.ino || openedStat.size !== before.size) return { error: 'path-changed' };
-      const buffer = Buffer.alloc(maxBytes + 1);
+      if (!openedStat.isFile() || statIdentity(openedStat) !== statIdentity(before)) return { error: 'path-changed' };
+      const buffer = Buffer.alloc(requestedBytes);
       let count = 0;
       while (count < buffer.length) {
-        const read = fs.readSync(fd, buffer, count, buffer.length - count, count);
+        const position = range ? range.offset + count : count;
+        const read = fs.readSync(fd, buffer, count, buffer.length - count, position);
         if (read === 0) break;
         count += read;
       }
-      if (count > maxBytes) return { error: 'file-too-large' };
+      if (!range && count > maxBytes) return { error: 'file-too-large' };
+      if (range && count !== requestedBytes) return { error: 'path-changed' };
       const after = fs.fstatSync(fd, { bigint: true });
       this.assertRootStable();
       const parentAfter = this.openDirectory(parts.join('/') || '.');
       try {
         const entryAfter = this.lstatAt(parentAfter.fd, name);
-        if (entryAfter.isSymbolicLink() || !entryAfter.isFile() || entryAfter.dev !== before.dev || entryAfter.ino !== before.ino || statIdentity(after) !== statIdentity(openedStat)) return { error: 'path-changed' };
+        if (entryAfter.isSymbolicLink() || !entryAfter.isFile() || statIdentity(after) !== statIdentity(openedStat) || statIdentity(entryAfter) !== statIdentity(after)) return { error: 'path-changed' };
         const afterChain = digest([...this.rootIdentities, ...parentAfter.identities].map((item) => `${item.name}:${item.dev}:${item.ino}:${item.mode}`).join('|'));
         if (afterChain !== parentToken) return { error: 'path-changed' };
         const fileStatFingerprint = statFingerprint(after, afterChain);
         if (expected?.statFingerprint && fileStatFingerprint !== expected.statFingerprint) return { error: 'path-changed' };
         const content = buffer.subarray(0, count);
-        return { text: content.toString('utf8'), bytes: count, sha256: digest(content), statFingerprint: fileStatFingerprint };
+        return {
+          text: content.toString('utf8'),
+          bytes: count,
+          sha256: digest(content),
+          statFingerprint: fileStatFingerprint,
+          ...(range ? { fileBytes: Number(after.size), contentBase64: content.toString('base64') } : {}),
+        };
       } finally { this.closeDirectory(parentAfter); }
     } catch (error) {
       return { error: error instanceof Error ? error.message : 'unreadable' };

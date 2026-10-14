@@ -1,4 +1,10 @@
 #!/usr/bin/env bun
+/**
+ * [INPUT]: 依赖已审阅 Skill 产物、真实宿主和合成项目夹具
+ * [OUTPUT]: 输出原生安装验收回执、文件指纹和真实跳过项
+ * [POS]: 仅供维护者验收；会运行指定产物的测试，不属于用户项目审计
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

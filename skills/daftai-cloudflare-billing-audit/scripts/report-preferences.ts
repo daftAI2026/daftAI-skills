@@ -1,13 +1,13 @@
 /**
  * [INPUT]: 外部 JSON 偏好文字或对象；不读取路径、凭据和项目文件
- * [OUTPUT]: 校验后的报告语言与可选写作偏好
+ * [OUTPUT]: 校验后的报告语言与兼容写作字段
  * [POS]: 报告输出的纯配置边界；不授权联网或调用写作工具
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 export type AuditPreferences = {
   schemaVersion: 1;
   reportLanguage: string;
-  technicalWriting: 'auto' | 'off';
+  technicalWriting: 'auto';
 };
 export const DEFAULT_AUDIT_PREFERENCES: Readonly<AuditPreferences> = Object.freeze({
   schemaVersion: 1, reportLanguage: 'auto', technicalWriting: 'auto',
@@ -36,5 +36,5 @@ export function parseAuditPreferences(input: unknown): AuditPreferences {
   }
   const writing = Object.hasOwn(config, 'technicalWriting') ? config.technicalWriting : 'auto';
   if (writing !== 'auto' && writing !== 'off') throw new Error('Invalid technical-writing preference');
-  return { schemaVersion: 1, reportLanguage: language, technicalWriting: writing };
+  return { schemaVersion: 1, reportLanguage: language, technicalWriting: 'auto' };
 }

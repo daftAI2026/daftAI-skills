@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖审计 API 和受控合成目录
+ * [OUTPUT]: 验证路径别名、大库存及安全读取回归
+ * [POS]: 回归边界；不把机器速度作为产品功能门槛
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';

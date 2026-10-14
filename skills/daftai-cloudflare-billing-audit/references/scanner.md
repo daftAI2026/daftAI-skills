@@ -1,5 +1,7 @@
 # Offline scanner contract
 
+This is the optional legacy quick scanner. Use [progressive-review.md](progressive-review.md) for default audits. The quick batch caps do not cap the progressive audit as a whole.
+
 ## Invocation and outputs
 
 Run from the skill directory with Bun:
@@ -44,7 +46,7 @@ Linux descriptor anchoring also is not an atomic snapshot or proof against every
 - `wrangler.json` and `wrangler.jsonc`: comments are lexically removed while retaining line breaks; one valid trailing comma is accepted; duplicate object keys and malformed JSON/JSONC are rejected. Bun's built-in JSONC parser is used when present after duplicate-key validation; Node's built-in JSON parser fallback adds no dependency.
 - `wrangler.toml`: parsed only when `Bun.TOML.parse` exists. Without it, the config is listed as `unsupported-no-bun-toml-parser`; no regex-based TOML fallback is used.
 - Parser acceptance is not Wrangler schema validation. Malformed known binding/trigger/route/limit shapes and invalid roots remain unknown, and malformed configs do not authorize auxiliary evidence review.
-- Wrangler environments are reported locally; bindings and values are not shallow-merged. `main` is checked as an in-project path and missing, excluded, symlink, invalid, or outside entry paths are explicit statuses. A present main does not prove it is loaded or a candidate is reachable.
+- Wrangler environments are reported locally; bindings and values are not shallow-merged. `main` is checked as an in-project path and missing, excluded, symlink, invalid, or outside entry paths are explicit statuses. Package-like main specifiers remain `package-entry-unresolved`; they are not imported or described as broken deployments. A present main does not prove it is loaded or a candidate is reachable.
 - The inventory reports only normalized binding labels/types, vars counts, cron/route counts, and explicitly whitelisted numeric `limits.cpuMs`; it omits actual resource IDs and config values. A binding declaration alone is not a risk finding.
 
 ## Auxiliary evidence paths
@@ -79,44 +81,6 @@ Source candidates include `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, 
 
 The scan excludes `.git`, `.hg`, `.svn`, `node_modules`, `build`, `dist`, `out`, `target`, `coverage`, `.wrangler`, `.next`, `.nuxt`, `.vercel`, `.turbo`, and `vendor`. It never reads `.env*`, `.dev.vars`, `.npmrc`, secret/credential-named files or directories, `.pem`, `.key`, `.p12`, or `.pfx`. Symlinks, FIFOs, sockets, devices, and other non-regular files are not read. Do not manually read excluded paths, symlink targets, or files absent from the controlled evidence allowlist.
 
-## Behavior tests and installed-artifact acceptance
+## Maintainer verification
 
-From the skill directory, with Bun and its native TOML parser:
-
-```sh
-bun test scripts/*.test.ts
-```
-
-The suites cover parser behavior, Wrangler inventory redaction, bounded candidates and unknowns, D1/workflow evidence selection, controlled-reader freshness/allowlisting, project/output containment, symlink/FIFO rejection where supported, deterministic path-substitution checks, and source-work budgets. `audit.portable.test.ts` tests the actual host-selected adapter and explicitly selects the portable adapter separately; it does not spoof `process.platform`. A Linux portable-adapter test is not a native macOS/Windows run. Platform-specific capabilities may skip; report those skips, not as passes.
-
-For an unpacked/installable artifact, run its acceptance harness on each real host:
-
-```sh
-bun scripts/installed-smoke.ts --skill-dir "/absolute/path/to/unpacked-skill" --output "/absolute/path/to/external-results/native-smoke.json"
-```
-
-In PowerShell, use ordinary quoted drive paths, for example:
-
-```powershell
-bun scripts/installed-smoke.ts --skill-dir "C:\audit-tools\daftai-cloudflare-billing-audit" --output "C:\audit-results\native-smoke.json"
-```
-
-Run from the skill directory. The smoke runner exercises only synthetic fixtures, imports the selected installed module, runs its CLI inventory/controlled reader, and executes all installed `*.test.ts` suites using explicit installed paths. Linux-only descriptor/hostile-concurrency/FIFO coverage is recorded as skipped on non-Linux hosts. It records OS/runtime/adapter, per-file SHA-256 values, an aggregate artifact hash, result logs, and a `nativeMatrix` with unexecuted hosts labeled `NOT_RUN`. Keep the result file outside the installed skill so it does not alter the hashed artifact. Inspect the logs for skipped features; an overall passing harness does not certify unavailable capabilities or hostile-concurrency isolation. Preserve a separate native result for Linux, macOS, and Windows, with matching artifact hashes, before claiming tested compatibility across those hosts.
-
-Expected host selection:
-
-| Real host | Default mode | Required result evidence |
-| --- | --- | --- |
-| Linux | `descriptor-anchored` | Native smoke plus Linux descriptor/security suite; portable-explicit tests are separate |
-| macOS (`darwin`) | `portable-stable-tree` | Native smoke on a stable tree; record unavailable features/skips |
-| Windows (`win32`) | `portable-stable-tree` | Native smoke on a stable local drive tree; record unavailable features/skips and path/junction limitations |
-
-Only a receipt from the actual host establishes that host's result. A matrix or runner by itself does not establish verified compatibility.
-
-On Node 24, the narrower behavior check is:
-
-```sh
-node --experimental-strip-types --test scripts/audit.test.ts
-```
-
-That Node run does not verify Bun's native TOML parser, the Bun acceptance runner, or native behavior on another OS. A skip is not a pass for those capabilities.
+Tests and installed-artifact checks belong to [maintenance.md](maintenance.md#maintainer-verification-only), not an audit of a user's project. Never pass a target/untrusted skill path to the smoke runner or run these commands during project review.

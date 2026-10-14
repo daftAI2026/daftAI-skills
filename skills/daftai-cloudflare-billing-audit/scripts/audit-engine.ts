@@ -1,14 +1,22 @@
+/**
+ * [INPUT]: 依赖配置、发现及平台文件访问模块的有界读取
+ * [OUTPUT]: 提供兼容的快速扫描、旧库存复读和共享库存输出
+ * [POS]: 离线扫描编排；渐进索引只复用输出边界，不调用全仓正文扫描
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import path from 'node:path';
+import fs from 'node:fs';
+import os from 'node:os';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import type { AuditReport, AuditOptions, ReviewEvidenceFile, UnknownItem, ConfigInventory, CandidateFinding } from './audit-types.ts';
-import { DEFAULT_LIMITS, SOURCE_EXTENSIONS, MAX_INVENTORY_BYTES } from './audit-types.ts';
+import { CONFIG_NAMES, DEFAULT_LIMITS, SOURCE_EXTENSIONS, MAX_INVENTORY_BYTES } from './audit-types.ts';
 import { isWithin, object, isObject, statFingerprint } from './fs-common.ts';
 import { openAuditFs, resolveAuditPath } from './audit-fs.ts';
 import type { AuditFs } from './audit-fs.ts';
 import { isSensitivePath, discoverProject, readBounded } from './discovery.ts';
 import type { Candidate } from './discovery.ts';
-import { parseConfig, parseJsoncStrict, parseWranglerEnvironments, hasD1Declaration, validAuxiliaryConfig, migrationDirectories } from './config.ts';
+import { parseConfig, parseJsoncStrict, parseWranglerEnvironments, hasD1Declaration, validAuxiliaryConfig, hasWorkerConfigSignal, migrationDirectories } from './config.ts';
 import { scanSource } from './source-scan.ts';
 const skillDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 function createOutputDirectory(base: AuditFs, now: Date): { tree: AuditFs; path: string } {
@@ -135,7 +143,9 @@ function auditOnTree(tree: AuditFs, projectPath: string, options: AuditOptions =
   };
   const readStatusUnknown = (candidate: Candidate, what: string, error?: string): void => {
     unreadableOrOversize++;
-    const detail = `${candidate.relative} could not be safely read${error === 'file-too-large' || error === 'total-byte-limit' ? ' within configured byte limits' : ''}; ${what} is unknown.`;
+    const detail = `${candidate.relative} could not be safely read (${error ?? 'unreadable'}); ${what} is unknown.`;
+    if (error === 'total-byte-limit') reportError(unknowns, 'scan-limit-max-total-bytes', 'The quick-scan batch byte limit was reached; this is not a completed project review.');
+    if (error === 'file-too-large') reportError(unknowns, 'scan-limit-max-file-bytes', 'At least one file exceeds the quick-scan whole-file limit; use bounded progressive ranges for relevant files.');
     const code = what === 'configuration' ? 'config-not-read' : what === 'workspace metadata' ? 'workspace-metadata-not-read' : what === 'source signals' ? 'source-not-scanned' : 'review-evidence-not-read';
     reportError(unknowns, code, detail);
   };
@@ -204,10 +214,22 @@ function auditOnTree(tree: AuditFs, projectPath: string, options: AuditOptions =
     if (!sourceFiles.includes(main)) reportError(unknowns, 'configured-main-not-reviewed', `Configured main ${main} was not safely included in the source review set.`);
   }
 
+  const workspaceConfigCounts = new Map<string, number>();
+  for (const workspace of new Set(configRaw.map(item => path.posix.dirname(item.candidate.relative)))) {
+    let count = 0;
+    for (const name of CONFIG_NAMES) {
+      const relative = workspace === '.' ? name : `${workspace}/${name}`;
+      if (tree.inspectFile(relative).status !== 'missing') count++;
+    }
+    workspaceConfigCounts.set(workspace, count);
+  }
+  for (const [workspace, count] of workspaceConfigCounts) if (count > 1)
+    reportError(unknowns, 'ambiguous-workspace-config', `${workspace}: multiple Wrangler config candidates; auxiliary authorization is unavailable without explicit config selection.`);
+  const unambiguous = (relative: string): boolean => workspaceConfigCounts.get(path.posix.dirname(relative)) === 1;
   const sqlCandidates = discovery.candidates.filter((candidate) => candidate.kind === 'sql');
   const auxiliaryToRead: Candidate[] = [];
   for (const item of configRaw) {
-    if (!item.valid || !hasD1Declaration(item.raw)) continue;
+    if (!item.valid || !unambiguous(item.candidate.relative) || !hasD1Declaration(item.raw)) continue;
     const selections = migrationDirectories(item.candidate.relative, item.raw);
     if (selections.length > 1) reportError(unknowns, 'd1-migration-binding-attribution-unknown', `Multiple D1 bindings are configured in ${item.candidate.relative}; the bounded SQL evidence paths are not attributed to individual bindings.`);
     for (const selection of selections) {
@@ -223,7 +245,7 @@ function auditOnTree(tree: AuditFs, projectPath: string, options: AuditOptions =
     }
   }
   const workflows = discovery.candidates.filter((candidate) => candidate.kind === 'workflow' && /^\.github\/workflows\/[^/]+\.(?:yml|yaml)$/i.test(candidate.relative));
-  if (configRaw.some((item) => item.valid)) auxiliaryToRead.push(...workflows);
+  if (configRaw.some((item) => item.valid && unambiguous(item.candidate.relative) && hasWorkerConfigSignal(item.raw))) auxiliaryToRead.push(...workflows);
   const uniqueAux = [...new Map(auxiliaryToRead.map((candidate) => [candidate.relative, candidate])).values()].sort((a, b) => a.relative.localeCompare(b.relative));
   const readAuxiliaryFiles: string[] = [];
   for (let i = 0; i < uniqueAux.length; i++) {
@@ -267,9 +289,23 @@ export function auditProject(projectPath: string, options: AuditOptions = {}): {
   try {
     const report = auditOnTree(tree, requestedRoot, options);
     if (options.writeReports === false) return { report };
-    const inventoryText = `${JSON.stringify(report, null, 2)}\n`;
+    const outputDirectory = writeInventoryOutput(requestedRoot, report, renderMarkdown(report), options);
+    return { report, outputDirectory };
+  } finally { tree.close(); }
+}
+
+export function writeInventoryOutput(requestedRoot: string, inventory: unknown, markdown: string, options: AuditOptions = {}): string {
+    const inventoryText = `${JSON.stringify(inventory, null, 2)}\n`;
     if (Buffer.byteLength(inventoryText) > MAX_INVENTORY_BYTES) throw new Error('inventory-too-large');
-    const outputBasePath = resolveAuditPath(options.outputDir ?? path.join(skillDir, 'audit-results'));
+    const defaultOutput = path.join(skillDir, 'audit-results');
+    const temporaryRoot = fs.realpathSync(os.tmpdir());
+    const fallbacks = [path.join(temporaryRoot, 'cloudflare-billing-audit'),
+      path.join(temporaryRoot, 'cloudflare-billing-audit-external'),
+      path.join(fs.realpathSync(os.homedir()), '.cloudflare-billing-audit')];
+    const defaultBase = isWithin(requestedRoot, defaultOutput)
+      ? fallbacks.find(candidate => !isWithin(requestedRoot, candidate)) : defaultOutput;
+    if (!options.outputDir && !defaultBase) throw new Error('output-inside-project');
+    const outputBasePath = resolveAuditPath(options.outputDir ?? defaultBase!);
     if (isWithin(requestedRoot, outputBasePath)) throw new Error('output-inside-project');
     let outputBase: AuditFs;
     try { outputBase = openAuditFs(outputBasePath, true, options.accessMode); }
@@ -282,11 +318,10 @@ export function auditProject(projectPath: string, options: AuditOptions = {}): {
       const output = createOutputDirectory(outputBase, options.now ?? new Date());
       try {
         output.tree.writeNewFile('inventory.json', inventoryText);
-        output.tree.writeNewFile('inventory.md', renderMarkdown(report));
+        output.tree.writeNewFile('inventory.md', markdown);
       } finally { output.tree.close(); }
-      return { report, outputDirectory: output.path };
+      return output.path;
     } finally { outputBase.close(); }
-  } finally { tree.close(); }
 }
 
 function isSafeEvidencePath(relative: string): boolean {
