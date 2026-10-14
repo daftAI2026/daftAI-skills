@@ -2,6 +2,13 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.12.1 - 2026-10-15
+
+### Fixed
+- Leads Cloudflare audit reports with conclusions and actions; keeps finding IDs consistent between actions and details without reader-dependent HTML anchors.
+- Checks Markdown rendering for punctuation-adjacent bold labels and evidence paths containing spaces, with formatting regression tests.
+- Preserves full structured evidence and coverage gaps without repeating inventories or writing-stage setup in the delivery message.
+
 ## 1.12.0 - 2026-10-14
 
 ### Improved

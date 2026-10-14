@@ -15,16 +15,66 @@ Keep JSON keys and machine-valued fields unchanged, including enum/sentinel valu
 
 Required final-writing review follows [report-writing.md](report-writing.md) after evidence and conclusions are frozen. Only explanatory strings and Markdown expression may change; compare protected JSON fields and cross-format conclusions before delivery. Preferences are output choices, never evidence or authorization.
 
-## Markdown report sections
+## Reader-first Markdown layout
 
-The section labels below describe required content, not fixed English headings; render headings and human-readable status labels in the selected language while preserving JSON status tokens.
+Use a stable information structure, not a fill-in-the-blanks script. Localize headings and human-readable statuses; keep machine tokens unchanged. Put the conclusion before configuration inventories, file lists, scanner details or methodology. Vary the length with actual findings and gaps; never invent content to fill a section.
 
-1. **Scope and result**: audit date, safely shortened project label, output path, actual offline or offline-plus-connected-evidence mode and its limitations, and a summary of confirmed / conditional / unknown results.
-2. **Coverage and limits**: workspaces, configuration files and configured environments found; entry points and triggers actually reviewed; narrow auxiliary files reviewed; skipped or unresolved paths, language/framework constraints, actual `runtimePlatform` and `secureReadMode`, stable-tree assumptions, and limits. Configuration does not prove what is currently deployed.
-3. **Scanner candidates**: each raw candidate with a report-local reference, rule/product, path and line, condition, possible consequence, recommendation, and source references. Show disposition separately (traced to finding, not substantiated, duplicate, or unresolved). Preserve the raw fields and do not describe candidates as findings.
-4. **Agent-reviewed findings**: findings with report-local IDs and a count by `confirmed`, `conditional`, and `unknown`. Do not elevate ordinary request handling or a binding declaration into a finding without a concrete source-supported amplification, duration, retention, or abuse mechanism and review of relevant guards.
-5. **Unknowns and follow-up**: missing evidence, why it matters, and the next low-risk verification step. In default offline mode, account checks remain unperformed. Optional authorized connected evidence must report its distinct scope, side effects, and gaps.
-6. **Sources and estimate assumptions**: direct source links and source IDs, including a product-guide/rule ID or public case ID when present. Include pricing sources and full assumptions only when the user requested an estimate.
+1. **Conclusion and action order**: state what the reviewed scope supports and count findings by confirmed / conditional / unknown. Count missing-evidence follow-ups separately; they are not additional unknown findings. Give recommended actions in priority order with a reason; call them sequential steps only when an actual dependency requires that order. Use the status note below when confirmed findings are present. Do not introduce severity scores, invented likelihoods or dollar estimates to justify ordering.
+2. **Findings**: one block per supported finding, identified by its report-local ID. Present the claim and status, triggering conditions, documented billable unit and amplification mechanism, existing guards, file-and-line evidence, mitigation and any proposed owner-run acceptance check. Keep material uncertainty beside the affected claim. Link the applicable sources near that claim. An acceptance check is a recommendation, not something this audit executed. Do not elevate ordinary request handling or a binding declaration into a finding without a concrete source-supported amplification, duration, retention or abuse mechanism and review of relevant guards. Retain the complete finding fields below in JSON.
+3. **Unknowns and follow-up**: identify missing evidence, why it affects the conclusion, and the next low-risk verification step. Distinguish unread bytes, content read but not traced, and unvisited paths. Surface incomplete coverage here rather than burying it in an appendix. Default offline account checks remain unperformed; online follow-up still requires the existing authorization gate.
+4. **Coverage and sources**: record the audit date, project label, output location, actual mode, reviewed workspaces/configurations/environments and entry paths, exclusions, unresolved paths, actual `runtimePlatform`/`secureReadMode`, language/framework constraints, stable-tree assumptions, reading limitations and any narrowly reviewed auxiliary files. Configuration does not prove the currently deployed version. State these concisely; keep the exhaustive file roster, index hashes and receipt details in JSON. Summarize actual coverage without claiming a complete repository or deployment audit. Include direct source links and stable source IDs. Add price sources and estimate assumptions only when the user requested an estimate; otherwise leave JSON `estimate` null and omit an empty estimate section.
+
+The conclusion and coverage remain necessary when no supported finding exists. Say “no supported billing risk found in the reviewed scope” with material gaps; do not say “safe”. Omit empty findings or follow-up blocks rather than fabricating issues or placeholder tables. Do not pad a short report with a fixed number of findings, recommendations or pages.
+
+### Finding labels and status note
+
+Use the same ID-first format in the action list and detail headings: `F-01: ...` in English or `F-01：...` in Chinese. Keep the report-local ID unchanged in JSON and across reordering. Put the ID before the action or finding title, not in trailing parentheses. Order actions by their stated priority; do not renumber findings merely to match that order. For example:
+
+```markdown
+- **F-01: Proposed action.** Give its evidence-linked reason and any prerequisite.
+
+### F-01: Finding title
+```
+
+Use plain text finding references. Do not generate HTML anchor tags or fragment-based report navigation. A shared ID is sufficient to connect an action with its detail without reader-specific scrolling support. No findings means no finding list or empty detail blocks.
+
+If the report uses confirmed status, explain its meaning once near the conclusion in a short plain Markdown blockquote with a localized label. Omit this note when no finding is confirmed. For example:
+
+```markdown
+> Note: Confirmed means the source establishes the mechanism, not that an extra production charge has been observed.
+```
+
+The examples show structure, not findings or reusable audit wording. Replace their labels with this audit's actual content. Keep the status definition in that one note, not repeated in the lead, finding blocks or delivery chat. Use clear status labels there and retain each finding's actual trigger conditions and material uncertainty. Do not hide the definition in an HTML comment or require a plugin-specific callout.
+
+### Evidence link syntax
+
+Use valid Markdown destinations for source-file links, including paths containing spaces. Wrap an absolute path and its fragment in angle brackets inside the link parentheses, or URL-encode whitespace. Unescaped spaces in a bare destination can turn a link into plain text. Do not change the evidence path, line reference or source URL while escaping it.
+
+After rendering, verify that source-file links remain actual links. An HTML-only check does not prove a destination works in the user's reader; do not claim click-through verification without testing that surface.
+
+### Portable Markdown formatting
+
+Keep label punctuation outside bold text when prose follows immediately. Closing emphasis beside punctuation can remain literal under CommonMark delimiter rules. Use forms such as:
+
+```markdown
+**下一步**：核对证据缺口。
+
+**日期**：保留本次审计日期。
+
+**Next step**: Review the missing evidence.
+```
+
+Write the report as Markdown, not a backslash-escaped copy or one fenced code block. Use code spans and fences only for literal commands, paths or code. Render the completed report with an already available Markdown renderer and check that intended emphasis, lists, headings and source links are actual formatted nodes. Inspect visible prose outside code for unintended literal formatting markers and raw HTML. If rendering cannot be checked, simplify optional styling instead of claiming a pass or adding a hidden formatter dependency. This check does not prove reader-specific navigation support.
+
+### Candidate reconciliation and optional detail
+
+Keep scanner candidates separate from agent conclusions. When actual candidates exist, include a compact reconciliation note or appendix: candidate reference, disposition (traced to a finding, not substantiated, duplicate, or unresolved), finding reference or evidence-linked reason. Unresolved candidates that affect the result also belong in unknowns. Preserve all raw candidate fields in JSON; do not repeat their full records in the main narrative or promote a candidate without tracing it.
+
+When no candidates were produced, omit the empty scanner-candidates section. Metadata indexes, read receipts, platform diagnostics and the complete reviewed-file list remain available in JSON. Add a detailed Markdown appendix only when it helps explain an otherwise unclear conclusion or the user requests it. Do not move necessary trigger conditions, guards or coverage gaps out of the main report.
+
+### Chat reply versus report files
+
+The chat reply is the delivery message, not another artifact: concise conclusion, first actions, material unknowns, then links to `agent-report.md` and `agent-report.json`. Do not paste the entire report, filesystem inventory, raw candidates or internal verification diary into chat. Both files describe the same findings and scope; their detail differs from the chat reply, not their conclusions. Successful dependency installation and writing checks stay internal under [report-writing.md](report-writing.md).
 
 ## Agent finding fields
 
@@ -49,7 +99,7 @@ The section labels below describe required content, not fixed English headings; 
 
 ### Default progressive report (schema 3)
 
-Reuse the finding fields, sources, conclusion boundaries and Markdown sections above. Schema `3` uses `scanner.mode = "on-demand"`, not a fabricated quick-scan inventory. Its `indexes` reference actual index files with schema version, file SHA-256, directory, adapter and truncation. Its `reads` preserve successful receipt metadata exactly, without `text` or `contentBase64`. Preserve actual candidateScan findings as raw candidates only when produced. Evidence references the applicable index and read receipt. scope.reviewedPaths contains only content examined; scope.unreadRanges and scope.unvisitedDirectories name concrete remaining work. Indexed is not reviewed; read is not automatically traced.
+Reuse the finding fields, sources and conclusion boundaries above. The reader-first Markdown layout does not change JSON fields, schema versions or legacy report compatibility. Schema `3` uses `scanner.mode = "on-demand"`, not a fabricated quick-scan inventory. Its `indexes` reference actual index files with schema version, file SHA-256, directory, adapter and truncation. Its `reads` preserve successful receipt metadata exactly, without `text` or `contentBase64`. Preserve actual candidateScan findings as raw candidates only when produced. Evidence references the applicable index and read receipt. scope.reviewedPaths contains only content examined; scope.unreadRanges and scope.unvisitedDirectories name concrete remaining work. Indexed is not reviewed; read is not automatically traced.
 
 ```json
 {
@@ -83,7 +133,7 @@ One operation/scope observation represents its bounded page aggregate, not just 
 
 For each observation, preserve enum values, evidence IDs and numeric metrics unchanged. Document approved resource/environment labels, operation, source/schema reference, observation time, requested window, deployment correlation, actual request/page/row counts, status/reason, and data-delay/sampling/retention gaps. Use unknown when a fact is not established. Never invent a local-to-production version match. The Agent may add a sanitized natural-language explanation beside the structured summary, following the response-language policy; never persist raw response/log text or credentials. Record a per-category unavailable reason even when no network request ran.
 
-In Markdown, include a distinct online-evidence subsection under coverage, mapping observations to agent finding IDs and the documented billable operation/unit where warranted. Add optional `runtimeEvidenceRefs` (CE-* IDs) to agent findings only in connected versions 2/3; do not replace source/config evidence or scanner candidates. Signals not linked to a billing mechanism belong under observations or unknowns, not confirmed billing findings. Configuration, invocation, metered usage, rated cost and invoice are different evidence levels.
+In Markdown, include a distinct online-evidence subsection under coverage and sources, mapping observations to agent finding IDs and the documented billable operation/unit where warranted. Add optional `runtimeEvidenceRefs` (CE-* IDs) to agent findings only in connected versions 2/3; do not replace source/config evidence or scanner candidates. Signals not linked to a billing mechanism belong under observations or unknowns, not confirmed billing findings. Configuration, invocation, metered usage, rated cost and invoice are different evidence levels.
 
 User-authorized already-received events may be described in a sanitized `receivedEvents` array within `connectedEvidence`, with report-local event reference, safe resource label, occurrence/receipt time, known delivery identity or `unknown`, duplicate/provenance state, and billing-path references. No raw payload, callback URL, signature/key, or original account ID is required. Do not claim verified signatures unless the client actually verified them. Reuse a known delivery identity to recognize duplicates, never to authorize queries or subscriptions. An event-only review uses report version 3 for on-demand evidence or version 2 for legacy quick-scan evidence and marks online requests zero. Its coverage is received events only, not complete history.
 
