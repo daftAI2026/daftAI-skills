@@ -1,6 +1,6 @@
 # Workers
 
-Risk is a billable operation multiplied by trigger count, amplification and runtime. Binding presence alone is not a finding. All rules below are static-source candidates, not account checks; runtime evidence is used only if the user separately supplies a redacted sample.
+Risk is a billable operation multiplied by trigger count, amplification and runtime. Binding presence alone is not a finding. All rules below remain static-source candidates. Default review makes no account calls; runtime evidence may come from a user-supplied redacted sample or the explicitly authorized, bounded operations in [connected-evidence.md](connected-evidence.md). Neither source of runtime evidence replaces static trigger/amplification review.
 
 ## Meter and applicability boundary
 

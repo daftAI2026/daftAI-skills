@@ -1,6 +1,6 @@
 # Containers, Browser Rendering, Workers AI and AI Gateway
 
-Default scope is offline, read-only source review; do not query a live account. Use runtime metrics only if the user separately supplies redacted evidence. Distinguish each biller and operation that starts/stops it. Do not infer a runaway loop from a billing dispute or a binding.
+Default scope is offline, read-only source review, with no live-account queries in that mode. Runtime evidence may come from user-supplied redacted material or, after explicit bounded authorization, permitted operations in [connected-evidence.md](connected-evidence.md) through existing official connections. Unsupported product queries remain out of scope. Distinguish each biller and operation that starts/stops it. Do not infer a runaway loop from a billing dispute or a binding.
 
 ## CF-CONTAINERS-IDLE-RUNTIME — allocated runtime outlives useful work
 - Risk conditions: start/sleep/stop logic can leave a container running or allocated after the job has finished, or concurrency/lifetime is unbounded.

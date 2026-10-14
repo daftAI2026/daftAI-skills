@@ -1,6 +1,6 @@
 # Account billing, Workers Logs and Builds
 
-Default scope is offline, read-only source review. Do not log into Cloudflare, inventory account alerts, call account APIs, read live metrics/invoices, change settings, or pause services. If the user separately supplies redacted runtime evidence, interpret only that evidence. Recommend account actions only for separate authorization.
+Default scope is offline, read-only source review: do not call account APIs or inspect live account data in that mode. Only after explicit, bounded user authorization may the optional workflow in [connected-evidence.md](connected-evidence.md) collect its permitted evidence through existing official connections. User-supplied redacted runtime evidence may be interpreted within its provided scope. Do not log in, expand permissions, change settings, pause services, or create persistent subscriptions; recommend account changes only for separate authorization. References below to separately supplied runtime evidence describe the default offline mode; connected evidence remains limited to the allowlisted workflow above.
 
 ## CF-BUDGET-ALERT-NOT-CAP — notification is not a stop
 - Risk conditions: a plan depends on a budget email or usage notification as the mechanism that prevents additional usage.

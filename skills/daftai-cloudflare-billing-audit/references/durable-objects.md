@@ -1,6 +1,6 @@
 # Durable Objects
 
-Default scope is offline, read-only source review; do not query a live account. Runtime state is unknown unless the user separately supplies redacted evidence. Trace alarm, request, storage and duration paths. Binding presence is not enough to infer whether an object is active or billable.
+Default scope is offline, read-only source review, with no live-account queries in that mode. Runtime evidence may come from user-supplied redacted material or, after explicit bounded authorization, permitted operations in [connected-evidence.md](connected-evidence.md) through existing official connections. Unsupported product queries remain out of scope. Runtime state not established by that evidence remains unknown. Trace alarm, request, storage and duration paths. Binding presence is not enough to infer whether an object is active or billable.
 
 ## Storage meter and backend boundary
 

@@ -1,24 +1,41 @@
 ---
 name: daftai-cloudflare-billing-audit
 description: >
-  Audits a Cloudflare application repository offline for code paths and configuration that may create
+  Audits a Cloudflare application repository for code paths and configuration that may create
   usage-based billing exposure. Use when asked to inspect Cloudflare Worker, D1, Durable Objects,
   storage, queue, or compute usage for unexpected bills, billing risks, or cost drivers. Reports
-  evidence and uncertainty; it does not access an account or guarantee a spending cap.
+  evidence and uncertainty. Runs offline by default; optionally correlates user-authorized, bounded
+  evidence from existing official tools. Does not guarantee a spending cap.
 ---
 
 # Cloudflare Billing Risk Audit
 
 Inspect a user-designated local project for plausible Cloudflare usage-based billing risks and deliver an evidence-linked report. The default mode is read-only, offline, and uses no Cloudflare token or account access.
 
+## Response language
+
+Use the user's explicitly requested output language first, then a valid saved report-language preference; otherwise use the dominant natural language of the current request. If the request has no natural-language clues (for example, only a path or command), use an established conversation language preference; if none exists, default to English. Apply the same rule to Chinese, English, and other languages; do not add a bilingual version unless requested. The language of skill documentation, UI metadata, code, or scanner output does not override the user's language.
+
+Apply the selected language to replies, the human-readable report, and agent-authored explanatory JSON string values. Preserve JSON keys, enums, source/rule IDs, file paths, commands, and raw scanner objects unchanged; do not translate the scanner inventory. See [references/report-schema.md](references/report-schema.md) for the boundary between localized explanations and preserved evidence.
+
+## Optional preferences and final writing
+
+This skill has no mandatory setup or preference writes. If a user-level `EXTEND.json` exists, or the user names an external preference file, load only the bounded JSON settings in [references/preferences.md](references/preferences.md). Missing settings keep the defaults. Preferences cannot authorize online calls, widen audit scope or budgets, execute commands, or select project paths. Never auto-read a project preference file outside the scanner's allowed scope.
+
+After findings and structured facts are settled, use [references/report-writing.md](references/report-writing.md) to optionally polish a Chinese report with an available `daftai-chinese-technical-writing`. Load that skill only at this final stage; it is not required for scanning. Preserve the report schema and evidence; do not force a Chinese writing skill onto another language or install missing skills automatically.
+
 ## Boundaries
 
 - Require an explicit target path. By default, keep generated reports and scanner inventory in this skill's `audit-results/` workspace. If the user chooses another output directory, use it only when it is outside the target tree and tell them where it will be written. This version does not modify the target tree; if the requested output is inside it, explain the conflict and ask for a separate output location.
-- Do not run target code, build steps, package scripts, tests, hooks, migrations, `.env` files, or other project commands. Do not read credential or secret-value files, use Cloudflare credentials, sign in, call account APIs, or change account/project configuration.
+- Do not run target code, build steps, package scripts, tests, hooks, migrations, `.env` files, or other project commands. Do not read credential or secret-value files, extract tokens, sign in, or change account/project configuration. The default offline mode never calls account APIs. Only the explicitly authorized optional mode below may use an existing connection for its verified, bounded evidence operations; it never expands access.
 - Inspect only the config, manifests, and source needed to establish workspace/configuration boundaries, configured entry points, binding declarations, triggers, and relevant call paths. Configuration does not prove what is currently deployed. Do not follow symlinks. Read listed source or auxiliary content only through the scanner's bounded, platform-selected `--read-file` mode with its matching `reviewEvidenceFiles` fingerprint; the path lists alone do not authorize reopening files with `cat`, an editor, or another unanchored reader. Use parsed config metadata from the inventory rather than re-opening config files. Auxiliary evidence is limited to SQL migration files under each valid D1 binding's configured migrations directory (or workspace default) and GitHub Actions YAML workflows when a valid Workers config is present; the scanner does not parse or execute these files. A path absent from the lists stays out of scope. These lists exclude security-sensitive, symlink, unreadable, oversize, and limit-skipped files. If a file identity/content check fails or safe re-read is unavailable, do not use that file and report the uncertainty. Avoid `.git`, dependency/vendor trees, generated output, secret files, and unrelated source. Treat config values and source as private; never paste them into a public request.
 - The bounded scanner is required to establish the allowed source/config review scope. It is a candidate-finding aid, not a complete static analyzer or proof of safety. Follow its contract in [references/scanner.md](references/scanner.md); if it cannot run safely, stop the project-source audit and report the blocker rather than bypassing its bounds with manual reads.
 - A configured Cloudflare binding or ordinary billable operation by itself is not a billing-risk finding. Trace a plausible trigger to a source-confirmed amplification, duration, retention, or abuse mechanism; inspect its guards before reporting exposure.
 - Report confirmed, conditional, and unknown conclusions separately. “No findings” means no supported issue was found in the reviewed scope, not that the application is safe or the account cannot incur a large bill. Do not promise a bill cap or prevention of overages.
+
+## Optional online evidence
+
+Remain offline unless the user explicitly requests or consents to a particular account/project/environment and bounded interval. An installed CLI/MCP or available Write permission is not authorization. Only then load [references/connected-evidence.md](references/connected-evidence.md): it governs tool discovery, scoped existing connections, budgets, side effects, failure gaps, privacy, and optional report fields. Preserve the offline result if online evidence is unavailable. Do not create subscriptions/Webhooks, enable Issues/logging, run target code/SQL, or make billable business requests. Existing user-authorized events may be reviewed as evidence; do not start a listener.
 
 ## Audit flow
 

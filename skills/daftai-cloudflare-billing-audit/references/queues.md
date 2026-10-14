@@ -1,6 +1,6 @@
 # Queues
 
-Default scope is offline, read-only source review; do not query a live account. Use runtime metrics only if the user separately supplies redacted evidence. Count operations per message, retry, fan-out and cross-service hop; queue binding presence alone is not a finding.
+Default scope is offline, read-only source review, with no live-account queries in that mode. Runtime evidence may come from user-supplied redacted material or, after explicit bounded authorization, permitted operations in [connected-evidence.md](connected-evidence.md) through existing official connections. Unsupported product queries remain out of scope. Count operations per message, retry, fan-out and cross-service hop; queue binding presence alone is not a finding.
 
 ## Meter and message-size boundary
 

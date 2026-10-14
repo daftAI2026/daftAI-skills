@@ -28,7 +28,7 @@ The helper may additionally list narrow auxiliary evidence in `readAuxiliaryFile
 
 For each relevant candidate in the allowed review scope, trace as far as source evidence supports:
 
-1. Identify the source/configured entry point or event handler and the environment declaration in which it appears. Configuration does not establish that the path is deployed or active; keep deployment status unknown unless the user separately supplies bounded, redacted evidence.
+1. Identify the source/configured entry point or event handler and the environment declaration in which it appears. Configuration does not establish that the path is deployed or active; keep deployment status unknown unless bounded, redacted user-supplied evidence or the explicitly authorized optional connected mode establishes it.
 2. Follow imports, route dispatch, callbacks, RPC/service bindings, and helper functions to a billable operation. Record file and line ranges for the trigger, call site, and any important guard, retry, or fan-out logic.
 3. Determine what causes the path to execute: a user request, scheduled poll, queue message, durable-object event/alarm, workflow, or another caller. Keep external traffic assumptions explicit.
 4. Look for amplification or duration mechanisms supported by evidence: repeated scans/polls, pagination, recursive or unbounded loops, retries/redelivery, fan-out, high concurrency, repeated writes, long-running work, retained data, or unbounded storage. Also record bounds such as caps, deduplication/idempotency, backoff, rate limits, or termination conditions; do not infer that a bound exists from a name alone.
@@ -75,6 +75,12 @@ Estimate current charges only when the user asks for an estimate. Read current o
 
 ## 7. Report and close the loop
 
-Follow [report-schema.md](report-schema.md). Produce both `agent-report.md` and `agent-report.json` in the selected audit run directory. Save any clearly necessary audit notes only there. Do not copy project files, credentials, complete source snippets, or bulky scanner output into the deliverable. Include exact reviewed scope and meaningful exclusions; a line-numbered excerpt is unnecessary when path and line references suffice.
+Follow [report-schema.md](report-schema.md), including its distinction between localized agent explanations and unchanged scanner evidence. Use the response language selected under `SKILL.md`. Produce both `agent-report.md` and `agent-report.json` in the selected audit run directory. Save any clearly necessary audit notes only there. Do not copy project files, credentials, complete source snippets, or bulky scanner output into the deliverable. Include exact reviewed scope and meaningful exclusions; a line-numbered excerpt is unnecessary when path and line references suffice.
+
+After freezing the findings and protected report fields, follow [report-writing.md](report-writing.md) for optional final expression review. This cannot expand source/account access, alter structured facts or create a second deliverable format.
 
 In the user-facing summary, state the highest-signal supported risks, unresolved unknowns, review coverage, and any limitations. Say clearly that the audit is a best-effort source review and not a spending cap, complete analyzer, invoice verification, or guarantee against a large bill.
+
+## Optional production correlation
+
+Only after explicit scoped authorization, follow [connected-evidence.md](connected-evidence.md). Keep local findings and original scanner evidence intact; append runtime observations and uncovered categories to the same report pair. Do not treat a deployed error, existing binding, or notification as an amplification finding without a traced operation/unit. A version mismatch or unknown deployment mapping remains a limitation. The default local workflow makes no account calls and reads no credentials.

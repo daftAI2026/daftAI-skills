@@ -27,7 +27,8 @@ test('macOS case-insensitive volume permits a real directory case alias, not a s
   assert.throws(() => auditProject(link, { writeReports: false }), /symlink/);
 }));
 
-test('a valid inventory over four MiB still authorizes its bounded evidence read', { skip: process.platform === 'win32' }, () => fixture((area, root) => {
+// ----- 大库存夹具验证读取契约，不把机器 I/O 速度当作 5 秒性能门槛 -----
+test('a valid inventory over four MiB still authorizes its bounded evidence read', { skip: process.platform === 'win32', timeout: 30000 }, () => fixture((area, root) => {
   const parts = Array.from({ length: 7 }, (_, n) => `${n}${'\u0001'.repeat(120)}`);
   const dir = path.join(root, ...parts);
   fs.mkdirSync(dir, { recursive: true });

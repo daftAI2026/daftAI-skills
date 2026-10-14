@@ -8,7 +8,9 @@ AI agent skills for video/subtitle processing and content utilities. All skills 
 
 ## Architecture
 
-Cloudflare project audit lives in `developer-tools` at `skills/daftai-cloudflare-billing-audit/`. It runs offline and reads only the explicit target; it does not execute the target project or access billing accounts. `.github/workflows/cloudflare-billing-audit.yml` validates the native-platform and installed-skill contracts. `.gitattributes` keeps this skill LF-normalized for matching installed-artifact hashes across platforms.
+Cloudflare project audit lives in `developer-tools` at `skills/daftai-cloudflare-billing-audit/`. Its scanner runs offline and reads only the explicit target; it never executes the target project. Optional Agent-led evidence collection may use existing official connections only after explicit, bounded user authorization, as defined in the skill; it does not log in, expand permissions, change account configuration, or create persistent subscriptions. `.github/workflows/cloudflare-billing-audit.yml` validates the native-platform and installed-skill contracts. `.gitattributes` keeps this skill LF-normalized for matching installed-artifact hashes across platforms.
+
+The Cloudflare audit's optional `EXTEND.json` controls report language and final writing only. Unlike the generic preference setup below, its missing preferences never block an audit or create configuration. It never auto-reads preferences from the audited target. An available Chinese technical-writing skill may polish the report only after evidence and structured facts are frozen.
 
 Skills are organized into plugin categories in `marketplace.json`:
 
@@ -108,7 +110,7 @@ Scripts use only Node.js built-in modules (`fs`, `path`, `child_process`, `os`).
 
 | Rule | Description |
 |------|-------------|
-| **Load project skills first** | MUST load all skills from `skills/` directory in current project. Project skills take priority over system/user-level skills with same name. |
+| **Load project skills first** | Discover project skill metadata first; load only skills relevant to the current task and only at their applicable stage. Project skills take priority over system/user-level skills with the same name. |
 
 **Loading Priority** (highest → lowest):
 1. Current project `skills/` directory

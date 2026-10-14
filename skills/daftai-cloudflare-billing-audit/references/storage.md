@@ -1,6 +1,6 @@
 # R2 and Workers KV
 
-Default scope is offline, read-only source review; do not query a live account. Use runtime metrics only if the user separately supplies redacted evidence. Distinguish storage operation, retrieval, data volume and duration. A storage binding alone is not a risk finding.
+Default scope is offline, read-only source review, with no live-account queries in that mode. Runtime evidence may come from user-supplied redacted material or, after explicit bounded authorization, permitted operations in [connected-evidence.md](connected-evidence.md) through existing official connections. Unsupported product queries remain out of scope. Distinguish storage operation, retrieval, data volume and duration. A storage binding alone is not a risk finding.
 
 ## CF-R2-OPERATION-AMPLIFICATION — repeated replication, metadata or event cycles
 - Risk conditions: replication lacks a delay/bound, hot paths repeatedly list/head objects, or R2 notification → Queue/Worker → R2 write forms a cycle.
