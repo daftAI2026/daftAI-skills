@@ -2,6 +2,18 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.12.0 - 2026-10-14
+
+### Improved
+- Uses metadata-first directory indexes and controlled byte-range reads for Cloudflare billing audits; per-read bounds no longer cap the complete review scope.
+- Preserves coverage gaps and existing report formats while adding progressive structured evidence and optional, explicitly scoped online evidence.
+- Resolves Chinese report writing internally and applies it within the same audit. Output follows the user's language; successful dependency setup stays out of the final response.
+- Separates official MCP setup, bounded evidence reads and persistent Events subscriptions. Keeps monitoring and automatic repairs outside the audit.
+
+### Fixed
+- Distinguishes unresolved package entry points from missing local files without executing or resolving target dependencies.
+- Refuses ambiguous configuration scopes and empty configuration signals when authorizing auxiliary source reads.
+
 ## 1.11.1 - 2026-10-14
 
 ### Fixed
