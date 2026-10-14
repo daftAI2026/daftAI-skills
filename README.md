@@ -21,7 +21,7 @@ npx skills add daftAI2026/daftAI-skills
 
 | Skill | Description |
 |-------|-------------|
-| [daftai-cloudflare-billing-audit](skills/daftai-cloudflare-billing-audit/) | Progressive, read-only Cloudflare billing-risk review with reports in the user’s language. Choose project-only checks or scoped Cloudflare queries through official MCP; remember the choice in `EXTEND.json` when requested. Requires Bun; see the skill for platform boundaries. |
+| [daftai-cloudflare-billing-audit](skills/daftai-cloudflare-billing-audit/) | Progressive, read-only Cloudflare billing-risk review with reports in the user’s language. Choose project-only checks or scoped Cloudflare queries through official MCP; remember the choice in `EXTEND.json` when requested. Requires Bun, which the skill installs at user scope if missing; it also obtains the Chinese report-writing dependency when needed. Explicit no-install instructions and host restrictions still apply. See the skill for platform boundaries. |
 | [daftai-video-compositor](skills/daftai-video-compositor/) | Embed a local video into an exact rectangular or rounded screenshot region, preserving layout and original audio. Requires Bun, FFmpeg, and FFprobe. |
 | [daftai-video-subtitler](skills/daftai-video-subtitler/) | Burn subtitles into local videos. Supports SRT/VTT/ASS formats, bilingual subtitle merging and translation |
 | [daftai-subtitle-translator](skills/daftai-subtitle-translator/) | Translate subtitle files (SRT/VTT) between languages with terminology consistency |

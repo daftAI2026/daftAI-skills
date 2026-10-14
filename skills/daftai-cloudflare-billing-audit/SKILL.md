@@ -8,9 +8,15 @@ description: >
   evidence from existing official tools. Does not guarantee a spending cap.
 ---
 
+<!--
+[INPUT]: 用户指定项目、平台受控读取器与可选官方连接。
+[OUTPUT]: 按用户语言输出证据报告和结构化 JSON。
+[POS]: 审计入口按阶段加载参考；依赖补齐不修改目标项目。
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
 # Cloudflare Billing Risk Audit
 
-Inspect a user-designated local project for plausible Cloudflare usage-based billing risks and deliver an evidence-linked report. The default mode is read-only, offline, and uses no Cloudflare token or account access.
+Inspect a user-designated local project for plausible Cloudflare usage-based billing risks and deliver an evidence-linked report. Project inspection is read-only and offline, with no Cloudflare token or account access by default. Missing named dependencies are automatically obtained at user scope through tool-setup.md; this setup can use the network without changing the target project.
 
 ## Response language
 
@@ -58,7 +64,7 @@ Use [references/workflow.md](references/workflow.md) for the detailed, bounded r
 
 ## Script Directory
 
-The helper is in this skill's `scripts/` directory. Resolve the absolute path of this `SKILL.md` as `SKILL_DIR` and set the command working directory to `${SKILL_DIR}`. Before running it, detect Bun once per session with `command -v bun` in a POSIX shell or `Get-Command bun` in PowerShell. If Bun is unavailable or the platform cannot meet the scanner's documented filesystem contract, stop the project-source audit and report the blocker; do not fall back to opening the raw project path.
+The helper is in this skill's `scripts/` directory. Resolve the absolute path of this `SKILL.md` as `SKILL_DIR` and set the command working directory to `${SKILL_DIR}`. Before running it, detect Bun once per session with `command -v bun` in a POSIX shell or `Get-Command bun` in PowerShell. If missing, automatically install the official runtime at user scope through [references/tool-setup.md](references/tool-setup.md), verify it and continue in this same audit; do not ask a separate dependency-installation question. Reuse an existing installation without upgrading it. A user no-network/no-install instruction or host permission restriction takes precedence. If setup fails or the platform cannot meet the scanner's documented filesystem contract, retain the draft and report the blocker; never fall back to opening the raw project path.
 
 Linux uses descriptor-anchored access; macOS/Windows use a weaker portable stable-tree adapter with identity checks. Neither is an atomic snapshot. Read the platform boundary in [references/scanner.md](references/scanner.md) before scanning; stop if a stable tree cannot be established. No raw-path manual-read fallback is allowed.
 

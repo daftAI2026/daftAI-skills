@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.13.1 - 2026-10-15
+
+### Improved
+- Automatically installs missing Bun and the required Chinese writer at user scope, verifies them and continues the same audit without a separate dependency question. Explicit user restrictions and host permissions still apply.
+
 ## 1.13.0 - 2026-10-15
 
 ### Improved

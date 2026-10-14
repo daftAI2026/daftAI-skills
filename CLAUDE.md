@@ -55,6 +55,8 @@ Each skill contains:
 
 All scripts are TypeScript, executed via `bun` (no build step).
 
+The Cloudflare billing audit overrides the missing-runtime stop below: automatically obtain missing Bun and its required writer at user scope through its `references/tool-setup.md`, verify them, and continue the same audit. No separate setup question is needed. Explicit user restrictions and host permissions still apply; no target mutation or administrator escalation is allowed.
+
 ### Runtime Detection
 
 Before running any script, the agent MUST detect the runtime **once per session**:
