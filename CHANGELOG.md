@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.13.2 - 2026-10-15
+
+### Fixed
+- Applies the required writing stage to reports in every requested language, using shared documentation principles without imposing Chinese-specific wording or typography on other languages.
+
 ## 1.13.1 - 2026-10-15
 
 ### Improved

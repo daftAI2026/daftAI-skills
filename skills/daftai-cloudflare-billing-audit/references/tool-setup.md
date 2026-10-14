@@ -10,7 +10,7 @@ Use the host's actual tool/skill registry and supported configuration interface.
 
 ## Automatic dependency setup
 
-Invoking this skill includes setting up its named audit dependencies. Detect and reuse existing installations. If Bun or the required Chinese writer is absent, install it at user scope without a separate confirmation, then verify and use it in this audit. This setup may use the network and write outside the audited project; the project itself remains read-only. Respect explicit no-network/no-install instructions and the host's permission policy. Do not elevate privileges, install unrelated packages, or bypass a denied operation. Explain a real blocker and recovery action rather than asking users to manage routine setup.
+Invoking this skill includes setting up its named audit dependencies. Detect and reuse existing installations. If Bun or the required writer is absent, install it at user scope without a separate confirmation, then verify and use it in this audit. This setup may use the network and write outside the audited project; the project itself remains read-only. Respect explicit no-network/no-install instructions and the host's permission policy. Do not elevate privileges, install unrelated packages, or bypass a denied operation. Explain a real blocker and recovery action rather than asking users to manage routine setup.
 
 ## Bun runtime
 
@@ -25,7 +25,7 @@ Verify the installed executable with `--version` and `--revision`, then invoke i
 
 ## Technical-writing dependency
 
-`daftai-chinese-technical-writing` is the required Chinese report-writing dependency. The user does not need to name it or supply its path. This is internal dependency resolution within an audit, not a standalone installation deliverable. Keep successful setup and future-activation notices out of the audit response.
+`daftai-chinese-technical-writing` is the required report-writing reference for every output language. The audit uses its general documentation principles across languages and applies Chinese-specific guidance only to Chinese output. Its name never selects the report language. The user does not need to name it or supply its path. This is internal dependency resolution within an audit, not a standalone installation deliverable. Keep successful setup and future-activation notices out of the audit response.
 
 1. Look it up in the host's available skill registry. Read the resolved `SKILL.md`, not a guessed path.
 2. If absent, obtain only that skill from [daftAI2026/daftAI-skills](https://github.com/daftAI2026/daftAI-skills/tree/main/skills/daftai-chinese-technical-writing). Use a supported host skill installer, or the public Skills CLI from a trusted directory outside the target. Do not substitute similarly named repositories or execute target hooks.
