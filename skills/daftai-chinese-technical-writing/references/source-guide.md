@@ -6,7 +6,6 @@
 - 固定提交：`571951731efb4b83b1939af1d3dd830441ebef45`。
 - [许可证声明](https://github.com/ruanyf/document-style-guide/blob/571951731efb4b83b1939af1d3dd830441ebef45/README.md#license)：公共领域（public domain）。
 - 六个本地文件保留该提交的原文。
-- 原指南的参考链接目录不作为新增规则来源。
 
 | 本地快照 | 上游文件 |
 | --- | --- |
@@ -17,13 +16,9 @@
 | [标点](ruanyf-marks.md) | [docs/marks.md](https://github.com/ruanyf/document-style-guide/blob/571951731efb4b83b1939af1d3dd830441ebef45/docs/marks.md) |
 | [文档体系](ruanyf-structure.md) | [docs/structure.md](https://github.com/ruanyf/document-style-guide/blob/571951731efb4b83b1939af1d3dd830441ebef45/docs/structure.md) |
 
-正常调用只读本地参考，不重新下载指南。
-维护原文时，同时核对六个文件与固定提交。
-不要只改提交号，不更新实际原文。
+## 适用范围
 
-## 适配决定
-
-以下决定属于本 Skill，不冒充阮一峰原文。
+下表说明本地规则与上游指南的差异。
 
 | 原指南语境 | 本 Skill 的适配 |
 | --- | --- |
@@ -41,7 +36,6 @@
 
 产品与界面规则分别见 `product-copy.md`、`ui-copy.md`。
 操作与技术状态段落读取 `controlled-technical-chinese.md`。
-真实用户修改的证据入口是 `style-evidence.md`。
 
 ## STE 方法来源与中文适配
 
@@ -53,14 +47,11 @@
 - 入口标记版本：`0.4.0`。
 
 该实现面向英文工具描述、Agent 指令和状态消息。
-本地借鉴结构与词汇检查分层、保真优先和保留精度的例外。
-不启用其 Strict 或 STE-flavored 模式。
-不迁入 Python linter、英文词数或词汇限制。
-上游样例不自动成为本地验收答案。
-结构检查通过不证明原稿与改稿含义相同。
-上游 linter 不比较原稿与改稿，不验证义务强度保真。
+采用语义保真原则与保留精度的例外。
+不采用 Strict 或 STE-flavored 模式。
+不使用其 Python linter、英文词数或词汇限制。
 
-### 原标准核对
+### ASD-STE100
 
 方法依据对照 [ASD-STE100 Issue 9 官方 PDF](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)。
 依据版次为 Issue 9，2025-01-15。
@@ -83,7 +74,6 @@
 许可与义务、必要与充分条件的保真检查是本地适配。
 不直接移植原版词典、英语语法或长度限制。
 本方法不是标准译本，不提供合规或认证结论。
-正式标准审查需另行确定版次、范围和证据。
 
 官方背景见[介绍](https://www.asd-ste100.org/about_STE.html)。
 [工具说明](https://www.asd-ste100.org/STEsoftware.html)与
@@ -99,7 +89,6 @@
 
 受控中文参考是这些 Skill 方法的本地改编。
 示例与验收请求由本项目编写，不是标准原文。
-不直接复制 Fenng 的整组样例作为验收答案。
 本 Skill 不依赖安装 Waza 或 Fenng Skill。
 
 ### 改编材料许可
@@ -133,3 +122,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## 维护参考
+
+仅在用户明确要求修改本 Skill 时，读取
+[修改回环](diff-update-loop.md)、[修改证据](style-evidence.md)
+与[验收案例](acceptance-cases.md)。
+普通写作不读取这些文件，也不保存用户修改样本。

@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.11.1 - 2026-10-14
+
+### Fixed
+- Streamlines Chinese technical writing instructions and loads references by task, without bringing skill maintenance into ordinary drafts.
+
 ## 1.11.0 - 2026-10-14
 
 ### Improved
