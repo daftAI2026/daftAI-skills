@@ -15,7 +15,8 @@ preferences.md: Optional JSON preferences；由审计入口按场景加载。
 progressive-review.md: Progressive source review；由审计入口按场景加载。
 queues.md: Queues；由审计入口按场景加载。
 report-schema.md: Audit report schema；由审计入口按场景加载。
-report-writing.md: 所有报告的必需表达复核；语言跟随主入口，中文规则条件加载。
+report-writing-en.md: 英文 STE 启发表达指引；仅英文报告加载，不复制标准词典。
+report-writing.md: 所有报告的必需表达复核；按语言分流写作指引，保护冻结事实。
 scanner.md: Offline scanner contract；由审计入口按场景加载。
 sources.json: 产品参考的来源身份索引；审计不整体预载。
 storage.md: R2 and Workers KV；由审计入口按场景加载。

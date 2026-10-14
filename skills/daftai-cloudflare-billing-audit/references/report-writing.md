@@ -1,5 +1,5 @@
 <!--
-[INPUT]: 冻结的审计事实、主入口输出语言与技术写作规则。
+[INPUT]: 冻结的审计事实、主入口输出语言、中文写作与英文 STE 指引。
 [OUTPUT]: 同语言报告的必需表达复核与事实保护门禁。
 [POS]: 取证结束后加载；不改变报告结构或审计结论。
 [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -8,15 +8,17 @@
 
 The audit owns evidence, conclusions and [report-schema.md](report-schema.md). The writer owns expression only. Complete this stage before calling the paired report final.
 
-## Resolve the writer internally
+## Select guidance by report language
 
-For every output language, resolve `daftai-chinese-technical-writing` through [tool-setup.md](tool-setup.md). Use an existing installation; if missing, obtain the named dependency from our public repository under the host's installation permissions. Do not ask the user for its name/path or require them to mention it in the audit request.
+Every report completes this writing stage. Keep the language selected by the audit entrypoint; a reference's name or documentation language never overrides it. Do not add a bilingual version unless requested.
 
-Read its actual `SKILL.md` and applicable technical-document references at this final stage, not during source discovery. Apply its language-neutral principles: reader tasks, clear structure, explicit actions and conditions, consistent terminology, and faithful facts. Keep the report in the language selected by the audit entrypoint; the writer's Chinese name and documentation language never override that selection. For Chinese output, also apply its Chinese wording, punctuation and typography guidance. For other languages, use the natural conventions of that language; skip Chinese-specific spacing, punctuation and localization rules. Do not add a bilingual version unless requested or claim native-language proofreading that was not performed.
+- **Chinese**: resolve `daftai-chinese-technical-writing` through [tool-setup.md](tool-setup.md). Read its actual entrypoint and applicable references, then apply them to the frozen draft in this audit. If absent, automatically obtain the named dependency at user scope. Do not ask for its name or path, defer it to another turn, or treat installation as completed writing.
+- **English**: read the bundled [English report writing](report-writing-en.md) reference. Apply its ASD-STE100-inspired clarity guidance to instructions and explanations. No external writing skill or standard download is required for this path.
+- **Other languages**: apply the shared principles below with that language's natural conventions. Do not impose Chinese typography or English-specific grammar and word-count targets, or claim native-language proofreading that was not performed.
 
-Do not copy its rules into a second maintained writing guide. This is an audit-owned adaptation of a documentation reference, not a change to the writing skill's standalone scope. Another requested writer can add a review within its actual scope, but cannot replace this required stage or change protected facts.
+Across languages, use reader-first structure, explicit actions and conditions, consistent terminology and faithful facts. Do not maintain another copy of the selected writing guide. A requested additional writer may review expression within its actual scope but cannot replace this stage, change the report schema or alter protected facts.
 
-`technicalWriting: "off"` is a legacy preference accepted for compatibility; it cannot disable this required report stage. Missing writing preferences require no writing questionnaire; resolve the audit-entry mode card through [preferences.md](preferences.md). If the required writer cannot be obtained, retain the draft and evidence, identify the writing blocker and recovery action, and do not claim completed writer review.
+`technicalWriting: "off"` is a legacy preference accepted for compatibility; it cannot disable this required stage. Missing writing preferences need no questionnaire. If required guidance is unavailable, retain the evidence and draft and report the precise blocker. Keep successful setup and writing-stage checks internal.
 
 ## Freeze facts before expression
 

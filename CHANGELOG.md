@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.13.3 - 2026-10-15
+
+### Improved
+- Routes final writing by output language: Chinese uses the Chinese technical-writing skill, English uses bundled STE-inspired guidance, and other languages retain shared factual checks without foreign-language typography rules.
+
 ## 1.13.2 - 2026-10-15
 
 ### Fixed
