@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 文件适配器、发现、配置解析和词法候选模块
- * [OUTPUT]: 提供 auditProject 与 readReviewEvidenceFile
- * [POS]: 审计编排层；统一额度、外置报告和证据复核
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';

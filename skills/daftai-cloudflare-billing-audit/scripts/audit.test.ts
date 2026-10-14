@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:test、合成夹具与审计公开接口
- * [OUTPUT]: 提供 配置和候选回归测试
- * [POS]: 核心契约测试；不访问真实用户项目
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';

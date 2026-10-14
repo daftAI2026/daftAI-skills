@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 候选契约与官方来源常量
- * [OUTPUT]: 提供 词法遮罩及带未知触发链的候选扫描
- * [POS]: 源码线索层；不构建调用图或确认风险
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import type { CandidateFinding } from './audit-types.ts';
 import { DOCS } from './audit-types.ts';
 function lineAt(source: string, offset: number): number {

@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 RGBA 像素缓冲与图片尺寸
- * [OUTPUT]: 对外提供纯色背景检测、前景色估计与 Alpha 重建能力
- * [POS]: daftai-image-to-svg 的预处理器，把白底/绿底/红底单色图归一为透明单色图
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 export interface Dimensions {
 	width: number;
 	height: number;

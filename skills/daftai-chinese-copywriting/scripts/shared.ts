@@ -44,14 +44,32 @@ export const DEFAULT_PREFERENCES: Preferences = {
 };
 
 export function getProjectPreferencesPath(cwd: string = process.cwd()): string {
-  return path.join(cwd, ".daftAI-skills", SKILL_NAME, "EXTEND.md");
+  return path.join(cwd, ".daftAI-skills", SKILL_NAME, "EXTEND.json");
 }
 
 export function getUserPreferencesPath(homeDir: string = os.homedir()): string {
-  return path.join(homeDir, ".daftAI-skills", SKILL_NAME, "EXTEND.md");
+  return path.join(homeDir, ".daftAI-skills", SKILL_NAME, "EXTEND.json");
 }
 
 export function writePreferences(filePath: string, preferences: Preferences): void {
+  const extension = path.extname(filePath).toLowerCase();
+  if (extension !== ".json" && extension !== ".md") {
+    throw new Error(`Unsupported preferences format: ${filePath}`);
+  }
+
+  if (extension === ".json") {
+    const stored = {
+      version: preferences.version,
+      default_mode: preferences.defaultMode,
+      language: preferences.language,
+      chunk_threshold: preferences.chunkThreshold,
+      chunk_max_words: preferences.chunkMaxWords,
+    };
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, `${JSON.stringify(stored, null, 2)}\n`, "utf8");
+    return;
+  }
+
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
   const lines = [
@@ -72,6 +90,10 @@ export function writePreferences(filePath: string, preferences: Preferences): vo
 
 export function loadPreferences(filePath: string): Preferences {
   const content = fs.readFileSync(filePath, "utf8");
+  if (path.extname(filePath).toLowerCase() === ".json") {
+    return parseJsonPreferences(content, filePath);
+  }
+
   const parsed = parseFrontmatter(content);
 
   return {
@@ -87,22 +109,21 @@ export function resolvePreferences(
   cwd: string = process.cwd(),
   homeDir: string = os.homedir(),
 ): PreferenceResolution {
-  const projectPath = getProjectPreferencesPath(cwd);
-  if (fs.existsSync(projectPath)) {
-    return {
-      preferences: loadPreferences(projectPath),
-      sourcePath: projectPath,
-      created: false,
-    };
-  }
-
-  const userPath = getUserPreferencesPath(homeDir);
-  if (fs.existsSync(userPath)) {
-    return {
-      preferences: loadPreferences(userPath),
-      sourcePath: userPath,
-      created: false,
-    };
+  const directories = [
+    path.dirname(getProjectPreferencesPath(cwd)),
+    path.dirname(getUserPreferencesPath(homeDir)),
+  ];
+  for (const directory of directories) {
+    for (const filename of ["EXTEND.json", "EXTEND.md"]) {
+      const filePath = path.join(directory, filename);
+      if (fs.existsSync(filePath)) {
+        return {
+          preferences: loadPreferences(filePath),
+          sourcePath: filePath,
+          created: false,
+        };
+      }
+    }
   }
 
   return {
@@ -120,7 +141,7 @@ export function ensurePreferencesConfigured(
   }
 
   throw new Error(
-    "First-time setup required: no EXTEND.md found. Ask the user all setup questions in one round, then run `bun scripts/main.ts init --mode <stable|quick|review> --scope <user|project>` before running review, quick, or stable.",
+    "First-time setup required: no EXTEND.json or legacy EXTEND.md found. Ask the user all setup questions in one round, then run `bun scripts/main.ts init --mode <stable|quick> --scope <user|project>` before running quick or stable.",
   );
 }
 
@@ -280,6 +301,51 @@ export function renderSummary(params: {
   return lines.join("\n");
 }
 
+function parseJsonPreferences(content: string, filePath: string): Preferences {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error(`Invalid preferences JSON: ${filePath}`);
+  }
+
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(`Preferences JSON must be an object: ${filePath}`);
+  }
+
+  const data = parsed as Record<string, unknown>;
+  const allowed = new Set(["version", "default_mode", "language", "chunk_threshold", "chunk_max_words"]);
+  for (const key of Object.keys(data)) {
+    if (!allowed.has(key)) {
+      throw new Error(`Unknown preferences field "${key}": ${filePath}`);
+    }
+  }
+
+  const read = <T>(key: string, fallback: T, valid: (value: unknown) => value is T): T => {
+    const value = data[key];
+    if (value === undefined) return fallback;
+    if (!valid(value)) throw new Error(`Invalid preferences field "${key}": ${filePath}`);
+    return value;
+  };
+
+  return {
+    version: read("version", DEFAULT_PREFERENCES.version, (value): value is number => value === 1),
+    defaultMode: read("default_mode", DEFAULT_PREFERENCES.defaultMode, isMode),
+    language: read("language", DEFAULT_PREFERENCES.language,
+      (value): value is string => typeof value === "string" && value.trim().length > 0),
+    chunkThreshold: read("chunk_threshold", DEFAULT_PREFERENCES.chunkThreshold, isPositiveInteger),
+    chunkMaxWords: read("chunk_max_words", DEFAULT_PREFERENCES.chunkMaxWords, isPositiveInteger),
+  };
+}
+
+function isPositiveInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0;
+}
+
+function isMode(value: unknown): value is Mode {
+  return value === "review" || value === "stable" || value === "quick";
+}
+
 function parseFrontmatter(content: string): Record<string, string> {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) {
@@ -320,7 +386,7 @@ function toStringValue(value: string | undefined, fallback: string): string {
 }
 
 function toMode(value: string | undefined, fallback: Mode): Mode {
-  if (value === "review" || value === "stable" || value === "quick") {
+  if (isMode(value)) {
     return value;
   }
   return fallback;

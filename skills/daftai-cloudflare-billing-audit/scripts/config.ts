@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 文件适配器、发现边界、共享契约和 Bun 解析器
- * [OUTPUT]: 提供 配置解析、环境投影与辅助证据范围
- * [POS]: 配置领域层；不执行配置或推断部署状态
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import path from 'node:path';
 import type { AuditFs } from './audit-fs.ts';
 import type { Candidate } from './discovery.ts';

@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 Linux 与便携文件适配器、node:path
- * [OUTPUT]: 提供 按真实平台选择的文件访问接口
- * [POS]: 编排层与平台实现之间的唯一选择边界
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import { AnchoredFs } from './linux-fs.ts';
 import path from 'node:path';
 import { PortableFs, validateWindowsUserPath } from './portable-fs.ts';

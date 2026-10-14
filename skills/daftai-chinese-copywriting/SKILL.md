@@ -3,8 +3,9 @@ name: daftai-chinese-copywriting
 description: >
   Checks and fixes Chinese copywriting with autocorrect-backed workflows for text
   and single-file Markdown/TXT inputs. Use when user asks to normalize Chinese
-  punctuation, spacing, full-width/half-width usage, or copywriting style.
+  punctuation, spacing, or full-width/half-width usage.
   Also triggers for "校对", "检查排版", "中英文空格", "全角半角".
+  Does not rewrite document structure, product claims, or UI messaging.
 metadata:
   openclaw:
     requires:
@@ -24,7 +25,8 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`
 2. Script path = `${SKILL_DIR}/scripts/<script-name>.ts`
 3. Execute via `bun ${SKILL_DIR}/scripts/<script-name>.ts`
-4. Replace all `${SKILL_DIR}` in this document with actual values
+4. Set the working directory to `${SKILL_DIR}` and use absolute input paths
+5. Replace all `${SKILL_DIR}` in this document with actual values
 
 **Script Reference**:
 | Script | Purpose |
@@ -33,12 +35,14 @@ Checks and fixes Chinese copywriting with `autocorrect`, using the upstream guid
 | `scripts/autocorrect.ts` | Detect, install, and run `autocorrect` |
 | `scripts/shared.ts` | Preferences, input handling, and syntax protection (code/math/links) |
 | `scripts/chunk.ts` | Markdown-aware chunking for long texts |
+| `scripts/main.test.ts` | Preferences and syntax-protection regression checks |
+| `scripts/cli.test.ts` | Isolated CLI mode/setup checks without installing autocorrect |
 
 All scripts are executed via `bun`. `scripts/chunk.ts` depends on `markdown-it` which is installed under `scripts/node_modules/`. Before AI post-processing, `protectSyntax` replaces fenced code blocks, inline code, block/inline math (`$$`/`$`), and link/image URLs with placeholders; `restoreSyntax` reverses this after processing.
 
 ## Defaults
 
-| Setting | Default | EXTEND.md key | Description |
+| Setting | Default | Preference key | Description |
 |---------|---------|---------------|-------------|
 | Mode | `stable` | `default_mode` | Workflow mode (`stable` or `quick`; `review` is inferred from user intent) |
 | Chunk threshold | `4000` | `chunk_threshold` | Word count to trigger chunked processing |
@@ -62,7 +66,7 @@ Infer mode from the user's wording:
 | 校对、修正、排版、格式化、fix、纠正、规范化 | `stable` | Check + fix with AI post-processing |
 | 快速修正、quick fix、autocorrect | `quick` | Pure autocorrect, no AI |
 
-If the user's wording matches `review`, skip first-time setup (review is read-only). For `stable` / `quick`, follow the normal EXTEND.md / first-time setup flow. If no keyword matches, fall back to the user's configured `default_mode` (default: `stable`).
+If the user's wording matches `review`, skip first-time setup (review is read-only). For `stable` / `quick`, load JSON-first preferences or complete first-time setup. If no keyword matches, fall back to the user's configured `default_mode` (default: `stable`).
 
 ### Modes
 
@@ -75,19 +79,19 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 ### `review` workflow
 
 ```
-- [ ] Step 0: Skip first-time setup (review is read-only, no EXTEND.md required)
+- [ ] Step 0: Skip first-time setup (review is read-only, no preference file required)
 - [ ] Step 1: Detect autocorrect and auto-install if missing
 - [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts review <input>
 - [ ] Step 3: Read references/rules/copywriting-guidelines.md for the full rule set
 - [ ] Step 4: AI review — review the original content against the guidelines, combine with autocorrect lint findings
-- [ ] Step 5: Format report using references/review-report-template.md, save to {filename}-review.md
+- [ ] Step 5: Format report using references/review-report-template.md; save to {filename}-review.md unless the user or calling skill requests an inline report
 - [ ] Step 6: Report results to user
 ```
 
 ### `quick` workflow
 
 ```
-- [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
+- [ ] Step 0: Load EXTEND.json or legacy EXTEND.md, or run first-time setup
 - [ ] Step 1: Detect autocorrect and auto-install if missing
 - [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts quick <input>
 - [ ] Step 3: Report output file path to user
@@ -96,7 +100,7 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 ### `stable` workflow
 
 ```
-- [ ] Step 0: Load preferences (EXTEND.md) or run first-time setup
+- [ ] Step 0: Load EXTEND.json or legacy EXTEND.md, or run first-time setup
 - [ ] Step 1: Detect autocorrect and auto-install if missing
 - [ ] Step 2: Run: bun ${SKILL_DIR}/scripts/main.ts stable <input>
 - [ ] Step 3: Read the output file ({filename}-corrected.{ext})
@@ -126,33 +130,37 @@ If the user's wording matches `review`, skip first-time setup (review is read-on
 - [ ] Step 7: Report output file path to user
 ```
 
-## Preferences (EXTEND.md)
+## Preferences (JSON-first)
 
 Search order:
 
 ```bash
+test -f .daftAI-skills/daftai-chinese-copywriting/EXTEND.json && echo "project JSON"
 test -f .daftAI-skills/daftai-chinese-copywriting/EXTEND.md && echo "project"
+test -f "$HOME/.daftAI-skills/daftai-chinese-copywriting/EXTEND.json" && echo "user JSON"
 test -f "$HOME/.daftAI-skills/daftai-chinese-copywriting/EXTEND.md" && echo "user"
 ```
 
-Priority: user explicit input > project EXTEND.md > user EXTEND.md > built-in defaults
+Priority: explicit input > project EXTEND.json > project EXTEND.md > user EXTEND.json > user EXTEND.md > built-in defaults.
+
+Read the first existing file only; do not merge formats or scopes. New settings created by `init` are pretty-printed JSON. Keep existing Markdown files readable and unchanged; reading does not migrate or create configuration. Invalid JSON or invalid fields are errors, not reasons to silently fall back to Markdown. See [preferences-schema.md](references/config/preferences-schema.md) for the schema.
 
 ### First-time setup (BLOCKING)
 
-When neither EXTEND.md exists, the agent **MUST** complete first-time setup before `quick` or `stable` workflows.
+When none of the four preference paths exists, the agent **MUST** complete first-time setup before `quick` or `stable` workflows.
 
 **Exception**: `review` mode (inferred from user intent) skips this setup entirely — it is read-only.
 
 1. Ask the user (in one message) their preferences:
    - Default mode: `stable` / `quick` (default: `stable`)
    - Save location: `project` (.daftAI-skills/...) or `user` (~/.daftAI-skills/...) (default: `project`)
-2. Write the EXTEND.md file via the script: `bun ${SKILL_DIR}/scripts/main.ts init --mode <mode> --scope <user|project>`
+2. Write EXTEND.json via the script: `bun ${SKILL_DIR}/scripts/main.ts init --mode <mode> --scope <user|project>`
 3. Confirm to the user: "Preferences saved to [path]"
 4. Continue with the requested workflow
 
-Do not auto-fill defaults before asking. Do not silently create a user-level or project-level EXTEND.md.
+Do not auto-fill defaults before asking. Do not silently create user-level or project-level configuration.
 
-After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers, save EXTEND.md, confirm the saved path, and continue.
+After the setup questions have been asked, the user may answer with "use your recommended settings", "use defaults", or equivalent. In that case, apply the recommended/default answers, save EXTEND.json, confirm the saved path, and continue. The full setup flow is in [first-time-setup.md](references/config/first-time-setup.md).
 
 ## Dependencies
 
@@ -184,4 +192,23 @@ bun ${SKILL_DIR}/scripts/main.ts quick "/path/to/file.txt"
 
 ## Extension Support
 
-Custom configurations via EXTEND.md. See **Preferences** for lookup order and the config references.
+Custom configurations use EXTEND.json by default, with legacy EXTEND.md read compatibility. See **Preferences** for lookup order and the config references.
+
+## Combining with Writing Skills
+
+`daftai-chinese-technical-writing` settles document structure, meaning, and wording before delegating formatting here. Keep this pass limited to punctuation, spacing, and character-width rules; do not change facts or rewrite the settled copy.
+
+Use explicit `review` for a check-only handoff. The CLI accepts it without a preference file, prints findings to stdout, and does not write a corrected file or a report. The agent writes a report only when the caller's delivery requirements call for one. `stable` and `quick` still require the documented preference setup.
+
+The CLI resolves project preferences from its working directory, not the input file's directory. Do not invent a `--cwd` flag or silently copy preferences into an installed skill. Report a mismatched preference location before running a fix workflow.
+
+## Maintenance validation
+
+Run from `${SKILL_DIR}`:
+
+```bash
+bun ${SKILL_DIR}/scripts/main.test.ts
+bun ${SKILL_DIR}/scripts/cli.test.ts
+```
+
+The CLI tests replace the external engine inside isolated Bun subprocesses. They cover no-preference review, source preservation, setup refusal for fix modes, configured defaults, explicit mode precedence, JSON initialization, and legacy Markdown compatibility. They do not prove the installed autocorrect binary's behavior.

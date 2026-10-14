@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:fs、node:path、文件适配器与静态集合
- * [OUTPUT]: 提供 有界发现、敏感路径排除和限量读取
- * [POS]: 配置与源码读取之前的范围选择层
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import fs from 'node:fs';
 import path from 'node:path';
 import type { AuditReport } from './audit-types.ts';

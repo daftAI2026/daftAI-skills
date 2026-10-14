@@ -1,11 +1,4 @@
 #!/usr/bin/env bun
-/**
- * [INPUT]: 依赖 Node 内建模块、geometry.ts、FFmpeg 与 FFprobe。
- * [OUTPUT]: 提供精准截图视频合成 CLI、预览和音画完整性验收。
- * [POS]: 技能唯一执行入口，隔离临时文件，验收通过后发布成品。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { spawn } from "node:child_process";
 import { existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join, resolve } from "node:path";

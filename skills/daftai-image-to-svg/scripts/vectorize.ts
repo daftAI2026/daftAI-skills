@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 Bun/Node 内建模块及 ffmpeg、ffprobe、potrace、rsvg-convert 或 inkscape
- * [OUTPUT]: 对外提供 path-only SVG、PNG 预览、可按目标优化的误差报告与可复用纯函数
- * [POS]: daftai-image-to-svg 的唯一执行入口，编排提取、描摹、量化和验收
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { spawnSync } from "node:child_process";
 import {
 	copyFileSync,

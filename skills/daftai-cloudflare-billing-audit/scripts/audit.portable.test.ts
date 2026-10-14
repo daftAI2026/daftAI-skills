@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:test、合成夹具与平台适配器
- * [OUTPUT]: 提供 宿主和便携适配器契约测试
- * [POS]: 平台回归测试；不伪造宿主平台
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -146,20 +140,13 @@ test('native CLI and public exports retain controlled reader contract', () => fi
   assert.equal(denied.out, '');
 }));
 
-test('installed architecture: bounded Chinese L3 modules, compatible public types and one-way dependency DAG', () => {
+test('installed architecture: bounded modules, compatible public types and one-way dependency DAG', () => {
   const dir = modulePath ? path.dirname(path.resolve(modulePath)) : path.dirname(fileURLToPath(import.meta.url));
   const files = fs.readdirSync(dir).filter(name => name.endsWith('.ts') && !name.endsWith('.test.ts') && name !== 'installed-smoke.ts');
   const graph = new Map<string, string[]>();
   for (const name of files) {
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
     assert.ok(text.split(/\r?\n/).length <= 800, `${name} exceeds 800 lines`);
-    const header = text.match(/^\/\*\*\r?\n(?:\s*\*.*\r?\n)*\s*\*\//)?.[0];
-    assert.ok(header, `${name} needs a leading L3 contract block`);
-    assert.match(header, /^\s*\* \[INPUT\]:\s+\S+/m, `${name} needs an INPUT contract`);
-    assert.match(header, /^\s*\* \[OUTPUT\]:\s+\S+/m, `${name} needs an OUTPUT contract`);
-    assert.match(header, /^\s*\* \[POS\]:\s+\S+/m, `${name} needs a POS contract`);
-    assert.match(header, /^\s*\* \[PROTOCOL\]: 变更时更新此头部，然后检查 CLAUDE\.md\s*$/m, `${name} needs the fixed protocol line`);
-    assert.match(header, /[\u3400-\u9fff]/, `${name} needs a Chinese L3 description`);
     const imports = [...text.matchAll(/(?:from\s*|import\s*\()\s*['"]\.\/([^'"]+\.ts)['"]/g)].map(match => match[1]!);
     if (name !== 'audit.ts') assert.ok(!imports.includes('audit.ts'), `${name} imports public facade backwards`);
     graph.set(name, imports);

@@ -1,7 +1,3 @@
-# [INPUT]: 技能脚本、产品参考与公开安装器
-# [OUTPUT]: 三平台原生回归和安装后回归结果
-# [POS]: 只读 CI；不发布、不读取项目凭据
-# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 name: Cloudflare billing audit
 on:
   push:

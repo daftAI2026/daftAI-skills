@@ -23,6 +23,7 @@ skills/
 ├── [utility-skills]                    # Content utilities
     ├── daftai-url-to-markdown/             # Fetch URL and convert to markdown with images
     ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
+    ├── daftai-chinese-technical-writing/   # Chinese technical, product, and UI writing
     ├── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
     └── daftai-gpt-image-2-5-prompt-optimizer/ # Optimize image prompts using live official references
 │
@@ -32,7 +33,7 @@ skills/
 
 **Plugin Categories**:
 
-Module navigation: [skills/CLAUDE.md](skills/CLAUDE.md). The GPT Image 2.5 prompt optimizer returns text only: agents compare a published layout under `references/gpt-image-2-5/` and a Bun script fetches the official 2.5 section only when that layout is missing. No image generation or source article is bundled.
+The GPT Image 2.5 prompt optimizer returns text only: agents compare a published layout under `references/gpt-image-2-5/` and a Bun script fetches the official 2.5 section only when that layout is missing. No image generation or source article is bundled.
 
 | Category | Description |
 |----------|-------------|
@@ -45,7 +46,8 @@ Each skill contains:
 - `scripts/` — TypeScript implementations
 - `references/` — Glossaries, config schemas, workflow details (optional)
 - `agents/` — Product-specific skill metadata (optional)
-- `CLAUDE.md` — GEB module map for skills with architecture-level files (optional)
+
+`daftai-chinese-technical-writing` bundles six verbatim public-domain sections from ruanyf/document-style-guide. Product and UI extensions stay separate from those sources. It has no CLI or persistent preferences; requested formatting checks delegate to `daftai-chinese-copywriting` in read-only `review` mode unless the user asks for fixes.
 
 ## Running Scripts
 
@@ -227,7 +229,11 @@ In SKILL.md, link to reference files (one level deep only):
 **Glossary**: See [references/glossary-en-zh.md](references/glossary-en-zh.md)
 ```
 
-## Extension Support (EXTEND.md)
+## Extension Support (EXTEND.json / EXTEND.md)
+
+New or migrated preference-aware skills must prefer `EXTEND.json` for reading and new saves, with legacy `EXTEND.md` read compatibility. Preserve scope priority: explicit input > project JSON > project Markdown > user JSON > user Markdown > defaults. Read only the first existing file, validate JSON, and report invalid configuration instead of falling back silently. Never migrate files merely by reading them.
+
+Current implementation: `daftai-chinese-copywriting` is JSON-first; `daftai-chinese-technical-writing` needs no preferences. Other existing skills retain their documented Markdown behavior until their readers and writers are migrated. The legacy guidance below applies to those unmigrated skills.
 
 Skills that need user preferences SHOULD support EXTEND.md configuration. This provides persistent settings (target language, glossary, style, etc.) without asking every time.
 

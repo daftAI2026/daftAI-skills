@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:fs、node:path 与 fs-common 指纹
- * [OUTPUT]: 提供 稳定目录树读取及独占输出能力
- * [POS]: macOS 和 Windows 的文件适配器；不提供恶意并发隔离
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import fs from 'node:fs';
 import path from 'node:path';
 import { digest, statIdentity, statFingerprint, isMissing } from './fs-common.ts';

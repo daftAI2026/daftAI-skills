@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 TypeScript 类型系统
- * [OUTPUT]: 提供 审计契约、额度和静态集合
- * [POS]: 脚本层的无副作用共享契约
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 export type UnknownItem = { code: string; detail: string; count?: number };
 export type Binding = { product: string; type: string; binding: string; role?: string };
 export type MainStatus = {

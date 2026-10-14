@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 Bun test 与 vectorize.ts 的纯函数契约
- * [OUTPUT]: 提供 SVG 识别、位图提取、误差计算、候选排序和结构验证测试
- * [POS]: daftai-image-to-svg 的回归门，阻止伪矢量与选择逻辑漂移
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { describe, expect, test } from "bun:test";
 import {
 	existsSync,

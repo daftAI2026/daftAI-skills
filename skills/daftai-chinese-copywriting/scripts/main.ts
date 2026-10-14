@@ -36,8 +36,9 @@ async function main(): Promise<void> {
 
   const explicitMode = toMode(firstArg);
   const rawInputArgs = explicitMode ? args.slice(1) : args;
-  const preferenceState = ensurePreferencesConfigured(resolvePreferences());
-  const mode = resolveMode(explicitMode, preferenceState.preferences);
+  const resolution = resolvePreferences();
+  const mode = resolveMode(explicitMode, resolution.preferences);
+  const preferenceState = mode === "review" ? resolution : ensurePreferencesConfigured(resolution);
   const inputs = resolveInputs(rawInputArgs);
 
   const engineState = ensureAutocorrect();
@@ -129,6 +130,8 @@ function printHelp(): void {
   console.log("Input:");
   console.log("  - Direct text");
   console.log("  - One or more .md / .txt file paths");
+  console.log("");
+  console.log("Preferences: init writes EXTEND.json; legacy EXTEND.md remains readable.");
 }
 
 function toMode(value: string | undefined): Mode | undefined {

@@ -6,6 +6,8 @@ import * as path from "node:path";
 import {
   DEFAULT_PREFERENCES,
   ensurePreferencesConfigured,
+  getProjectPreferencesPath,
+  getUserPreferencesPath,
   loadPreferences,
   protectSyntax,
   resolvePreferences,
@@ -148,6 +150,100 @@ async function testMissingPreferencesFails(): Promise<void> {
   );
 }
 
+function withPreferencesFixture(check: (project: string, home: string) => void): void {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "copywriting-json-test-"));
+  try {
+    const project = path.join(root, "project");
+    const home = path.join(root, "home");
+    fs.mkdirSync(project);
+    fs.mkdirSync(home);
+    check(project, home);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+async function testJsonPreferencesRoundTrip(): Promise<void> {
+  withPreferencesFixture((project, home) => {
+    const jsonPath = getProjectPreferencesPath(project);
+    assert.equal(path.basename(jsonPath), "EXTEND.json");
+    assert.equal(path.basename(getUserPreferencesPath(home)), "EXTEND.json");
+    const preferences = { ...DEFAULT_PREFERENCES, defaultMode: "quick" as const, chunkThreshold: 6000 };
+    writePreferences(jsonPath, preferences);
+    const content = fs.readFileSync(jsonPath, "utf8");
+    assert.deepEqual(JSON.parse(content), {
+      version: 1,
+      default_mode: "quick",
+      language: "zh",
+      chunk_threshold: 6000,
+      chunk_max_words: 5000,
+    });
+    assert.ok(content.endsWith("\n"));
+    assert.deepEqual(loadPreferences(jsonPath), preferences);
+    assert.equal(fs.existsSync(path.join(path.dirname(jsonPath), "EXTEND.md")), false);
+  });
+}
+
+async function testJsonAndScopePriority(): Promise<void> {
+  withPreferencesFixture((project, home) => {
+    const projectJson = getProjectPreferencesPath(project);
+    const projectMarkdown = path.join(path.dirname(projectJson), "EXTEND.md");
+    const userJson = getUserPreferencesPath(home);
+    const userMarkdown = path.join(path.dirname(userJson), "EXTEND.md");
+    const cases = [
+      [userMarkdown, "quick"],
+      [userJson, "review"],
+      [projectMarkdown, "stable"],
+      [projectJson, "quick"],
+    ] as const;
+    for (const [filePath, defaultMode] of cases) {
+      writePreferences(filePath, { ...DEFAULT_PREFERENCES, defaultMode });
+      const before = cases.filter(([p]) => fs.existsSync(p)).map(([p]) => [p, fs.readFileSync(p, "utf8")] as const);
+      const resolved = resolvePreferences(project, home);
+      assert.equal(resolved.sourcePath, filePath);
+      assert.equal(resolved.preferences.defaultMode, defaultMode);
+      assert.equal(resolved.created, false);
+      for (const [p, content] of before) assert.equal(fs.readFileSync(p, "utf8"), content);
+    }
+  });
+}
+
+async function testInvalidJsonDoesNotFallBack(): Promise<void> {
+  withPreferencesFixture((project, home) => {
+    const jsonPath = getProjectPreferencesPath(project);
+    writePreferences(path.join(path.dirname(jsonPath), "EXTEND.md"), DEFAULT_PREFERENCES);
+    const invalid = [
+      "{", "[]", "null", '"quick"',
+      '{"defaultMode":"quick"}', '{"default_mode":"other"}',
+      '{"default_mode":null}', '{"version":2}', '{"language":""}',
+      '{"chunk_threshold":"4000"}', '{"chunk_threshold":0}',
+      '{"chunk_threshold":1.5}', '{"chunk_max_words":-1}',
+    ];
+    for (const content of invalid) {
+      fs.writeFileSync(jsonPath, content);
+      assert.throws(() => loadPreferences(jsonPath), /[Pp]references/);
+      assert.throws(() => resolvePreferences(project, home), /[Pp]references/);
+      assert.equal(fs.readFileSync(jsonPath, "utf8"), content);
+    }
+    fs.writeFileSync(jsonPath, "{}");
+    assert.deepEqual(loadPreferences(jsonPath), DEFAULT_PREFERENCES);
+    fs.writeFileSync(jsonPath, '{"chunk_threshold":6000}');
+    assert.equal(loadPreferences(jsonPath).chunkThreshold, 6000);
+  });
+}
+
+async function testLegacyReadDoesNotMigrate(): Promise<void> {
+  withPreferencesFixture((project, home) => {
+    const jsonPath = getProjectPreferencesPath(project);
+    const markdownPath = path.join(path.dirname(jsonPath), "EXTEND.md");
+    writePreferences(markdownPath, { ...DEFAULT_PREFERENCES, defaultMode: "quick" });
+    const before = fs.readFileSync(markdownPath, "utf8");
+    assert.equal(resolvePreferences(project, home).sourcePath, markdownPath);
+    assert.equal(fs.existsSync(jsonPath), false);
+    assert.equal(fs.readFileSync(markdownPath, "utf8"), before);
+  });
+}
+
 async function main(): Promise<void> {
   await testPreferencesRoundTrip();
   await testFenceProtection();
@@ -158,6 +254,10 @@ async function main(): Promise<void> {
   await testImageUrlProtection();
   await testMixedProtection();
   await testMissingPreferencesFails();
+  await testJsonPreferencesRoundTrip();
+  await testJsonAndScopePriority();
+  await testInvalidJsonDoesNotFallBack();
+  await testLegacyReadDoesNotMigrate();
   console.log("main.test.ts passed");
 }
 

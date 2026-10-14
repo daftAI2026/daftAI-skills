@@ -141,4 +141,3 @@ it belongs to this run and no render is still using it.
 bun test ${SKILL_DIR}/scripts/composite.test.ts
 ```
 
-[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md

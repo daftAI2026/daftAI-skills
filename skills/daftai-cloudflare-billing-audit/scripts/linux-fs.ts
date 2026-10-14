@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:fs、node:path 与 fs-common 身份原语
- * [OUTPUT]: 提供 Linux 描述符锚定读取与独占输出能力
- * [POS]: Linux 文件适配器；能力缺失时拒绝而不降级
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';

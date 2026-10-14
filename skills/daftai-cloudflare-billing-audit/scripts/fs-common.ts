@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:fs、node:path 和 node:crypto
- * [OUTPUT]: 提供 路径包含判断、对象守卫与身份指纹
- * [POS]: 平台适配器共用的无状态原语
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';

@@ -1,4 +1,3 @@
-<!-- L3 | skills/daftai-cloudflare-billing-audit/references/scanner.md -->
 # Offline scanner contract
 
 ## Invocation and outputs

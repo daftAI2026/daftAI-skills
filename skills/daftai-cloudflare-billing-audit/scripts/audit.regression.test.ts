@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:test、合成文件树与审计公开接口
- * [OUTPUT]: 提供 macOS 大小写别名与大库存读回回归
- * [POS]: 交付复核测试；不访问真实用户项目
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';

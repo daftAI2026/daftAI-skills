@@ -1,10 +1,4 @@
 #!/usr/bin/env bun
-/**
- * [INPUT]: 依赖 node 内置模块、Bun 和指定安装目录
- * [OUTPUT]: 提供 原生 CLI、受控读取、安装测试和哈希回执
- * [POS]: 安装验收入口；只创建并清理自身合成夹具
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

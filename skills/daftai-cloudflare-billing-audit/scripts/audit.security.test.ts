@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:test、Linux 文件接口与审计公开接口
- * [OUTPUT]: 提供 描述符和确定性竞态回归测试
- * [POS]: Linux 专属安全测试；其他平台明确跳过
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';

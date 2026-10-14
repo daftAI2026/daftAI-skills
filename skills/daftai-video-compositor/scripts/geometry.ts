@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖截图像素尺寸、窗口矩形、圆角与边框参数。
- * [OUTPUT]: 提供窗口校验与抗锯齿 PGM 前景遮罩。
- * [POS]: 合成器的纯几何层，不读文件，不调用 FFmpeg。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 export interface Size { width: number; height: number }
 export interface Rect extends Size { x: number; y: number }
 export type Fit = "strict" | "contain" | "cover";

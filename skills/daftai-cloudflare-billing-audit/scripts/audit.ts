@@ -1,9 +1,3 @@
-/**
- * [INPUT]: 依赖 node:path、node:process、node:url 和 audit-engine 的受控入口
- * [OUTPUT]: 提供 兼容导出、CLI 与退出码
- * [POS]: 脚本层的唯一命令入口；领域模块不反向依赖它
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';

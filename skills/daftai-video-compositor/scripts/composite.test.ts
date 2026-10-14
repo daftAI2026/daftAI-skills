@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 Bun test、Node 临时目录与真实 FFmpeg 工具链。
- * [OUTPUT]: 提供几何、像素、完整音画、失败与中断清理测试。
- * [POS]: 合成入口的回归门，夹具不进入仓库或下载目录。
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";

@@ -2,6 +2,19 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.10.0 - 2026-10-14
+
+### Added
+- Adds `daftai-chinese-technical-writing` for Chinese technical docs, product copy, and UI microcopy, with six bundled ruanyf source sections, separate scenario extensions, and a real-diff evidence loop.
+- Registers the skill under utility-skills and delegates requested formatting checks to the existing copywriting skill.
+
+### Fixed
+- Allows copywriting `review` without a preference file while preserving setup requirements for `stable` and `quick`; adds isolated CLI regression tests.
+
+### Improved
+- Prefers `EXTEND.json` for copywriting preferences and new configuration saves, with strict JSON validation, project-scope precedence, and legacy `EXTEND.md` compatibility; reading never migrates files.
+- Removes GEB module maps and contract comments from skills, scripts, and workflow docs.
+
 ## 1.9.0 - 2026-10-14
 
 ### Added
