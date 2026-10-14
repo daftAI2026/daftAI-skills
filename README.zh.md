@@ -28,7 +28,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-extracting-video-subtitles](skills/daftai-extracting-video-subtitles/) | 使用 OpenAI Whisper 从视频/音频文件中提取带时间戳的 SRT 字幕 |
 | [daftai-url-to-markdown](skills/daftai-url-to-markdown/) | 通过 Chrome CDP 抓取网页并转换为 Markdown，自动下载图片 |
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
-| [daftai-chinese-technical-writing](skills/daftai-chinese-technical-writing/) | 基于随附的阮一峰写作指南，撰写和审阅中文技术文档、产品文案与界面文案；格式检查联动现有格式 Skill |
+| [daftai-chinese-technical-writing](skills/daftai-chinese-technical-writing/) | 基于阮一峰指南与 STE 启发的中文方法，撰写和审阅中文技术文档、产品文案与界面文案；格式检查联动格式 Skill |
 | [daftai-image-to-svg](skills/daftai-image-to-svg/) | 将透明或纯色底单色 PNG/SVG 转换为经过误差量化的纯路径真矢量 SVG |
 | [daftai-gpt-image-2-5-prompt-optimizer](skills/daftai-gpt-image-2-5-prompt-optimizer/) | 依据在线官方参考，将自然语言优化为 GPT Image 2.5 提示词；只输出文字，不生图 |
 
@@ -73,6 +73,8 @@ npx skills add daftAI2026/daftAI-skills
 
 写作 Skill 本身不需要运行时或偏好设置。可选的自动格式检查需要单独安装 `daftai-chinese-copywriting`、Bun 和 autocorrect。
 
+操作说明、工具描述、Agent 指令和状态消息按需采用 STE 启发的中文方法，保留条件、权限与失败分支；不提供 ASD-STE100 合规结论。
+
 格式 Skill 优先读取 `EXTEND.json`，新设置保存为 JSON；旧 `EXTEND.md` 继续兼容，不会自动迁移。
 
 ## 项目结构
@@ -109,7 +111,7 @@ daftAI-skills/
     │   └── references/       # 配置文档
     ├── daftai-chinese-technical-writing/
     │   ├── SKILL.md
-    │   └── references/       # 六份原文、产品/界面扩展与修改证据回环
+    │   └── references/       # 六份原文、受控中文方法与产品/界面扩展
     ├── daftai-image-to-svg/
     │   ├── SKILL.md
     │   ├── agents/           # Codex 元数据
