@@ -1,13 +1,16 @@
 name: Cloudflare billing audit
 on:
   push:
-    branches: [main, codex/cloudflare-billing-audit]
+    branches: [main]
     paths: ['skills/daftai-cloudflare-billing-audit/**', '.github/workflows/cloudflare-billing-audit.yml']
   pull_request:
     paths: ['skills/daftai-cloudflare-billing-audit/**', '.github/workflows/cloudflare-billing-audit.yml']
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   native:
     strategy:
