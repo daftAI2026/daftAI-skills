@@ -35,7 +35,7 @@ skills/
 
 **Plugin Categories**:
 
-The GPT Image prompt optimizer returns text only. Its Bun script revalidates the fixed official Markdown page once per session using ETag or Last-Modified. It selects the newest numbered prompting guide by default, or an explicitly requested version from the same page. A changed guide replaces the single current set of verbatim slices under `references/gpt-image/current/`; unchanged content reuses existing slices. Offline and stale results identify their cached model and freshness limit. Old skill names and caches have no migration layer. No image generation or official source article is bundled.
+The GPT Image prompt optimizer returns text only. Its Bun script revalidates the fixed official Markdown page once per session using ETag or Last-Modified. It selects the newest numbered prompting guide by default, or an explicitly requested version from the same page. A changed guide replaces the single current set of verbatim slices under `references/gpt-image/current/`; unchanged content reuses existing slices. Offline and stale results identify their cached model and freshness limit. Old caches are not migrated. The skill checks exact superseded installation names once per session and loads retirement guidance only when found. Scoped user authorization permits agent-executed retirement after replacement verification, with backups outside skill discovery; cleanup never blocks prompt work. No image generation or official source article is bundled.
 
 | Category | Description |
 |----------|-------------|

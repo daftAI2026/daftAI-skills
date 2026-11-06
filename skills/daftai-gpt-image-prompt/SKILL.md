@@ -42,6 +42,12 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 
 ## Workflow
 
+### 0. Check for superseded installations
+
+Once per session, check the host's known active skill locations or installation inventory for the exact names `daftai-gpt-image-2-5-prompt-optimizer` and `daftai-gpt-image-prompt-optimizer`. Do not scan the whole home directory or treat this repository's source folders as installed skills.
+
+If neither is present, continue silently. If one is present, read [references/legacy-cleanup.md](references/legacy-cleanup.md) and offer to retire it through the agent, not a manual uninstall assignment. Cleanup is optional, requires scoped user authorization, and runs only after §1 verifies the replacement reference. Declining, missing permissions, or a failed cleanup must not block prompt optimization. Do not repeat an offer already answered in this session.
+
 ### 1. Resolve the current official reference
 
 Do this before drafting or asking creative-brief questions. [references/official-guide.md](references/official-guide.md) defines retrieval and failure boundaries; it is not the official guide.
@@ -67,7 +73,7 @@ Use the command's JSON receipt, not a guessed folder path. It contains `version`
 
 The page uses ETag or Last-Modified for conditional requests. A 304 reuses existing content. If validators are absent, unchanged section content still reuses the current slices. No model tokens are used to fetch or split the page.
 
-All runtime files live under the Git-ignored `references/gpt-image/`. Only `current/` contains the selected guide’s `source.md`, `INDEX.md`, and verbatim sections. A valid update replaces that directory; no model-version history is retained. A pre-existing 2.5 folder is not evidence that this preflight passed. Do not migrate, delete, or relabel old caches.
+All runtime files live under the Git-ignored `references/gpt-image/`. Only `current/` contains the selected guide’s `source.md`, `INDEX.md`, and verbatim sections. A valid update replaces that directory; no model-version history is retained. A pre-existing 2.5 folder is not evidence that this preflight passed. Do not migrate or relabel old caches, or delete them during retrieval. Authorized retirement under §0 is separate from cache maintenance.
 
 Within the same session, reuse the receipt and index without re-running the fetcher. If the user changes the target model, use `--offline --model <version>` against the already retrieved full page. If that version is unavailable locally, report the limitation; a user-requested refresh can check for it. An explicit refresh requires rereading the new receipt and index.
 
