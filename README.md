@@ -17,6 +17,16 @@ Skills shared by daftAI for improving daily work efficiency with AI Agent.
 npx skills add daftAI2026/daftAI-skills
 ```
 
+### Upgrade GPT Image Prompt
+
+Install the current skill name:
+
+```bash
+npx skills add daftAI2026/daftAI-skills --skill daftai-gpt-image-prompt -g -y
+```
+
+On first use in a session, the agent checks for superseded installations. If found, it offers to retire them after your authorization, replacement verification, and backup. You do not need to run a separate uninstall command. If ownership or permissions prevent safe cleanup, it leaves the old installation unchanged and explains why; prompt optimization can continue.
+
 ## Available Skills
 
 | Skill | Description |

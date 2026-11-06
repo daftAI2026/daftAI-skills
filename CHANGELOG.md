@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.14.2 - 2026-11-06
+
+### Improved
+- Adds an on-demand agent workflow to retire verified superseded GPT Image skill installations after scoped user authorization and replacement checks, with backups; skipped cleanup does not block prompt optimization.
+
 ## 1.14.1 - 2026-11-06
 
 ### Changed
