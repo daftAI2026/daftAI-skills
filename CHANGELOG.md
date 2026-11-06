@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.14.1 - 2026-11-06
+
+### Changed
+- Shortens the public skill name to `daftai-gpt-image-prompt`. The 1.14.0 name is not retained.
+
 ## 1.14.0 - 2026-11-06
 
 ### Changed

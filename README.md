@@ -30,7 +30,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | Check and fix Chinese copywriting (punctuation, spacing, full-width/half-width) using autocorrect |
 | [daftai-chinese-technical-writing](skills/daftai-chinese-technical-writing/) | Write and review Chinese technical docs, product copy, and UI microcopy with ruanyf references and STE-inspired Chinese methods; delegate formatting checks to the copywriting skill |
 | [daftai-image-to-svg](skills/daftai-image-to-svg/) | Convert transparent or solid-background single-color PNG/SVG artwork into measured, path-only SVG output |
-| [daftai-gpt-image-prompt-optimizer](skills/daftai-gpt-image-prompt-optimizer/) | Optimize image requests with the latest official GPT Image guide, or an explicit model version; returns text, not images |
+| [daftai-gpt-image-prompt](skills/daftai-gpt-image-prompt/) | Optimize image requests with the latest official GPT Image guide, or an explicit model version; returns text, not images |
 
 ## Usage
 
@@ -57,7 +57,7 @@ User: Burn Chinese subtitles into this video
 ### Example: Optimize an Image Prompt
 
 ```text
-User: Use daftai-gpt-image-prompt-optimizer: a watercolor postcard of an orange cat in a rainy alley, no text.
+User: Use daftai-gpt-image-prompt: a watercolor postcard of an orange cat in a rainy alley, no text.
 → On first use in a session, AI checks the official page and automatically replaces current slices when the selected guide changes
 → ETag/304 and unchanged content reuse existing slices; later prompts in the session reuse the index, with no image API key
 ```
@@ -116,7 +116,7 @@ daftAI-skills/
     │   ├── SKILL.md
     │   ├── agents/           # Codex metadata
     │   └── scripts/          # TypeScript converter and tests
-    └── daftai-gpt-image-prompt-optimizer/
+    └── daftai-gpt-image-prompt/
         ├── SKILL.md
         ├── agents/           # Codex metadata
         ├── scripts/          # Lightweight TypeScript fetcher and tests

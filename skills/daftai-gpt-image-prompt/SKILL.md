@@ -1,5 +1,5 @@
 ---
-name: daftai-gpt-image-prompt-optimizer
+name: daftai-gpt-image-prompt
 description: >
   Optimizes natural-language image requests and rough prompts into ready-to-use
   GPT Image prompts using the official prompting guide as a live reference.
@@ -8,7 +8,7 @@ description: >
   not images, unless the user explicitly asks to generate.
 ---
 
-# GPT Image Prompt Optimizer
+# GPT Image Prompt
 
 Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Support new scenes, reference-assisted creation, and editing instructions without promising an absolute “best” prompt.
 

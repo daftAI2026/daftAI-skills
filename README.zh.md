@@ -30,7 +30,7 @@ npx skills add daftAI2026/daftAI-skills
 | [daftai-chinese-copywriting](skills/daftai-chinese-copywriting/) | 基于 autocorrect 检查和修正中文排版（标点、空格、全角/半角） |
 | [daftai-chinese-technical-writing](skills/daftai-chinese-technical-writing/) | 基于阮一峰指南与 STE 启发的中文方法，撰写和审阅中文技术文档、产品文案与界面文案；格式检查联动格式 Skill |
 | [daftai-image-to-svg](skills/daftai-image-to-svg/) | 将透明或纯色底单色 PNG/SVG 转换为经过误差量化的纯路径真矢量 SVG |
-| [daftai-gpt-image-prompt-optimizer](skills/daftai-gpt-image-prompt-optimizer/) | 依据最新官方 GPT Image 指南优化提示词，也支持显式模型版本；只输出文字，不生图 |
+| [daftai-gpt-image-prompt](skills/daftai-gpt-image-prompt/) | 依据最新官方 GPT Image 指南优化提示词，也支持显式模型版本；只输出文字，不生图 |
 
 ## 使用方式
 
@@ -57,7 +57,7 @@ npx skills add daftAI2026/daftAI-skills
 ### 示例：优化生图提示词
 
 ```text
-用户：用 daftai-gpt-image-prompt-optimizer 优化：雨后巷子里的橘猫，水彩明信片，不要字。
+用户：用 daftai-gpt-image-prompt 优化：雨后巷子里的橘猫，水彩明信片，不要字。
 → 会话首次使用时检查官方页面；所选指南变化后，自动替换当前分片
 → ETag/304 与未变正文复用分片；同一会话后续提示词复用索引，无需生图 API Key
 ```
@@ -116,7 +116,7 @@ daftAI-skills/
     │   ├── SKILL.md
     │   ├── agents/           # Codex 元数据
     │   └── scripts/          # TypeScript 转换器与测试
-    └── daftai-gpt-image-prompt-optimizer/
+    └── daftai-gpt-image-prompt/
         ├── SKILL.md
         ├── agents/           # Codex 元数据
         ├── scripts/          # 轻量 TypeScript 抓取器与测试

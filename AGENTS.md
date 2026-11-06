@@ -27,7 +27,7 @@ skills/
     ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
     ├── daftai-chinese-technical-writing/   # Chinese technical, product, and UI writing
     ├── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
-    └── daftai-gpt-image-prompt-optimizer/ # Optimize image prompts using live official references
+    └── daftai-gpt-image-prompt/ # Optimize image prompts using live official references
 │
 └── [developer-tools]
     └── daftai-cloudflare-billing-audit/     # Offline Cloudflare project billing diagnostics

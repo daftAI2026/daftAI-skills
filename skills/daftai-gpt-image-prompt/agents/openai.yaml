@@ -1,0 +1,4 @@
+interface:
+  display_name: "GPT Image Prompt"
+  short_description: "Turn image ideas into prompts using official guidance"
+  default_prompt: "Use $daftai-gpt-image-prompt to turn my image idea into a ready-to-use GPT Image prompt without generating an image."
