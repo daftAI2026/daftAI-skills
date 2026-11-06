@@ -2,7 +2,7 @@
 
 [English](./CHANGELOG.md) | 中文
 
-## 未发布
+## 1.14.0 - 2026-11-06
 
 ### 变更
 - 图像提示词技能更名为 `daftai-gpt-image-prompt-optimizer`。新会话自动选择最新官方指南；显式模型版本读取同一页面中的对应栏目。

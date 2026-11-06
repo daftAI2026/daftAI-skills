@@ -2,7 +2,7 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
-## Unreleased
+## 1.14.0 - 2026-11-06
 
 ### Changed
 - Renames the image prompt optimizer to `daftai-gpt-image-prompt-optimizer`. New sessions automatically select the latest official prompting guide; explicit model versions use their section on the same page.
