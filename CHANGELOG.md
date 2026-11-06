@@ -2,6 +2,14 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## Unreleased
+
+### Changed
+- Renames the image prompt optimizer to `daftai-gpt-image-prompt-optimizer`. New sessions automatically select the latest official prompting guide; explicit model versions use their section on the same page.
+- Revalidates with HTTP validators, replaces one current set of verbatim slices, and discloses offline or stale references. Adds conditional reading routes for complexity, SVG, looping GIFs, and markup edits.
+- Does not retain a legacy skill entry or migrate old caches. Existing unupdated installations are unchanged.
+- Does not include GEB module maps or contract comments.
+
 ## 1.13.3 - 2026-10-15
 
 ### Improved

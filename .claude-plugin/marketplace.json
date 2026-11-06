@@ -30,7 +30,7 @@
         "./skills/daftai-chinese-copywriting",
         "./skills/daftai-chinese-technical-writing",
         "./skills/daftai-image-to-svg",
-        "./skills/daftai-gpt-image-2-5-prompt-optimizer"
+        "./skills/daftai-gpt-image-prompt-optimizer"
       ]
     },
     {

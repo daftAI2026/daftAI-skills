@@ -1,4 +1,0 @@
-interface:
-  display_name: "GPT Image 2.5 Prompt Optimizer"
-  short_description: "Turn rough image ideas into clear GPT Image 2.5 prompts"
-  default_prompt: "Use $daftai-gpt-image-2-5-prompt-optimizer to turn my image idea into a ready-to-use GPT Image 2.5 prompt without generating an image."

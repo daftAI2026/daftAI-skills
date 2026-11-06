@@ -27,7 +27,7 @@ skills/
     ├── daftai-chinese-copywriting/         # Normalize Chinese copywriting
     ├── daftai-chinese-technical-writing/   # Chinese technical, product, and UI writing
     ├── daftai-image-to-svg/                # Convert transparent or solid-background images into path-only SVG
-    └── daftai-gpt-image-2-5-prompt-optimizer/ # Optimize image prompts using live official references
+    └── daftai-gpt-image-prompt-optimizer/ # Optimize image prompts using live official references
 │
 └── [developer-tools]
     └── daftai-cloudflare-billing-audit/     # Offline Cloudflare project billing diagnostics
@@ -35,7 +35,7 @@ skills/
 
 **Plugin Categories**:
 
-The GPT Image 2.5 prompt optimizer returns text only: agents compare a published layout under `references/gpt-image-2-5/` and a Bun script fetches the official 2.5 section only when that layout is missing. No image generation or source article is bundled.
+The GPT Image prompt optimizer returns text only. Its Bun script revalidates the fixed official Markdown page once per session using ETag or Last-Modified. It selects the newest numbered prompting guide by default, or an explicitly requested version from the same page. A changed guide replaces the single current set of verbatim slices under `references/gpt-image/current/`; unchanged content reuses existing slices. Offline and stale results identify their cached model and freshness limit. Old skill names and caches have no migration layer. No image generation or official source article is bundled.
 
 | Category | Description |
 |----------|-------------|

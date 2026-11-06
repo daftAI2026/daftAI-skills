@@ -1,14 +1,14 @@
 ---
-name: daftai-gpt-image-2-5-prompt-optimizer
+name: daftai-gpt-image-prompt-optimizer
 description: >
   Optimizes natural-language image requests and rough prompts into ready-to-use
-  GPT Image 2.5 prompts using the official prompting guide as a live reference.
+  GPT Image prompts using the official prompting guide as a live reference.
   Use when users ask to improve image prompts, 优化生图提示词, 把想法变成提示词,
-  or write prompts for GPT Image 2.5 Flare or Sunburst. Produces prompt text,
+  or write GPT Image generation, editing, vector, or animated-image prompts. Produces prompt text,
   not images, unless the user explicitly asks to generate.
 ---
 
-# GPT Image 2.5 Prompt Optimizer
+# GPT Image Prompt Optimizer
 
 Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Support new scenes, reference-assisted creation, and editing instructions without promising an absolute “best” prompt.
 
@@ -17,8 +17,8 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 - This skill produces prompt text only. Do not invoke image generation merely because an image-generation tool is available.
 - If the user asks only to optimize or write a prompt, return the prompt and stop. Do not routinely ask whether they want to generate an image.
 - If the user explicitly asks both to optimize the prompt and generate the image, complete the prompt first, then allow the host agent to invoke its image-generation capability as a separate step. Do not ask for a second confirmation.
-- Do not request API keys, install dependencies silently, or create image output files. A Git-ignored local official reference may be written under `references/gpt-image-2-5/`.
-- Target GPT Image 2.5. Preserve an explicitly selected Flare or Sunburst variant; otherwise do not require variant selection or switch model families.
+- Do not request API keys, install dependencies silently, or create image output files. A Git-ignored local official reference may be written under `references/gpt-image/`.
+- Default to the newest numbered prompting-guide section on the official page. Preserve an explicit model version and variant; use `--model <version>` for the version. Never silently substitute another model or require variant selection. The skill name is not a model selection.
 - Use the current request and conversation, not persistent preferences. No configuration file or mandatory first-run setup is needed. This version does not read or write persistent preferences.
 - Write questions and final prompts in the user's language unless they request another language. English skill instructions do not imply English-only output.
 
@@ -30,43 +30,48 @@ Turn a rough idea or existing draft into a clear, ready-to-use image prompt. Sup
 1. Determine this SKILL.md file's directory path as `SKILL_DIR`.
 2. Detect Bun once per session with `command -v bun`; if missing, report the requirement instead of silently installing it.
 3. Set working directory to `${SKILL_DIR}`.
-4. Follow Workflow §1. Run `bun ${SKILL_DIR}/scripts/fetch-guide.ts` only when the published layout check fails, or when the user requested `--refresh`.
+4. Follow Workflow §1. Run `bun ${SKILL_DIR}/scripts/fetch-guide.ts` once at first use in a session, not once per prompt. Honor explicit offline requests.
 5. Replace every `${SKILL_DIR}` with the actual absolute path.
 
 | Script | Purpose |
 |---|---|
-| `scripts/fetch-guide.ts` | Write the published layout when it is missing or invalid; download only if `source.md` is absent; `--refresh` updates the source |
+| `scripts/fetch-guide.ts` | Revalidate the official page, choose the latest or explicit model guide, and return its verified index path; supports `--refresh`, `--offline`, and `--model` |
 | `scripts/split-guide.ts` | Deterministic verbatim section slicing and index generation; invoked by the fetcher, not an LLM |
 | `scripts/split-guide.test.ts` | Lossless slicing and index tests; run `bun test ${SKILL_DIR}/scripts/split-guide.test.ts` |
 | `scripts/fetch-guide.test.ts` | Offline extraction and local-reference tests; run `bun test ${SKILL_DIR}/scripts/fetch-guide.test.ts` |
 
 ## Workflow
 
-### 1. Check the published local layout; fetch only if it fails
+### 1. Resolve the current official reference
 
-Do this before drafting or asking creative-brief questions. [references/official-guide.md](references/official-guide.md) is a retrieval protocol, not the official guide.
+Do this before drafting or asking creative-brief questions. [references/official-guide.md](references/official-guide.md) defines retrieval and failure boundaries; it is not the official guide.
 
-The local official reference is gitignored and always uses this layout:
+On the first use in a session, run:
 
-`${SKILL_DIR}/references/gpt-image-2-5/`
+```bash
+bun ${SKILL_DIR}/scripts/fetch-guide.ts
+```
 
-| Path | Pass if |
+- Default: select the highest numeric version among official **prompting guide** sections. Legacy reference tabs and version mentions inside examples are not candidates.
+- Explicit model version: add `--model <version>`, for example `--model 2.5`. The same official page supplies that version. Preserve any explicit variant in the user's request.
+- Explicit offline request: add `--offline`; do not try networking first.
+- Explicit update request: add `--refresh`, which bypasses HTTP validators and reports update failure instead of silently falling back. It cannot be combined with `--offline`.
+
+Use the command's JSON receipt, not a guessed folder path. It contains `version`, `status`, `path`, `indexPath`, and `sectionCount`, with `fetchedAt` and `warning` when available.
+
+| Status | Action |
 |---|---|
-| `source.md` | File exists |
-| `INDEX.md` | File exists, contains `Layout: gpt-image-2-5/v1`, and links Overview and Prompting fundamentals |
-| The "Read first" files named in `INDEX.md` | Those files exist beside `INDEX.md` |
+| `downloaded`, `unchanged`, `not-modified` | Read `indexPath`, then Overview and Prompting fundamentals. |
+| `offline`, `stale` | Use the named cached model; if the user explicitly requested a version, require a match. Disclose that the latest official page was not verified; never hide `warning`. |
+| Command fails or no verified local page exists | Follow the reference failure rules. Do not claim official verification or silently change the model. |
 
-Compare only against this layout. Do not treat a path receipt, `references/official-guide.md`, or any other folder under `references/` as a pass.
+The page uses ETag or Last-Modified for conditional requests. A 304 reuses existing content. If validators are absent, unchanged section content still reuses the current slices. No model tokens are used to fetch or split the page.
 
-| Result | Action |
-|---|---|
-| All rows pass | Read `INDEX.md`, then Overview and Prompting fundamentals. Do not run `fetch-guide.ts`. Do not announce downloading, crawling, or preparing the official guide. |
-| Any row fails | Run `bun ${SKILL_DIR}/scripts/fetch-guide.ts`. Only a missing `source.md` downloads. Re-check the same layout, then read `INDEX.md`. |
-| User requested an update | Run the same command with `--refresh`. |
+All runtime files live under the Git-ignored `references/gpt-image/`. Only `current/` contains the selected guide’s `source.md`, `INDEX.md`, and verbatim sections. A valid update replaces that directory; no model-version history is retained. A pre-existing 2.5 folder is not evidence that this preflight passed. Do not migrate, delete, or relabel old caches.
 
-Do not read the complete source or every section by default. A path receipt is not the reference itself.
+Within the same session, reuse the receipt and index without re-running the fetcher. If the user changes the target model, use `--offline --model <version>` against the already retrieved full page. If that version is unavailable locally, report the limitation; a user-requested refresh can check for it. An explicit refresh requires rereading the new receipt and index.
 
-Follow [references/official-guide.md](references/official-guide.md) for source boundaries and failures. Never present an unverified general rewrite as an official-guide-based result.
+Verify `Layout: gpt-image/v1`, the index's `Model:` line, and the baseline files before use. Read only baseline sections and matching examples plus their parent context, not the complete page or every slice. A JSON path receipt is not the reference itself.
 
 ### 2. Guide beginners only when needed
 
@@ -106,7 +111,7 @@ Resolve aspect ratio in this order:
 3. A style, identity, or palette reference alone does not determine output ratio. Use an explicit destination requirement when supplied. Otherwise leave the ratio unspecified, or offer a clearly labeled suggestion if useful; do not force a ratio question for every request.
 4. With multiple incompatible composition references and no designated base, ask which image defines the canvas. Do not arbitrarily inherit the first image's dimensions.
 
-Before writing the prompt, select the closest example from the verified official 2.5 guide by task and constraints, not merely by a shared subject. Use the generated index to read its complete section file plus any listed parent context. Preserve explanations, prompt blocks, settings, and image links; these files are direct source slices, not summaries. Follow references to earlier examples or input images through the index when needed. Sequential refinement workflows remain intact so later steps retain prerequisites. Add a second example only when it addresses a distinct requirement, such as exact text within an editing task.
+Before writing the prompt, select the closest example from the verified official guide for the resolved model by task and constraints, not merely by a shared subject. Use the generated index to read its complete section file plus any listed parent context. Preserve explanations, prompt blocks, settings, and image links; these files are direct source slices, not summaries. Follow references to earlier examples or input images through the index when needed. Sequential refinement workflows remain intact so later steps retain prerequisites. Add a second example only when it addresses a distinct requirement, such as exact text within an editing task.
 
 Use these section titles as navigation hints, verifying they exist in the actual reference rather than treating this table as a substitute for reading:
 
@@ -121,6 +126,18 @@ Use these section titles as navigation hints, verifying they exist in the actual
 | Make one local change and preserve the rest | Remove an object / Change one condition |
 | Reinterpret a sketch without losing its structure | Turn a drawing into a realistic image |
 | Isolate a referenced product with transparency | Create a transparent product cutout |
+| Optimize latency or plan a complex layout | Compare complexity; Model parameters |
+| Deliver a scalable vector logo or icon | Generate SVG output; relevant design example |
+| Design a looping animation | Generate a looping GIF |
+| Edit an object selected with an annotation | Guide an edit with markup |
+
+For these conditional tasks, read the matching live section before applying its capabilities:
+- Complexity: distinguish planning effort from rendering quality. Do not maximize settings by default or promise a cost or latency reduction without evidence.
+- SVG: express scalable vector intent; keep any required output-format setting outside the prompt. Describing an SVG appearance does not guarantee vector output.
+- GIF: specify the motion, starting and ending poses, camera behavior, and loop continuity. Leave unrelated animation choices open.
+- Markup: distinguish the original image, annotation overlay, and other references. Read the live requirements for overlay dimensions and allowed settings; do not confuse markup with a mask or assume every reference marks an edit region.
+
+These are conditional reading routes, not a bundled capability registry. If the selected version lacks a section, do not borrow capabilities from another version. Official support does not prove that the host image tool exposes that feature.
 
 Extract the useful instruction pattern: what the example specifies, what it preserves, how references are assigned, and how constraints are expressed. Adapt that pattern to the user's request; do not import the example's subject, branding, dimensions, quality settings, or unrelated exclusions.
 
@@ -138,7 +155,7 @@ Apply relevant methods from the verified guide using original wording:
 - Separate edits from preservation constraints. Assign each reference image a numbered role.
 - Keep simple prompts short; use sections only when complexity warrants them. Avoid filler quality claims and unrelated platform syntax.
 
-API settings are not prompt syntax. Omit settings by default. If requested, or necessary for a delivery requirement such as transparency, read the indexed 2.5 Model parameters section and place a short settings note outside the prompt. Never imply that prose alone guarantees a technical output property.
+API settings are not prompt syntax. Omit settings by default. If requested, or necessary for a delivery requirement such as transparency, read the selected model’s indexed Model parameters section and place a short settings note outside the prompt. Never imply that prose alone guarantees a technical output property.
 
 ### 5. Check and deliver
 
